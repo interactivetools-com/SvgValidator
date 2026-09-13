@@ -1,0 +1,4 @@
+<!-- rejected: the target attribute is not on the allowlist -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10">
+  <a href="#home" target="_top"><rect width="10" height="10"/></a>
+</svg>

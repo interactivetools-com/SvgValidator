@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40">
+  <style>
+    @keyframes pulse { from { opacity: 1 } to { opacity: 0.3 } }
+    .pulse { animation: pulse 1s ease-in-out infinite alternate }
+  </style>
+  <path id="track" d="M5 20 Q20 0 35 20" fill="none" stroke="#ccc"/>
+  <circle class="pulse" r="3" fill="#1D4ED8">
+    <animateMotion dur="2s" repeatCount="indefinite"><mpath href="#track"/></animateMotion>
+    <animate attributeName="r" values="3;5;3" dur="2s" repeatCount="indefinite"/>
+  </circle>
+  <rect x="2" y="30" width="10" height="6" fill="#EC4899">
+    <animateTransform attributeName="transform" type="rotate" from="0 7 33" to="360 7 33" dur="4s" repeatCount="indefinite"/>
+    <set attributeName="fill" to="#6366F1" begin="2s"/>
+  </rect>
+</svg>

@@ -1,0 +1,4 @@
+<!-- rejected: an image loaded from a URL instead of embedded as data: -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10">
+  <image href="https://example.com/photo.jpg" width="10" height="10"/>
+</svg>

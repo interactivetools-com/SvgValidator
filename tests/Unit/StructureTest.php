@@ -1,0 +1,269 @@
+<?php
+declare(strict_types=1);
+
+namespace Itools\SvgValidator\Tests\Unit;
+
+use Itools\SvgValidator\SvgValidator;
+use Itools\SvgValidator\Tests\Support\SvgValidatorTestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
+
+/**
+ * Everything decided before the first element is inspected: reading the file, the
+ * bytes before the root tag, processing instructions, the root element, and what
+ * libxml reports about well-formedness.
+ *
+ * Codes: file-unreadable, not-svg, not-utf8, doctype-not-allowed,
+ * processing-instruction, comment-not-allowed, root-not-svg, root-namespace-wrong,
+ * malformed-xml.
+ *
+ * libxml's 10 MB text-node limit is not exercised: building the input costs more
+ * than it proves. The depth limit is, since 300 nested elements are cheap.
+ */
+class StructureTest extends SvgValidatorTestCase
+{
+    //region Reading the File
+
+    public function testMissingFile(): void
+    {
+        $result = SvgValidator::checkFile('/no/such/dir/logo.svg');
+        $this->assertFalse($result->ok);
+        $this->assertSame('file-unreadable', $result->errors[0]->code);
+        $this->assertSame('logo.svg', $result->errors[0]->detail);   // basename only: the message may end up in a page
+    }
+
+    public function testDirectory(): void
+    {
+        $this->assertSame('file-unreadable', SvgValidator::checkFile(sys_get_temp_dir())->errors[0]->code);
+    }
+
+    public function testFileAndStringAgree(): void
+    {
+        $svg        = $this->svg('<rect width="1" height="1"/><script/>');
+        $fromFile   = SvgValidator::checkFile($this->tempFile($svg));
+        $fromString = SvgValidator::checkString($svg);
+        $this->assertSame(['element-not-allowed'], array_column($fromFile->errors, 'code'));
+        $this->assertEquals($fromString, $fromFile);
+    }
+
+    public function testAcceptedFile(): void
+    {
+        $this->assertTrue(SvgValidator::checkFile($this->tempFile($this->svg()))->ok);
+    }
+
+    //endregion
+    //region Before the Root Tag
+
+    #[DataProvider('acceptedPrologProvider')]
+    public function testPrologAccepted(string $prolog): void
+    {
+        $this->assertAccepts($prolog . $this->svg());
+    }
+
+    public static function acceptedPrologProvider(): array
+    {
+        $doctype = '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">';
+        return [
+            'nothing'                            => [''],
+            'leading whitespace'                 => ["\n\n \t"],
+            'xml declaration'                    => ['<?xml version="1.0"?>'],
+            'utf-8 declared, lowercase'          => ['<?xml version="1.0" encoding="utf-8"?>'],
+            'utf-8 declared, with standalone'    => ['<?xml version="1.0" encoding="UTF-8" standalone="no"?>'],
+            'utf-8 bom'                          => ["\xEF\xBB\xBF"],
+            'bom then declaration'               => ["\xEF\xBB\xBF<?xml version=\"1.0\" encoding=\"UTF-8\"?>"],
+            'comment'                            => ['<!-- Generator: Adobe Illustrator 27.0, SVG Export Plug-In -->'],
+            'doctype with public and system ids' => [$doctype],
+            'doctype with [ inside a quoted id'  => ['<!DOCTYPE svg SYSTEM "odd[name].dtd">'],
+            'declaration, comment, doctype'      => ["<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<!-- Generator: Adobe Illustrator -->\n$doctype\n"],
+        ];
+    }
+
+    #[DataProvider('rejectedPrologProvider')]
+    public function testPrologRejected(string $file, string $code, string $detail): void
+    {
+        $this->assertRejects($file, $code, $detail);
+    }
+
+    public static function rejectedPrologProvider(): array
+    {
+        $svg    = '<svg xmlns="http://www.w3.org/2000/svg"/>';
+        $subset = 'it contains an internal DTD subset (entity declarations)';
+        $noRoot = 'no root element within the first 64 KB';
+        $svgDtd = '"-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"';
+        $laughs = '<!DOCTYPE lolz [<!ENTITY lol "lol"><!ENTITY lol2 "&lol;&lol;&lol;&lol;&lol;&lol;&lol;&lol;&lol;&lol;">]>';
+        return [
+            'empty file'                    => ['', 'not-svg', 'nothing (the file is empty)'],
+            'whitespace only'               => ["  \n\t", 'not-svg', 'nothing (the file is empty)'],
+            'plain text'                    => ['Hello, this is a text file.', 'not-svg', 'Hello, this is a tex'],
+            'text before the root tag'      => ["hello $svg", 'not-svg', 'hello <svg xmlns="ht'],
+            'png bytes'                     => ["\x89PNG\r\n\x1a\n", 'not-svg', '\211PNG\r\n\032\n'],
+            'utf-16 le with bom'            => ["\xFF\xFE<\0s\0v\0g\0", 'not-utf8', 'UTF-16 or UTF-32'],
+            'utf-16 be with bom'            => ["\xFE\xFF\0<\0s\0v\0g", 'not-utf8', 'UTF-16 or UTF-32'],
+            'utf-16 le without bom'         => ["<\0s\0v\0g\0", 'not-utf8', 'UTF-16 or UTF-32'],
+            'utf-16 be without bom'         => ["\0<\0s\0v\0g", 'not-utf8', 'UTF-16 or UTF-32'],
+            'utf-32 le'                     => ["<\0\0\0s\0\0\0", 'not-utf8', 'UTF-16 or UTF-32'],
+            'utf-32 be'                     => ["\0\0\0<\0\0\0s", 'not-utf8', 'UTF-16 or UTF-32'],
+            'latin-1 declared'              => ['<?xml version="1.0" encoding="ISO-8859-1"?>' . $svg, 'not-utf8', 'declared as ISO-8859-1'],
+            'utf-16 declared'               => ['<?xml version="1.0" encoding="UTF-16"?>' . $svg, 'not-utf8', 'declared as UTF-16'],
+            'internal subset'               => ['<!DOCTYPE svg [<!ENTITY x "y">]>' . $svg, 'doctype-not-allowed', $subset],
+            'internal subset after the ids' => ["<!DOCTYPE svg PUBLIC $svgDtd [ <!ENTITY ns_svg \"http://www.w3.org/2000/svg\"> ]>$svg", 'doctype-not-allowed', $subset],
+            'billion laughs'                => [$laughs . $svg, 'doctype-not-allowed', $subset],
+            'root tag after 64 KB'          => ['<!-- ' . str_repeat('x', 70000) . ' -->' . $svg, 'malformed-xml', $noRoot],
+            'comment never closed'          => ['<!-- never closed', 'malformed-xml', $noRoot],
+        ];
+    }
+
+    //endregion
+    //region Processing Instructions
+
+    #[DataProvider('processingInstructionProvider')]
+    public function testProcessingInstructionRejected(string $file, string $target): void
+    {
+        $this->assertRejects($file, 'processing-instruction', $target);
+    }
+
+    public static function processingInstructionProvider(): array
+    {
+        $open = '<svg xmlns="http://www.w3.org/2000/svg">';
+        return [
+            'external stylesheet'       => ['<?xml-stylesheet type="text/css" href="theme.css"?>' . $open . '</svg>', 'xml-stylesheet'],
+            'same-document xslt'        => ['<?xml-stylesheet type="text/xsl" href="#s"?>' . $open . '</svg>', 'xml-stylesheet'],   // Chrome applies this one even in <img>
+            'after the xml declaration' => ['<?xml version="1.0"?><?xml-stylesheet href="#s"?>' . $open . '</svg>', 'xml-stylesheet'],
+            'inside the document'       => [$open . '<?php echo 1; ?></svg>', 'php'],
+            'after the root element'    => [$open . '</svg><?done?>', 'done'],
+        ];
+    }
+
+    //endregion
+    //region Comments
+
+    #[DataProvider('acceptedCommentProvider')]
+    public function testCommentAccepted(string $body): void
+    {
+        $this->assertAccepts($this->svg($body));
+    }
+
+    public static function acceptedCommentProvider(): array
+    {
+        return [
+            'plain'                  => ['<!-- Generator: Adobe Illustrator -->'],
+            'empty'                  => ['<!---->'],
+            'markup inside'          => ['<!-- <img src=x onerror=alert(1)> stays a comment in both parsers -->'],
+            'dash then text'         => ['<!-- -x -->'],
+            'greater-than inside'    => ['<!-- a > b -->'],
+        ];
+    }
+
+    /** To an HTML parser <!--> and <!---> are whole comments, so anything after them would be live markup if the file were served as text/html. */
+    #[DataProvider('rejectedCommentProvider')]
+    public function testCommentRejected(string $file, string $detail): void
+    {
+        $this->assertRejects($file, 'comment-not-allowed', $detail);
+    }
+
+    public static function rejectedCommentProvider(): array
+    {
+        $open = '<svg xmlns="http://www.w3.org/2000/svg">';
+        return [
+            'empty comment quirk'   => [$open . '<!--> <img src=x onerror=alert(1)> <!--></svg>', '>'],
+            'dash quirk'            => [$open . '<!---> <img src=x onerror=alert(1)> <!--></svg>', '->'],
+            'before the root'       => ['<!--> <img src=x onerror=alert(1)> --><svg xmlns="http://www.w3.org/2000/svg"/>', '>'],
+        ];
+    }
+
+    //endregion
+    //region The Root Element
+
+    #[DataProvider('acceptedRootProvider')]
+    public function testRootAccepted(string $file): void
+    {
+        $this->assertAccepts($file);
+    }
+
+    public static function acceptedRootProvider(): array
+    {
+        return [
+            'prefixed svg'                 => ['<s:svg xmlns:s="http://www.w3.org/2000/svg"><s:rect width="1" height="1"/></s:svg>'],
+            'extra namespace declarations' => ['<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"/>'],
+            'nested svg'                   => ['<svg xmlns="http://www.w3.org/2000/svg"><svg x="10" width="5" height="5"/></svg>'],
+            'illustrator root attributes'  => ['<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 100 100" style="enable-background:new 0 0 100 100;" xml:space="preserve"/>'],
+        ];
+    }
+
+    /** Nothing past a wrong root is reported: the file is not an SVG, so its contents are not the news. */
+    #[DataProvider('rejectedRootProvider')]
+    public function testRootRejected(string $file, string $code, string $detail): void
+    {
+        $result = SvgValidator::checkString($file);
+        $this->assertSame([$code], array_column($result->errors, 'code'));
+        $this->assertSame($detail, $result->errors[0]->detail);
+    }
+
+    public static function rejectedRootProvider(): array
+    {
+        return [
+            'xhtml'                      => ['<html xmlns="http://www.w3.org/1999/xhtml"><body><script/></body></html>', 'root-not-svg', 'html'],
+            'html doctype'               => ['<!DOCTYPE html><html></html>', 'root-not-svg', 'html'],
+            'rss'                        => ['<rss version="2.0"><channel/></rss>', 'root-not-svg', 'rss'],
+            'svg without a namespace'    => ['<svg><script/></svg>', 'root-namespace-wrong', 'none'],
+            'svg in the wrong namespace' => ['<svg xmlns="http://www.w3.org/1999/xhtml"/>', 'root-namespace-wrong', 'xmlns="http://www.w3.org/1999/xhtml"'],
+            'prefixed, wrong namespace'  => ['<x:svg xmlns:x="http://example.com/"/>', 'root-namespace-wrong', 'xmlns="http://example.com/"'],
+        ];
+    }
+
+    //endregion
+    //region Well-Formedness
+
+    #[DataProvider('malformedProvider')]
+    public function testMalformedXml(string $file, string $libxmlMessage): void
+    {
+        $violation = $this->assertRejects($file, 'malformed-xml');
+        $this->assertStringContainsString($libxmlMessage, $violation->detail);
+        $this->assertMatchesRegularExpression('/ \(line \d+\)$/', $violation->detail);
+    }
+
+    public static function malformedProvider(): array
+    {
+        $open = '<svg xmlns="http://www.w3.org/2000/svg">';
+        return [
+            'tag never closed'                  => [$open . '<rect width="1" height="1"></svg>', 'Opening and ending tag mismatch'],
+            'tags crossed'                      => [$open . '<g><a></g></a></svg>', 'Opening and ending tag mismatch'],
+            'attribute without quotes'          => [$open . '<rect width=1/></svg>', 'AttValue: " or \' expected'],
+            'duplicate attribute'               => [$open . '<rect id="a" id="b"/></svg>', 'Attribute id redefined'],
+            'undefined entity'                  => [$open . '<text>&nbsp;</text></svg>', "Entity 'nbsp' not defined"],
+            'unescaped ampersand'               => [$open . '<text>Tom & Jerry</text></svg>', 'xmlParseEntityRef: no name'],
+            'unbound prefix'                    => [$open . '<foo:bar/></svg>', 'Namespace prefix foo on bar is not defined'],
+            'two root elements'                 => [$open . '</svg>' . $open . '</svg>', 'Extra content at the end of the document'],
+            'text after the root'               => [$open . '</svg>trailing', 'Extra content at the end of the document'],
+            'truncated file'                    => [$open . '<rect/></s', "expected '>'"],
+            'nesting deeper than libxml allows' => [$open . str_repeat('<g>', 300) . str_repeat('</g>', 300) . '</svg>', 'Excessive depth'],
+        ];
+    }
+
+    public function testBuiltInEntitiesAndCharacterReferencesAreFine(): void
+    {
+        $this->assertAccepts($this->svg('<text>&amp; &lt; &gt; &quot; &apos; &#169; &#xA9; Tom &amp; Jerry</text>'));
+    }
+
+    /**
+     * libxml parses in chunks of a few hundred bytes and drops the chunk a well-formedness
+     * error is in, so problems found earlier in the file are reported and anything in or
+     * after the broken chunk is not. The comment pads the file so the two land in
+     * different chunks.
+     */
+    public function testMalformedXmlEndsTheList(): void
+    {
+        $padding = '<!--' . str_repeat('x', 5000) . '-->';
+        $result  = SvgValidator::checkString($this->svg("<script/>$padding") . '<foreignObject/>');
+        $this->assertSame(['element-not-allowed', 'malformed-xml'], array_column($result->errors, 'code'));
+        $this->assertSame('script', $result->errors[0]->detail);
+    }
+
+    /** In a small file the error shares a chunk with everything else, so malformed-xml is the only report. */
+    public function testSmallMalformedFileReportsOnlyTheXmlError(): void
+    {
+        $result = SvgValidator::checkString($this->svg('<script/>') . '<foreignObject/>');
+        $this->assertSame(['malformed-xml'], array_column($result->errors, 'code'));
+    }
+
+    //endregion
+}

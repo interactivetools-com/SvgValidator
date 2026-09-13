@@ -1,0 +1,743 @@
+<?php
+declare(strict_types=1);
+
+namespace Itools\SvgValidator;
+
+use Closure;
+use XMLReader;
+
+// import built-ins so calls resolve at compile time instead of per-call lookups; NamespacedCallsTest keeps this list exact
+use function addcslashes, array_key_last, array_keys, array_map, array_pop, array_values, base64_decode, basename, count, explode, file_get_contents, implode, in_array, is_file, is_readable, libxml_clear_errors, libxml_get_errors, libxml_use_internal_errors, min, number_format, preg_match, preg_match_all, str_starts_with, strcasecmp, stripos, strlen, strpos, strspn, strtolower, substr, substr_compare, trim;
+use const LIBXML_NONET;
+
+/**
+ * Checks an uploaded SVG against what browsers allow for SVG in an <img> tag, and rejects
+ * anything that could run script or load an outside resource when the same file is opened
+ * directly. The file is streamed and never modified.
+ *
+ *     $result = SvgValidator::checkFile($_FILES['logo']['tmp_name']);
+ *     if (!$result->ok) {
+ *         foreach ($result->errors as $violation) {
+ *             echo htmlspecialchars($violation->message), "<br>";
+ *         }
+ *     }
+ *
+ *     $result = SvgValidator::checkString($svg);   // same check on a string
+ *     $rules  = SvgValidator::rules();             // the allowlists, for docs and debugging
+ *
+ * Every rule is an allowlist. Elements, attributes, XML namespaces, URL forms, and CSS
+ * functions not on a list are rejected, so a new browser feature is closed until it is
+ * added here. docs/what-gets-rejected.md explains each rule and docs/what-gets-through.md
+ * shows the lists.
+ */
+final class SvgValidator
+{
+    //region Allowlists
+
+    private const SVG_NS   = 'http://www.w3.org/2000/svg';
+    private const XLINK_NS = 'http://www.w3.org/1999/xlink';
+    private const XML_NS   = 'http://www.w3.org/XML/1998/namespace';
+    private const XMLNS_NS = 'http://www.w3.org/2000/xmlns/';
+
+    /** Elements allowed in the SVG namespace. Not here on purpose: script, foreignObject, handler, iframe, font, tref, cursor. */
+    private const ELEMENTS = [
+        // structure
+        'svg', 'g', 'defs', 'symbol', 'use', 'title', 'desc', 'metadata', 'switch', 'a', 'view', 'style',
+
+        // shapes, text, images
+        'path', 'rect', 'circle', 'ellipse', 'line', 'polyline', 'polygon', 'text', 'tspan', 'textPath', 'image',
+
+        // paint servers, clipping, masking, markers
+        'linearGradient', 'radialGradient', 'stop', 'pattern', 'clipPath', 'mask', 'marker',
+
+        // filters
+        'filter', 'feBlend', 'feColorMatrix', 'feComponentTransfer', 'feComposite', 'feConvolveMatrix', 'feDiffuseLighting',
+        'feDisplacementMap', 'feDistantLight', 'feDropShadow', 'feFlood', 'feFuncA', 'feFuncB', 'feFuncG', 'feFuncR',
+        'feGaussianBlur', 'feImage', 'feMerge', 'feMergeNode', 'feMorphology', 'feOffset', 'fePointLight', 'feSpecularLighting',
+        'feSpotLight', 'feTile', 'feTurbulence',
+
+        // animation
+        'animate', 'set', 'animateTransform', 'animateMotion', 'mpath',
+    ];
+
+    /** Attributes allowed without a prefix, plus data-* and aria-*. Not here on purpose: on*, cursor, tabindex, target, crossorigin. */
+    private const ATTRIBUTES = [
+        // core, conditional processing, accessibility
+        'id', 'class', 'style', 'lang', 'role', 'requiredExtensions', 'requiredFeatures', 'systemLanguage', 'externalResourcesRequired',
+
+        // root and viewport
+        'version', 'baseProfile', 'viewBox', 'preserveAspectRatio', 'zoomAndPan', 'contentStyleType', 'x', 'y', 'width', 'height',
+
+        // geometry and references
+        'cx', 'cy', 'r', 'rx', 'ry', 'x1', 'y1', 'x2', 'y2', 'fx', 'fy', 'fr', 'd', 'points', 'pathLength', 'href', 'transform',
+        'transform-origin', 'transform-box',
+
+        // text
+        'dx', 'dy', 'rotate', 'textLength', 'lengthAdjust', 'startOffset', 'method', 'spacing', 'side',
+
+        // gradients, patterns, clipping, masking, markers
+        'gradientUnits', 'gradientTransform', 'spreadMethod', 'offset', 'patternUnits', 'patternContentUnits', 'patternTransform',
+        'clipPathUnits', 'maskUnits', 'maskContentUnits', 'markerUnits', 'markerWidth', 'markerHeight', 'refX', 'refY', 'orient',
+
+        // filters
+        'filterUnits', 'primitiveUnits', 'filterRes', 'in', 'in2', 'result', 'mode', 'type', 'values', 'tableValues', 'slope',
+        'intercept', 'amplitude', 'exponent', 'k1', 'k2', 'k3', 'k4', 'operator', 'radius', 'stdDeviation', 'edgeMode',
+        'kernelMatrix', 'order', 'divisor', 'bias', 'targetX', 'targetY', 'kernelUnitLength', 'preserveAlpha', 'surfaceScale',
+        'diffuseConstant', 'specularConstant', 'specularExponent', 'z', 'azimuth', 'elevation', 'pointsAtX', 'pointsAtY', 'pointsAtZ',
+        'limitingConeAngle', 'xChannelSelector', 'yChannelSelector', 'scale', 'baseFrequency', 'numOctaves', 'seed', 'stitchTiles',
+
+        // animation
+        'attributeName', 'attributeType', 'begin', 'dur', 'end', 'min', 'max', 'restart', 'repeatCount', 'repeatDur', 'calcMode',
+        'keyTimes', 'keySplines', 'from', 'to', 'by', 'additive', 'accumulate', 'path', 'keyPoints', 'origin',
+
+        // presentation
+        'alignment-baseline', 'baseline-shift', 'clip', 'clip-path', 'clip-rule', 'color', 'color-interpolation',
+        'color-interpolation-filters', 'color-rendering', 'direction', 'display', 'dominant-baseline', 'enable-background', 'fill',
+        'fill-opacity', 'fill-rule', 'filter', 'flood-color', 'flood-opacity', 'font', 'font-family', 'font-kerning', 'font-size',
+        'font-size-adjust', 'font-stretch', 'font-style', 'font-variant', 'font-weight', 'glyph-orientation-horizontal',
+        'glyph-orientation-vertical', 'image-rendering', 'isolation', 'kerning', 'letter-spacing', 'lighting-color', 'marker',
+        'marker-end', 'marker-mid', 'marker-start', 'mask', 'mask-type', 'mix-blend-mode', 'opacity', 'overflow', 'paint-order',
+        'pointer-events', 'shape-rendering', 'stop-color', 'stop-opacity', 'stroke', 'stroke-dasharray', 'stroke-dashoffset',
+        'stroke-linecap', 'stroke-linejoin', 'stroke-miterlimit', 'stroke-opacity', 'stroke-width', 'text-anchor', 'text-decoration',
+        'text-rendering', 'unicode-bidi', 'vector-effect', 'visibility', 'white-space', 'word-spacing', 'writing-mode',
+    ];
+
+    /** Prefixed attributes allowed, by namespace. Not here on purpose: xml:base, xlink:actuate, xlink:show. */
+    private const NAMESPACED_ATTRIBUTES = [
+        self::XML_NS   => ['id', 'lang', 'space'],
+        self::XLINK_NS => ['href', 'title'],
+    ];
+
+    /**
+     * Namespaces browsers ignore: design-tool and metadata vocabularies. Elements and attributes
+     * in them pass without inspection, except on* attributes. Matched by prefix, since Adobe
+     * alone uses dozens of namespaces under one host.
+     * @noinspection HttpUrlsUsage
+     */
+    private const INERT_NAMESPACES = [
+        'http://www.inkscape.org/namespaces/inkscape',
+        'http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd',
+        'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
+        'http://www.w3.org/2000/01/rdf-schema#',
+        'http://purl.org/dc/',
+        'http://creativecommons.org/ns#',
+        'http://web.resource.org/cc/',
+        'http://ns.adobe.com/',
+        'adobe:ns:meta/',
+        'http://www.serif.com/',
+        'http://www.bohemiancoding.com/sketch/ns',
+        'http://schemas.microsoft.com/visio/2003/SVGExtensions/',
+        'http://www.w3.org/2001/XMLSchema-instance',
+    ];
+
+    /** The only elements whose href may be an embedded data: image. Every other href must be #id. */
+    private const IMAGE_ELEMENTS = ['image', 'feImage'];
+
+    private const ANIMATION_ELEMENTS         = ['animate', 'set', 'animateTransform', 'animateMotion'];
+    private const ANIMATION_TARGETS_DENIED   = ['href', 'xlink:href', 'style', 'class'];
+    private const ANIMATION_VALUE_ATTRIBUTES = ['from', 'to', 'by', 'values'];
+
+    //endregion
+    //region Patterns and Limits
+
+    // data:image/png;base64, and the other embedded image forms allowed on <image> and <feImage>; jpg is a common mislabel browsers accept
+    private const DATA_IMAGE = '/^data:image\/(png|jpeg|jpg|gif|webp|svg\+xml);base64,/i';
+
+    // url( not followed by #, allowing whitespace and a quote first: url(https://x), url( "x" ). Possessive
+    // quantifiers (*+ ?+) stop the regex from backtracking past the quote to dodge the # lookahead.
+    private const URL_NOT_FRAGMENT = '/url\(\s*+["\']?+\s*+(?!#)/i';
+
+    // CSS that can escape, import, or fetch: a backslash (CSS escapes), @import, @charset, and the functions that load URLs
+    private const CSS_FORBIDDEN = '/\\\\|@import|@charset|image\(|image-set\(|src\(|expression\(|-moz-binding|behavior\s*:/i';
+
+    // url( in CSS that is not #id and not an embedded font (data:font/... or data:;base64,...), with up to 40 chars of context
+    private const CSS_URL_NOT_ALLOWED = '/url\(\s*+["\']?+\s*+(?!#|data:font\/|data:;base64,)[^)]{0,40}/i';
+
+    // a URL scheme at the start of a value: javascript:, data:, https:
+    private const SCHEME = '/^\s*[a-z][a-z0-9+.\-]*:/i';
+
+    private const PROLOG_LIMIT     = 65536;    // the root tag must start within this many bytes
+    private const MAX_ERRORS       = 50;       // distinct errors reported per file
+    private const MAX_EMBED_DEPTH  = 3;        // SVG inside SVG inside SVG, then stop
+    private const MAX_EXPANDED_ELEMENTS = 100000;   // elements the references in a file may add up to when expanded
+
+    //endregion
+    //region Public API
+
+    /**
+     * Checks an SVG file on disk. Streams it, so memory use does not depend on file size.
+     *
+     *     $result = SvgValidator::checkFile('/tmp/php3F.tmp');
+     *
+     * @param string $path Path to the file, such as an upload's tmp_name
+     */
+    public static function checkFile(string $path): Result
+    {
+        $head = is_file($path) && is_readable($path) ? file_get_contents($path, false, null, 0, self::PROLOG_LIMIT) : false;
+        if ($head === false) {
+            return new Result([new Violation('file-unreadable', basename($path))]);
+        }
+        return (new self(0))->check($head, fn(XMLReader $reader) => $reader->open($path, null, LIBXML_NONET));
+    }
+
+    /**
+     * Checks SVG source held in a string.
+     *
+     *     $result = SvgValidator::checkString('<svg xmlns="http://www.w3.org/2000/svg"/>');
+     */
+    public static function checkString(string $svg): Result
+    {
+        return self::checkEmbedded($svg, 0);
+    }
+
+    /**
+     * Returns the allowlists as arrays, keyed by what they list: elements, attributes,
+     * namespacedAttributes, inertNamespaces, imageElements, dataImageTypes. For
+     * documentation and debugging; the rules themselves are not configurable.
+     *
+     * @return array<string, array>
+     */
+    public static function rules(): array
+    {
+        return [
+            'elements'             => self::ELEMENTS,
+            'attributes'           => self::ATTRIBUTES,
+            'namespacedAttributes' => self::NAMESPACED_ATTRIBUTES,
+            'inertNamespaces'      => self::INERT_NAMESPACES,
+            'imageElements'        => self::IMAGE_ELEMENTS,
+            'dataImageTypes'       => ['png', 'jpeg', 'jpg', 'gif', 'webp', 'svg+xml'],
+        ];
+    }
+
+    //endregion
+    //region Check Flow
+
+    /** @var array<string, Violation> keyed by code and detail, so the same problem reports once */
+    private array $errors = [];
+
+    private function __construct(private readonly int $embedDepth)
+    {
+    }
+
+    private static function checkEmbedded(string $svg, int $embedDepth): Result
+    {
+        $head = substr($svg, 0, self::PROLOG_LIMIT);
+        return (new self($embedDepth))->check($head, fn(XMLReader $reader) => $reader->XML($svg, null, LIBXML_NONET));
+    }
+
+    /**
+     * Runs the byte-level prolog check, then streams the document. $load points the reader at
+     * the source; it runs only when the prolog gave no reason to stop.
+     */
+    private function check(string $head, Closure $load): Result
+    {
+        if ($this->prologAllowsParsing($head)) {
+            $reader = new XMLReader();
+            $load($reader);
+            $this->walk($reader);
+        }
+        return new Result(array_values($this->errors));
+    }
+
+    private function fail(string $code, string $detail): void
+    {
+        $this->errors["$code\0$detail"] ??= new Violation($code, $detail);
+    }
+
+    //endregion
+    //region Prolog
+
+    /**
+     * Checks the bytes before the root element: BOM, encoding declaration, DOCTYPE. XMLReader
+     * cannot report these in a usable form, and a DOCTYPE with an internal subset must be
+     * refused before the parser expands anything it declares. Returns false when the file is
+     * not worth parsing.
+     */
+    private function prologAllowsParsing(string $head): bool
+    {
+        if (str_starts_with($head, "\xEF\xBB\xBF")) {
+            $head = substr($head, 3);
+        }
+        foreach (["\xFF\xFE", "\xFE\xFF", "<\0", "\0<", "\0\0"] as $utf16or32Start) {
+            if (str_starts_with($head, $utf16or32Start)) {
+                $this->fail('not-utf8', 'UTF-16 or UTF-32');
+                return false;
+            }
+        }
+        if (preg_match('/^<\?xml\s[^>]*?encoding\s*=\s*["\']([^"\']*)["\']/i', $head, $match) && strcasecmp($match[1], 'utf-8') !== 0) {
+            $this->fail('not-utf8', "declared as $match[1]");
+            return false;
+        }
+
+        $pos = strspn($head, " \t\r\n");
+        if (substr($head, $pos, 1) !== '<') {
+            $start = addcslashes(substr($head, 0, 20), "\0..\37\177..\377");
+            $this->fail('not-svg', trim($head) === '' ? 'nothing (the file is empty)' : $start);
+            return false;
+        }
+
+        // walk the prolog: comments, PIs, and the DOCTYPE, until the root tag
+        $length = strlen($head);
+        while ($pos < $length) {
+            $pos += strspn($head, " \t\r\n", $pos);
+            if (substr_compare($head, '<!--', $pos, 4) === 0) {
+                $end = strpos($head, '-->', $pos + 4);
+                if ($end === false) {
+                    break;
+                }
+                $pos = $end + 3;
+            } elseif (substr_compare($head, '<?', $pos, 2) === 0) {
+                $end = strpos($head, '?>', $pos + 2);
+                if ($end === false) {
+                    break;
+                }
+                $pos = $end + 2;
+            } elseif (substr_compare($head, '<!DOCTYPE', $pos, 9) === 0) {
+                $end = $this->doctypeEnd($head, $pos + 9);
+                if ($end === null) {
+                    $this->fail('doctype-not-allowed', 'it contains an internal DTD subset (entity declarations)');
+                    return false;
+                }
+                $pos = $end;
+            } else {
+                return true;   // the root start tag, or something the parser will report
+            }
+        }
+        $this->fail('malformed-xml', 'no root element within the first 64 KB');
+        return false;
+    }
+
+    /**
+     * Returns the offset just past the DOCTYPE's closing >, or null when a [ opens an
+     * internal subset first. Quoted public and system ids are skipped, so a [ inside them
+     * does not count.
+     */
+    private function doctypeEnd(string $head, int $pos): ?int
+    {
+        $length = strlen($head);
+        while ($pos < $length) {
+            $char = $head[$pos];
+            if ($char === '"' || $char === "'") {
+                $close = strpos($head, $char, $pos + 1);
+                if ($close === false) {
+                    return $length;
+                }
+                $pos = $close + 1;
+                continue;
+            }
+            if ($char === '[') {
+                return null;
+            }
+            if ($char === '>') {
+                return $pos + 1;
+            }
+            $pos++;
+        }
+        return $length;
+    }
+
+    //endregion
+    //region Document Walk
+
+    private function walk(XMLReader $reader): void
+    {
+        $previousErrorMode = libxml_use_internal_errors(true);
+        libxml_clear_errors();
+        // both default to false; set here because they are the whole defense against DTD entities
+        $reader->setParserProperty(XMLReader::LOADDTD, false);
+        $reader->setParserProperty(XMLReader::SUBST_ENTITIES, false);
+
+        $isRoot     = true;
+        $styleDepth = null;   // depth of the open <style> while its text is being collected
+        $css        = '';
+
+        while (count($this->errors) < self::MAX_ERRORS && $reader->read()) {
+            switch ($reader->nodeType) {
+                case XMLReader::ELEMENT:
+                    if ($isRoot) {
+                        $isRoot = false;
+                        if ($reader->localName !== 'svg') {
+                            $this->fail('root-not-svg', $reader->name);
+                            break 2;
+                        }
+                        if ($reader->namespaceURI !== self::SVG_NS) {   // a hand-written <svg> with no xmlns: browsers show nothing
+                            $this->fail('root-namespace-wrong', $reader->namespaceURI === '' ? 'none' : 'xmlns="' . $reader->namespaceURI . '"');
+                            break 2;
+                        }
+                    }
+                    $this->checkElement($reader);
+                    $this->noteReferences($reader);
+                    if ($styleDepth === null && $reader->localName === 'style' && $reader->namespaceURI === self::SVG_NS && !$reader->isEmptyElement) {
+                        $styleDepth = $reader->depth;
+                    }
+                    break;
+                case XMLReader::END_ELEMENT:
+                    $this->noteEndElementForReferences($reader->depth);
+                    if ($reader->depth === $styleDepth) {
+                        $this->checkCss($css);
+                        $styleDepth = null;
+                        $css        = '';
+                    }
+                    break;
+                case XMLReader::COMMENT:
+                    // <!--> and <!---> are complete comments to an HTML parser, so what follows them
+                    // would be live markup if the file were ever served as text/html
+                    if (str_starts_with($reader->value, '>') || str_starts_with($reader->value, '->')) {
+                        $this->fail('comment-not-allowed', str_starts_with($reader->value, '>') ? '>' : '->');
+                    }
+                    break;
+                case XMLReader::TEXT:
+                case XMLReader::CDATA:
+                case XMLReader::WHITESPACE:
+                case XMLReader::SIGNIFICANT_WHITESPACE:
+                    if ($styleDepth !== null) {
+                        $css .= $reader->value;   // browsers use the element's whole text content, child elements included
+                    }
+                    break;
+                case XMLReader::PI:
+                    $this->fail('processing-instruction', $reader->name);
+                    break;
+            }
+        }
+
+        // any libxml diagnostic counts, not only fatal ones: browsers render up to the first error,
+        // and a file that parses differently in two parsers is where trouble starts
+        $libxmlError = libxml_get_errors()[0] ?? null;
+        if ($libxmlError !== null) {
+            $this->fail('malformed-xml', trim($libxmlError->message) . " (line $libxmlError->line)");
+        }
+        libxml_clear_errors();
+        libxml_use_internal_errors($previousErrorMode);
+        $reader->close();
+
+        if ($libxmlError === null) {
+            $this->checkReferenceExpansion();
+        }
+    }
+
+    private function checkElement(XMLReader $reader): void
+    {
+        $namespace = $reader->namespaceURI;
+        $element   = $reader->localName;
+        $inert     = self::isInertNamespace($namespace);
+
+        if ($namespace === self::SVG_NS) {
+            if (!in_array($element, self::ELEMENTS, true)) {
+                $this->fail('element-not-allowed', $element);
+                return;   // one error for the element; its attributes are not worth reporting
+            }
+        } elseif ($namespace === '') {
+            $this->fail('element-not-allowed', $reader->name);   // unbound prefix, or xmlns="" reset
+            return;
+        } elseif (!$inert) {
+            $this->fail('namespace-not-allowed', $namespace);
+            return;
+        }
+
+        if (!$reader->moveToFirstAttribute()) {
+            return;
+        }
+        do {
+            $this->checkAttribute($reader, $element, $inert);
+        } while ($reader->moveToNextAttribute());
+        $reader->moveToElement();
+    }
+
+    private function checkAttribute(XMLReader $reader, string $element, bool $inertElement): void
+    {
+        $namespace = $reader->namespaceURI;
+        $attribute = $reader->localName;
+        $name      = $reader->name;     // as written, such as xlink:href
+        $value     = $reader->value;
+
+        if ($namespace === self::XMLNS_NS) {
+            return;
+        }
+        if (stripos($attribute, 'on') === 0) {
+            $this->fail('event-handler', $name);
+            return;
+        }
+        if ($inertElement || self::isInertNamespace($namespace)) {
+            return;
+        }
+
+        $allowed = $namespace === ''
+            ? in_array($attribute, self::ATTRIBUTES, true) || str_starts_with($attribute, 'data-') || str_starts_with($attribute, 'aria-')
+            : in_array($attribute, self::NAMESPACED_ATTRIBUTES[$namespace] ?? [], true);
+        if (!$allowed) {
+            $this->fail('attribute-not-allowed', $name);
+            return;
+        }
+
+        if ($attribute === 'href') {
+            $this->checkHref($element, $value);
+        } elseif ($attribute === 'style') {
+            $this->checkCss($value);
+        } else {
+            if (preg_match(self::URL_NOT_FRAGMENT, $value)) {
+                $this->fail('url-not-fragment', $name);   // fill="url(https://...)" and friends
+            }
+            if (in_array($element, self::ANIMATION_ELEMENTS, true)) {
+                $this->checkAnimationAttribute($attribute, $value);
+            }
+        }
+    }
+
+    //endregion
+    //region Reference Expansion
+
+    /*
+     * A <use> renders a copy of the element it references, and that copy can hold more <use>
+     * elements. A few dozen elements arranged as a tree of references expand to billions of
+     * rendered elements, which hangs a browser tab or a server-side rasterizer. Patterns,
+     * markers, masks, filters and gradients are references too: fill="url(#p)" renders the
+     * pattern's content, and that content can be filled with the next pattern. Loops are caught
+     * the same way. The walk records, for every element with an id, how many elements it
+     * contains and which ids the elements inside it reference; the count runs once the whole
+     * file has been read, since a target may be defined after the reference.
+     */
+
+    // elements whose href renders or extends the referenced element (<a> and the animation elements do neither)
+    private const HREF_RENDERS_TARGET = ['use', 'pattern', 'linearGradient', 'radialGradient', 'filter', 'feImage'];
+
+    // elements whose content renders only when something references it
+    private const HIDDEN_ELEMENTS = ['defs', 'symbol', 'pattern', 'mask', 'marker', 'clipPath', 'filter'];
+
+    // url(#id) in an attribute value, quotes and whitespace allowed: url( "#id" ); captures the id
+    private const URL_FRAGMENT = '/url\(\s*+["\']?+\s*+#([^"\')\s]*)/i';
+
+    /** @var array<int, string> id of each open element that has one, by depth */
+    private array $openIds = [];
+
+    /** @var array<string, int> elements inside each id, itself included */
+    private array $elementsUnder = [];
+
+    /** @var array<string, string[]> ids referenced from inside each id */
+    private array $referencesUnder = [];
+
+    /** @var string[] ids referenced by elements that render on their own, outside the hidden elements */
+    private array $renderedReferences = [];
+
+    /** depth of the outermost open hidden element */
+    private ?int $hiddenDepth = null;
+
+    private function noteReferences(XMLReader $reader): void
+    {
+        foreach ($this->openIds as $id) {
+            $this->elementsUnder[$id]++;
+        }
+        $holders = $this->openIds;   // ids whose content includes this element's references
+        $id      = $reader->getAttribute('id');
+        if ($id !== null && $id !== '') {
+            $this->elementsUnder[$id] = ($this->elementsUnder[$id] ?? 0) + 1;
+            if ($reader->isEmptyElement) {
+                $holders[] = $id;   // no END_ELEMENT will follow, so it never joins openIds
+            } else {
+                $this->openIds[$reader->depth] = $id;
+                $holders[$reader->depth]       = $id;
+            }
+        }
+        if ($reader->namespaceURI !== self::SVG_NS) {
+            return;
+        }
+        $element = $reader->localName;
+        if ($this->hiddenDepth === null && in_array($element, self::HIDDEN_ELEMENTS, true) && !$reader->isEmptyElement) {
+            $this->hiddenDepth = $reader->depth;
+        }
+
+        $targets = [];
+        if ($reader->moveToFirstAttribute()) {
+            do {
+                $value = $reader->value;
+                if ($reader->localName === 'href' && ($reader->namespaceURI === '' || $reader->namespaceURI === self::XLINK_NS)) {
+                    $value = trim($value);
+                    if (str_starts_with($value, '#') && in_array($element, self::HREF_RENDERS_TARGET, true)) {
+                        $targets[] = substr($value, 1);
+                    }
+                } elseif (stripos($value, 'url(') !== false && preg_match_all(self::URL_FRAGMENT, $value, $matches)) {
+                    $targets = [...$targets, ...$matches[1]];   // fill, stroke, marker-*, mask, clip-path, filter, and style=
+                }
+            } while ($reader->moveToNextAttribute());
+            $reader->moveToElement();
+        }
+        foreach ($targets as $target) {
+            if ($this->hiddenDepth === null) {
+                $this->renderedReferences[] = $target;
+            }
+            foreach ($holders as $holder) {
+                $this->referencesUnder[$holder][] = $target;
+            }
+        }
+    }
+
+    private function noteEndElementForReferences(int $depth): void
+    {
+        unset($this->openIds[$depth]);
+        if ($depth === $this->hiddenDepth) {
+            $this->hiddenDepth = null;
+        }
+    }
+
+    private function checkReferenceExpansion(): void
+    {
+        $limit   = self::MAX_EXPANDED_ELEMENTS + 1;   // totals are capped here so a bomb cannot overflow an int
+        $counted = [];   // id => elements rendered by one reference to it
+        $loop    = null;
+        $total   = 0;
+        foreach ($this->renderedReferences as $target) {
+            $total = min($total + $this->expandedElements($target, $counted, $limit, $loop), $limit);
+        }
+        if ($loop !== null) {
+            $this->fail('reference-expansion-too-large', "form a loop ($loop)");
+        } elseif ($total > self::MAX_EXPANDED_ELEMENTS) {
+            $this->fail('reference-expansion-too-large', 'expand to more than ' . number_format(self::MAX_EXPANDED_ELEMENTS) . ' elements');
+        }
+    }
+
+    /**
+     * Elements rendered by one reference to $start: its own, plus those of every id referenced
+     * from inside it, and so on down. A depth-first walk with its own stack, since a reference
+     * chain can be longer than PHP's call stack allows. $counted is filled in as ids finish, so
+     * each id is expanded once. $loop gets the first reference loop found.
+     *
+     * @param array<string, int> $counted
+     */
+    private function expandedElements(string $start, array &$counted, int $limit, ?string &$loop): int
+    {
+        if (isset($counted[$start])) {
+            return $counted[$start];
+        }
+        $frames = [[$start, 0, $this->elementsUnder[$start] ?? 0]];   // [id, next target index, total so far]; an undefined id renders nothing
+        $onPath = [$start => true];
+        while ($frames !== []) {
+            $last              = array_key_last($frames);
+            [$id, $next, $sum] = $frames[$last];
+            $targets           = $this->referencesUnder[$id] ?? [];
+            if ($next < count($targets)) {
+                $target = $targets[$next];
+                $frames[$last][1]++;
+                if (isset($counted[$target])) {
+                    $frames[$last][2] = min($sum + $counted[$target], $limit);
+                } elseif (isset($onPath[$target])) {
+                    $loop ??= implode(' -> ', array_map(fn(string $step) => "#$step", [...array_keys($onPath), $target]));
+                    $frames[$last][2] = $limit;
+                } else {
+                    $onPath[$target] = true;
+                    $frames[]        = [$target, 0, $this->elementsUnder[$target] ?? 0];
+                }
+                continue;
+            }
+            array_pop($frames);
+            unset($onPath[$id]);
+            $counted[$id] = $sum;
+            if ($frames !== []) {
+                $last = array_key_last($frames);
+                $frames[$last][2] = min($frames[$last][2] + $sum, $limit);
+            }
+        }
+        return $counted[$start];
+    }
+
+    //endregion
+    //region Value Rules
+
+    private function checkHref(string $element, string $value): void
+    {
+        $value = trim($value);
+        if (str_starts_with($value, '#')) {
+            return;
+        }
+        $shown = $value === '' ? '(empty)' : self::excerpt($value);
+        if (!in_array($element, self::IMAGE_ELEMENTS, true)) {
+            $this->fail('href-not-allowed', $shown);
+            return;
+        }
+        if (!preg_match(self::DATA_IMAGE, $value, $match)) {
+            $this->fail('image-href-not-allowed', $shown);
+            return;
+        }
+        if (strtolower($match[1]) === 'svg+xml') {
+            $this->checkEmbeddedSvg(substr($value, strlen($match[0])));
+        }
+    }
+
+    /**
+     * An SVG inside <image> renders in the browser's secure mode, so it cannot run script
+     * there. Server-side rasterizers give it no such protection, so it gets the same check.
+     */
+    private function checkEmbeddedSvg(string $base64): void
+    {
+        if ($this->embedDepth >= self::MAX_EMBED_DEPTH) {
+            $this->fail('embedded-svg-not-allowed', 'SVG images nested more than ' . self::MAX_EMBED_DEPTH . ' levels deep');
+            return;
+        }
+        $svg = base64_decode($base64, true);
+        if ($svg === false) {
+            $this->fail('embedded-svg-not-allowed', 'the data: URL is not valid base64');
+            return;
+        }
+        foreach (self::checkEmbedded($svg, $this->embedDepth + 1)->errors as $violation) {
+            $this->fail('embedded-svg-not-allowed', $violation->message);
+        }
+    }
+
+    /**
+     * Applies to <style> text and style= values. With the backslash banned CSS has no escape
+     * syntax, so every token reads as written and a regex sees the same thing a browser does.
+     */
+    private function checkCss(string $css): void
+    {
+        if (preg_match(self::CSS_FORBIDDEN, $css, $match)) {
+            $this->fail('css-not-allowed', $match[0]);
+        }
+        if (preg_match(self::CSS_URL_NOT_ALLOWED, $css, $match)) {
+            $this->fail('css-not-allowed', self::excerpt($match[0]));
+        }
+    }
+
+    /**
+     * SMIL can rewrite any attribute, so animating href, style, class, or an event handler
+     * would bypass the attribute checks, and from/to/by/values must not carry a URL scheme.
+     */
+    private function checkAnimationAttribute(string $attribute, string $value): void
+    {
+        if ($attribute === 'attributeName') {
+            $target = trim($value);
+            if (in_array($target, self::ANIMATION_TARGETS_DENIED, true) || stripos($target, 'on') === 0) {
+                $this->fail('animation-target-not-allowed', $target);
+            }
+            return;
+        }
+        if (in_array($attribute, self::ANIMATION_VALUE_ATTRIBUTES, true)) {
+            foreach (explode(';', $value) as $item) {
+                if (preg_match(self::SCHEME, $item)) {
+                    $this->fail('animation-value-not-allowed', $attribute);
+                    return;
+                }
+            }
+        }
+    }
+
+    //endregion
+    //region Helpers
+
+    private static function isInertNamespace(string $namespace): bool
+    {
+        foreach (self::INERT_NAMESPACES as $inert) {
+            if (str_starts_with($namespace, $inert)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** The first 60 characters of a value for an error message, cut on a UTF-8 boundary. */
+    private static function excerpt(string $value): string
+    {
+        preg_match('/^.{0,60}/us', $value, $match);
+        $start = $match[0] ?? substr($value, 0, 60);
+        return strlen($start) < strlen($value) ? "$start..." : $start;
+    }
+
+    //endregion
+}

@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+  <image href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==" width="20" height="20" preserveAspectRatio="none"/>
+  <filter id="blur"><feGaussianBlur stdDeviation="1"/></filter>
+  <rect x="5" y="5" width="10" height="10" fill="#1D4ED8" filter="url(#blur)"/>
+</svg>

@@ -1,0 +1,354 @@
+<?php
+declare(strict_types=1);
+
+namespace Itools\SvgValidator\Tests\Unit;
+
+use Itools\SvgValidator\Tests\Support\SvgValidatorTestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
+
+/**
+ * Every place a URL can appear in an attribute: href and xlink:href on each kind of
+ * element, embedded data: images, SVG nested inside data: images, and url() in
+ * attribute values.
+ *
+ * Codes: href-not-allowed, image-href-not-allowed, embedded-svg-not-allowed,
+ * url-not-fragment, reference-expansion-too-large. CSS url() is in CssTest.
+ */
+class UrlsTest extends SvgValidatorTestCase
+{
+    private const XLINK = 'xmlns:xlink="http://www.w3.org/1999/xlink"';
+
+    // a 1x1 transparent PNG
+    private const PNG = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==';
+
+    //region href: Same-File References
+
+    #[DataProvider('fragmentHrefProvider')]
+    public function testFragmentHrefAccepted(string $body): void
+    {
+        $this->assertAccepts($this->svg($body, self::XLINK));
+    }
+
+    public static function fragmentHrefProvider(): array
+    {
+        return [
+            'use to a symbol'        => ['<symbol id="icon"><rect width="1" height="1"/></symbol><use href="#icon"/>'],
+            'use with xlink:href'    => ['<symbol id="icon"/><use xlink:href="#icon"/>'],
+            'a'                      => ['<a href="#top"><rect/></a>'],
+            'textPath'               => ['<path id="p" d="M0 0h10"/><text><textPath href="#p">x</textPath></text>'],
+            'mpath'                  => ['<path id="m" d="M0 0h10"/><rect><animateMotion dur="1s"><mpath href="#m"/></animateMotion></rect>'],
+            'gradient template'      => ['<linearGradient id="a"/><linearGradient id="b" href="#a"/>'],
+            'pattern template'       => ['<pattern id="a"/><pattern id="b" xlink:href="#a"/>'],
+            'feImage'                => ['<rect id="r"/><filter id="f"><feImage href="#r"/></filter>'],
+            'image'                  => ['<rect id="r"/><image href="#r"/>'],
+            'animate target'         => ['<rect id="r"/><animate href="#r" attributeName="x" to="1"/>'],
+            'surrounding whitespace' => ['<symbol id="icon"/><use href=" #icon "/>'],
+        ];
+    }
+
+    #[DataProvider('externalHrefProvider')]
+    public function testExternalHrefRejected(string $body, string $detail): void
+    {
+        $this->assertRejects($this->svg($body, self::XLINK), 'href-not-allowed', $detail);
+    }
+
+    public static function externalHrefProvider(): array
+    {
+        return [
+            'empty'                     => ['<a href=""/>', '(empty)'],
+            'only whitespace'           => ['<use href="  "/>', '(empty)'],
+            'javascript in a'           => ['<a href="javascript:alert(1)"/>', 'javascript:alert(1)'],
+            'javascript in xlink:href'  => ['<a xlink:href="javascript:alert(1)"/>', 'javascript:alert(1)'],
+            'upper case scheme'         => ['<a href="JAVASCRIPT:alert(1)"/>', 'JAVASCRIPT:alert(1)'],
+            'https in a'                => ['<a href="https://example.com/"/>', 'https://example.com/'],
+            'external use'              => ['<use href="https://evil.example/x.svg#a"/>', 'https://evil.example/x.svg#a'],
+            'data in use'               => ['<use href="data:image/svg+xml;base64,PHN2Zy8+"/>', 'data:image/svg+xml;base64,PHN2Zy8+'],
+            'relative use'              => ['<use href="x.svg#a"/>', 'x.svg#a'],
+            'protocol-relative use'     => ['<use href="//evil.example/x.svg#a"/>', '//evil.example/x.svg#a'],
+            'external mpath'            => ['<animateMotion><mpath href="https://evil.example/p.svg#m"/></animateMotion>', 'https://evil.example/p.svg#m'],
+            'external gradient'         => ['<linearGradient href="https://evil.example/g.svg#g"/>', 'https://evil.example/g.svg#g'],
+            'trimmed before reporting'  => ['<use href="  javascript:alert(1)  "/>', 'javascript:alert(1)'],
+            'long value cut at 60'      => ['<use href="' . str_repeat('a', 70) . '"/>', str_repeat('a', 60) . '...'],
+        ];
+    }
+
+    //endregion
+    //region href: Embedded Images
+
+    #[DataProvider('embeddedImageProvider')]
+    public function testEmbeddedImageAccepted(string $body): void
+    {
+        $this->assertAccepts($this->svg($body, self::XLINK));
+    }
+
+    public static function embeddedImageProvider(): array
+    {
+        $png = self::PNG;
+        return [
+            'png'                => ["<image href=\"data:image/png;base64,$png\"/>"],
+            'jpeg'               => ['<image href="data:image/jpeg;base64,/9j/4AAQ"/>'],
+            'jpg'                => ['<image href="data:image/jpg;base64,/9j/4AAQ"/>'],
+            'gif'                => ['<image href="data:image/gif;base64,R0lGODlh"/>'],
+            'webp'               => ['<image href="data:image/webp;base64,UklGRg=="/>'],
+            'upper case'         => ["<image href=\"DATA:IMAGE/PNG;BASE64,$png\"/>"],
+            'xlink:href'         => ["<image xlink:href=\"data:image/png;base64,$png\"/>"],
+            'feImage'            => ["<filter id=\"f\"><feImage href=\"data:image/png;base64,$png\"/></filter>"],
+            'line-wrapped base64' => ['<image href="data:image/png;base64,' . chunk_split($png, 20, "\n") . '"/>'],
+        ];
+    }
+
+    #[DataProvider('externalImageProvider')]
+    public function testExternalImageRejected(string $body, string $detail): void
+    {
+        $this->assertRejects($this->svg($body), 'image-href-not-allowed', $detail);
+    }
+
+    public static function externalImageProvider(): array
+    {
+        return [
+            'https'                   => ['<image href="https://evil.example/x.png"/>', 'https://evil.example/x.png'],
+            'same-origin absolute'    => ['<image href="/images/x.png"/>', '/images/x.png'],
+            'relative'                => ['<image href="x.png"/>', 'x.png'],
+            'javascript'              => ['<image href="javascript:alert(1)"/>', 'javascript:alert(1)'],
+            'data html'               => ['<image href="data:text/html,&lt;script&gt;alert(1)&lt;/script&gt;"/>', 'data:text/html,<script>alert(1)</script>'],
+            'svg not base64'          => ['<image href="data:image/svg+xml;utf8,&lt;svg/&gt;"/>', 'data:image/svg+xml;utf8,<svg/>'],
+            'svg url-encoded'         => ['<image href="data:image/svg+xml,%3Csvg%2F%3E"/>', 'data:image/svg+xml,%3Csvg%2F%3E'],
+            'png not base64'          => ['<image href="data:image/png,AAAA"/>', 'data:image/png,AAAA'],
+            'unlisted image type'     => ['<image href="data:image/bmp;base64,AAAA"/>', 'data:image/bmp;base64,AAAA'],
+            'feImage https'           => ['<filter id="f"><feImage href="https://evil.example/x.png"/></filter>', 'https://evil.example/x.png'],
+        ];
+    }
+
+    //endregion
+    //region href: Embedded SVG
+
+    /** Wraps $inner as a data: image inside a new outer SVG. */
+    private function embed(string $inner): string
+    {
+        return $this->svg('<image href="data:image/svg+xml;base64,' . base64_encode($inner) . '"/>');
+    }
+
+    public function testEmbeddedSvgAccepted(): void
+    {
+        $this->assertAccepts($this->embed($this->svg('<rect width="1" height="1"/>')));
+        $this->assertAccepts($this->embed($this->embed($this->svg())));
+        $this->assertAccepts($this->embed($this->embed($this->embed($this->svg()))));   // three levels is the limit
+    }
+
+    public function testEmbeddedSvgNestedTooDeep(): void
+    {
+        $violation = $this->assertRejects($this->embed($this->embed($this->embed($this->embed($this->svg())))), 'embedded-svg-not-allowed');
+        $this->assertStringContainsString('nested more than 3 levels deep', $violation->detail);
+    }
+
+    public function testLineWrappedEmbeddedSvg(): void
+    {
+        $this->assertAccepts($this->svg('<image href="data:image/svg+xml;base64,' . chunk_split(base64_encode($this->svg()), 16, "\n") . '"/>'));
+    }
+
+    /** The inner file gets the full check, and its message becomes the outer detail. */
+    #[DataProvider('badEmbeddedSvgProvider')]
+    public function testBadEmbeddedSvgRejected(string $inner, string $detail): void
+    {
+        $this->assertRejects($this->embed($inner), 'embedded-svg-not-allowed', $detail);
+    }
+
+    public static function badEmbeddedSvgProvider(): array
+    {
+        $open = '<svg xmlns="http://www.w3.org/2000/svg"';
+        return [
+            'script inside'        => ["$open><script/></svg>", '<script> is not allowed in uploaded SVGs'],
+            'event handler inside' => ["$open onload=\"alert(1)\"/>", 'onload= event handler attributes are not allowed'],
+            'external image inside' => ["$open><image href=\"https://evil.example/x.png\"/></svg>", 'Image href must be #id or an embedded PNG, JPEG, GIF, WebP or SVG data: URL, not https://evil.example/x.png'],
+            'not an svg at all'    => ['hello', 'This is not an SVG file: it starts with hello'],
+        ];
+    }
+
+    /** A gzipped SVG (svgz) declared as image/svg+xml: the bytes start with the gzip magic number, not with <. */
+    public function testGzippedEmbeddedSvg(): void
+    {
+        $violation = $this->assertRejects($this->embed(gzencode($this->svg())), 'embedded-svg-not-allowed');
+        $this->assertStringStartsWith('This is not an SVG file: it starts with \\037\\213', $violation->detail);
+    }
+
+    public function testEmbeddedSvgWithBrokenBase64(): void
+    {
+        $this->assertRejects($this->svg('<image href="data:image/svg+xml;base64,!!!"/>'), 'embedded-svg-not-allowed', 'the data: URL is not valid base64');
+    }
+
+    //endregion
+    //region url() in Attribute Values
+
+    #[DataProvider('fragmentUrlProvider')]
+    public function testFragmentUrlAccepted(string $body): void
+    {
+        $this->assertAccepts($this->svg($body));
+    }
+
+    public static function fragmentUrlProvider(): array
+    {
+        return [
+            'fill gradient'      => ['<linearGradient id="grad"/><rect fill="url(#grad)"/>'],
+            'filter'             => ['<filter id="f"/><rect filter="url(#f)"/>'],
+            'spaces inside'      => ['<rect fill="url( #g )"/>'],
+            'newline inside'     => ["<rect fill=\"url(\n#g)\"/>"],
+            'single quotes'      => ['<rect fill="url(\'#g\')"/>'],
+            'double quotes'      => ['<rect fill="url(&quot;#g&quot;)"/>'],
+            'quotes and spaces'  => ['<rect fill="url( &quot;#g&quot; )"/>'],
+            'with fallback'      => ['<rect fill="url(#g) red"/>'],
+            'mask'               => ['<rect mask="url(#m)"/>'],
+            'clip-path'          => ['<rect clip-path="url(#c)"/>'],
+            'marker-start'       => ['<path d="M0 0" marker-start="url(#m)"/>'],
+            'plain colors'       => ['<rect fill="none" stroke="rgb(1,2,3)"/>'],
+        ];
+    }
+
+    #[DataProvider('externalUrlProvider')]
+    public function testExternalUrlRejected(string $body, string $attribute): void
+    {
+        $this->assertRejects($this->svg($body), 'url-not-fragment', $attribute);
+    }
+
+    public static function externalUrlProvider(): array
+    {
+        return [
+            'https'                       => ['<rect fill="url(https://evil.example/p.svg#a)"/>', 'fill'],
+            'upper case'                  => ['<rect fill="URL(https://evil.example/p.svg#a)"/>', 'fill'],
+            'quoted'                      => ['<rect fill="url( \'https://evil.example/p.svg#a\' )"/>', 'fill'],
+            'newline inside'              => ["<rect fill=\"url(\nhttps://evil.example/p.svg#a)\"/>", 'fill'],
+            'data'                        => ['<rect filter="url(data:image/svg+xml;base64,AAAA)"/>', 'filter'],
+            'relative'                    => ['<rect stroke="url(p.svg#a)"/>', 'stroke'],
+            'clip-path'                   => ['<rect clip-path="url(https://evil.example/c.svg#c)"/>', 'clip-path'],
+            'mask'                        => ['<rect mask="url(https://evil.example/m.svg#m)"/>', 'mask'],
+            'marker-end'                  => ['<path d="M0 0" marker-end="url(https://evil.example/m.svg#m)"/>', 'marker-end'],
+            'any attribute, here animate' => ['<animate attributeName="fill" to="url(https://evil.example/p.svg#a)"/>', 'to'],
+        ];
+    }
+
+    //endregion
+    //region Reference Expansion
+
+    /** $fanOut <use> elements per level, $levels deep: the last level renders $fanOut ** $levels copies of the leaf. */
+    private function useTree(int $fanOut, int $levels): string
+    {
+        $body = '<circle id="l0" r="1"/>';
+        for ($level = 1; $level <= $levels; $level++) {
+            $body .= "<g id=\"l$level\">" . str_repeat('<use href="#l' . ($level - 1) . '"/>', $fanOut) . '</g>';
+        }
+        return $this->svg("<defs>$body</defs><use href=\"#l$levels\"/>");
+    }
+
+    /** $fanOut rects per pattern, each filled with the pattern below it, $levels deep. */
+    private function patternChain(int $fanOut, int $levels): string
+    {
+        $body = '<pattern id="p0" width="1" height="1"><rect width="1" height="1"/></pattern>';
+        for ($level = 1; $level <= $levels; $level++) {
+            $body .= "<pattern id=\"p$level\" width=\"1\" height=\"1\">" . str_repeat('<rect width="1" height="1" fill="url(#p' . ($level - 1) . ')"/>', $fanOut) . '</pattern>';
+        }
+        return $this->svg("<defs>$body</defs><rect width=\"1\" height=\"1\" fill=\"url(#p$levels)\"/>");
+    }
+
+    #[DataProvider('acceptedReferenceProvider')]
+    public function testReferenceExpansionAccepted(string $body): void
+    {
+        $this->assertAccepts($this->svg($body, self::XLINK));
+    }
+
+    public static function acceptedReferenceProvider(): array
+    {
+        return [
+            'pattern filled a hundred times' => ['<pattern id="p" width="1" height="1"><rect width="1" height="1"/></pattern>' . str_repeat('<rect fill="url(#p)"/>', 100)],
+            'gradient template chain'        => ['<linearGradient id="a"><stop/></linearGradient><linearGradient id="b" href="#a"/><rect fill="url(#b)"/>'],
+            'marker inside another marker'   => ['<marker id="m1"><path marker-start="url(#m2)"/></marker><marker id="m2"><circle r="1"/></marker><path marker-start="url(#m1)"/>'],
+            'reference in a style attribute' => ['<pattern id="p"/><rect style="fill:url(#p)"/>'],
+            'animation of an ancestor'       => ['<g id="g"><animate href="#g" attributeName="opacity" to="0"/></g>'],   // animating does not render the target
+            'link to an ancestor'            => ['<g id="top"><a href="#top"><rect/></a></g>'],
+            'one use'               => ['<symbol id="s"><circle r="1"/></symbol><use href="#s"/>'],
+            'many uses of one'      => ['<symbol id="s"><circle r="1"/></symbol>' . str_repeat('<use href="#s"/>', 500)],
+            'nested a few levels'   => ['<circle id="a" r="1"/><g id="b"><use href="#a"/><use href="#a"/></g><g id="c"><use href="#b"/><use href="#b"/></g><use href="#c"/>'],
+            'target defined later'  => ['<use href="#s"/><symbol id="s"><circle r="1"/></symbol>'],
+            'unknown target'        => ['<use href="#nothing"/>'],
+            'xlink:href'            => ['<circle id="a" r="1"/><use xlink:href="#a"/>'],
+            'loop in defs, nothing references it' => ['<defs><g id="a"><use href="#a"/></g></defs>'],   // never rendered, so never expanded, same as in a browser
+            'bomb in a symbol, never used'        => ['<symbol id="s"><g id="l1">' . str_repeat('<use href="#l0"/>', 100) . '</g><g id="l2">' . str_repeat('<use href="#l1"/>', 100) . '</g><g id="l3">' . str_repeat('<use href="#l2"/>', 100) . '</g></symbol><circle id="l0" r="1"/>'],
+        ];
+    }
+
+    public function testTenThousandCopiesIsFine(): void
+    {
+        $this->assertAccepts($this->useTree(10, 4));   // 10^4 leaves, plus the groups
+    }
+
+    public function testAHundredThousandCopiesIsTooMany(): void
+    {
+        $violation = $this->assertRejects($this->useTree(10, 5), 'reference-expansion-too-large');
+        $this->assertSame('expand to more than 100,000 elements', $violation->detail);
+    }
+
+    public function testBinaryTreeBomb(): void
+    {
+        $this->assertRejects($this->useTree(2, 40), 'reference-expansion-too-large', 'expand to more than 100,000 elements');
+    }
+
+    /** The loop is reported from the first <use> in the file that reaches it. */
+    public function testLoop(): void
+    {
+        $violation = $this->assertRejects(
+            $this->svg('<g id="ping"><use href="#pong"/></g><g id="pong"><use href="#ping"/></g><use href="#ping"/>'),
+            'reference-expansion-too-large',
+        );
+        $this->assertSame('form a loop (#pong -> #ping -> #pong)', $violation->detail);
+    }
+
+    public function testSelfReference(): void
+    {
+        $this->assertRejects($this->svg('<defs><g id="a"><use href="#a"/></g></defs><use href="#a"/>'), 'reference-expansion-too-large', 'form a loop (#a -> #a)');
+    }
+
+    public function testBombInDefsReferencedOnce(): void
+    {
+        $this->assertRejects($this->svg('<defs><circle id="l0" r="1"/><g id="l1">' . str_repeat('<use href="#l0"/>', 400) . '</g><g id="l2">' . str_repeat('<use href="#l1"/>', 400) . '</g></defs><use href="#l2"/>'), 'reference-expansion-too-large', 'expand to more than 100,000 elements');
+    }
+
+    public function testPatternChainOfFourLevels(): void
+    {
+        $this->assertAccepts($this->patternChain(10, 4));   // about 32,000 rects
+    }
+
+    public function testPatternBomb(): void
+    {
+        $this->assertRejects($this->patternChain(10, 5), 'reference-expansion-too-large', 'expand to more than 100,000 elements');
+    }
+
+    #[DataProvider('referenceLoopProvider')]
+    public function testReferenceLoop(string $body, string $loop): void
+    {
+        $this->assertRejects($this->svg($body, self::XLINK), 'reference-expansion-too-large', "form a loop ($loop)");
+    }
+
+    public static function referenceLoopProvider(): array
+    {
+        return [
+            'marker on itself'          => ['<path id="a" d="M0 0" marker-start="url(#a)"/>', '#a -> #a'],
+            'marker containing itself'  => ['<marker id="m"><path marker-start="url(#m)"/></marker><path marker-end="url(#m)"/>', '#m -> #m'],
+            'mask on itself'            => ['<mask id="m" mask="url(#m)"/><rect mask="url(#m)"/>', '#m -> #m'],
+            'two clip paths'            => ['<clipPath id="a"><rect clip-path="url(#b)"/></clipPath><clipPath id="b"><rect clip-path="url(#a)"/></clipPath><rect clip-path="url(#a)"/>', '#a -> #b -> #a'],
+            'filter through feImage'    => ['<filter id="f"><feImage href="#r"/></filter><rect id="r" filter="url(#f)"/>', '#f -> #r -> #f'],
+            'gradient templates'        => ['<defs><linearGradient id="a" href="#b"/><linearGradient id="b" xlink:href="#a"/></defs><rect fill="url(#a)"/>', '#a -> #b -> #a'],
+            'pattern template itself'   => ['<defs><pattern id="p" href="#p"/></defs><rect fill="url(#p)"/>', '#p -> #p'],
+            'through a style attribute' => ['<defs><pattern id="p"><rect style="fill: url(#p)"/></pattern></defs><rect style="fill:url(#p)"/>', '#p -> #p'],
+            'use inside a pattern'      => ['<defs><pattern id="p"><use href="#p"/></pattern></defs><rect fill="url(#p)"/>', '#p -> #p'],
+        ];
+    }
+
+    public function testChainLongerThanTheCallStack(): void
+    {
+        $body = '<circle id="l0" r="1"/>';
+        for ($level = 1; $level <= 2000; $level++) {
+            $body .= "<g id=\"l$level\"><use href=\"#l" . ($level - 1) . '"/></g>';
+        }
+        $this->assertAccepts($this->svg("<defs>$body</defs><use href=\"#l2000\"/>"));   // 4001 elements, one copy each
+    }
+
+    //endregion
+}

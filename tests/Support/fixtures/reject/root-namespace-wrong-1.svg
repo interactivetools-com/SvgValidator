@@ -1,0 +1,4 @@
+<!-- rejected: the root svg element has no xmlns, so browsers treat it as an unknown XML element and show nothing -->
+<svg viewBox="0 0 10 10">
+  <rect width="10" height="10"/>
+</svg>

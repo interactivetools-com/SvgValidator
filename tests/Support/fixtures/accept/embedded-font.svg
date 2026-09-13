@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 30">
+  <style>
+    @font-face {
+      font-family: "Brand";
+      src: url(data:font/woff2;base64,d09GMgABAAAAAAAA) format("woff2"),
+           url("data:;base64,AAEAAAAA") format("truetype");
+    }
+    .brand { font-family: "Brand", sans-serif; font-size: 16px; fill: #111; }
+  </style>
+  <text class="brand" x="4" y="20">Sample</text>
+</svg>

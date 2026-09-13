@@ -1,0 +1,4 @@
+<!-- rejected: an element from the XHTML namespace -->
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:h="http://www.w3.org/1999/xhtml" viewBox="0 0 10 10">
+  <h:iframe src="https://example.com/"/>
+</svg>
