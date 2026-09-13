@@ -99,8 +99,9 @@ The check covers the contents. Four things stay with the upload handler:
 
 ## Serving Accepted Files
 
-An accepted file is still XML that a browser will render when opened directly. Three
-response headers keep that safe, and they cost nothing:
+An accepted file is safe to open directly with no special headers: it has nothing to run
+and nothing to load. Three response headers add a second layer in case a rule is ever
+bypassed, and they cost nothing:
 
 ```text
 Content-Type: image/svg+xml

@@ -21,7 +21,9 @@ use function sprintf;
  *     echo sprintf(t($violation->template), htmlspecialchars($violation->detail));
  *
  * TEMPLATES lists every template by code, so a translation system can register all of
- * them up front. detail comes from the uploaded file: HTML-encode it before output.
+ * them up front. detail comes from the uploaded file: always valid UTF-8, but it can hold
+ * </script>, quotes and backticks, so encode it for wherever it goes (HTML-encode for a
+ * page, json_encode() with the JSON_HEX_* flags for a <script> block).
  */
 final class Violation
 {

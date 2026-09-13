@@ -86,9 +86,6 @@ move_uploaded_file($_FILES['logo']['tmp_name'], 'uploads/logo.svg');   // the or
   only useful when someone can fix the file. Use a sanitizer and re-check its output.
 - **You put SVG source inline in HTML pages.** That is a different threat model: the page's
   origin and the page's scripts. Sanitize on output with DOMPurify instead.
-- **You cannot set headers on the upload folder.** An accepted file is still XML a browser
-  will render. Serve uploads with `X-Content-Type-Options: nosniff` and a Content Security
-  Policy that forbids script; the [Security Model](docs/security-model.md) page shows both.
 
 ## Related Libraries
 

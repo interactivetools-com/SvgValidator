@@ -5,11 +5,10 @@ citations and Blink details. Written 2026-09-12, before the library existed, by 
 research agents plus one fact checker per finding, then hand-verified against Chromium
 source. The public summary is [docs/how-browsers-handle-svg.md](../how-browsers-handle-svg.md).
 
-Read section 7 with that date in mind: it recommends building a sanitizer on top of
-enshrined/svg-sanitize, and the decision recorded in
-[design-decisions.md](design-decisions.md) went the other way (reject, never rewrite). The
-allow and deny lists in that section are the seed of the current allowlists, not the
-current allowlists; `SvgValidator::rules()` is.
+Read section 7 with that date in mind: it was written to design a sanitizer, and the
+decision recorded in [design-decisions.md](design-decisions.md) went the other way (reject,
+never rewrite). The allow and deny lists in that section are the seed of the current
+allowlists, not the current allowlists; `SvgValidator::rules()` is.
 
 ---
 
@@ -439,12 +438,6 @@ raster in `<image>`. Stripping them breaks legitimate files and buys nothing.
 | **MediaWiki** (rejector, not sanitizer) | closest match | `UploadVerification.php` `checkSvgScriptCallback`: href must be `#` or `data:`, except `<a>` which may be `http(s)`; `data:` href must match `image/(gif|jpeg|jpg|a?png|webp|avif)`; rejects `set`/`animate` with `attributeName` starting `on`, `set/@attributeName` containing `href`, `set/@to` matching `(http|https|data|script):`. `SvgCssChecker.php` tokenizes CSS. Also carries a large allow-list of Illustrator, Inkscape, sodipodi, XMP, Photoshop and Dublin Core namespaces, which answers the design-tool question. Rejects the file instead of rewriting it. |
 | **Cloudflare svg-hush** (Rust) | best mechanism | Types every attribute (`Url`, `UrlFunc`, `StyleSheet`, `Keyword`, `Number`, `Text`, `AnyAscii`) and lets `animate`/`set` target only inert types. Keeps `animate`, `set`, `animateTransform`, `animateMotion`. Drops all `data:` URLs unless you supply an `image_filter` callback, so embedded rasters and fonts are lost by default. |
 | **librsvg** (for server-side thumbnails) | no | "ignores animations, scripts, and events" but does resolve referenced images (https://gnome.pages.gitlab.gnome.org/librsvg/devel-docs/security.html). Static mode with network, not Chrome's `<img>`. |
-
-The practical recommendation: start from enshrined/svg-sanitize (PHP, maintained,
-already handles CDATA and `<use>` depth), turn `removeRemoteReferences` on,
-replace `isHrefSafeValue` with a fragment-or-data-only rule, add a real CSS
-tokenizer pass modelled on `SvgCssChecker.php`, add the SMIL `attributeName`
-rule from svg-hush, and add `<?xml-stylesheet?>` and DTD removal.
 
 ### Unit test cases, derived from the browser tests
 

@@ -198,7 +198,7 @@ the lists are constants.
 
 ## Messages Report the Finding, Not the Fix - DECIDED (2026-09)
 
-`Violation::$message` names what was found ("<script> is not allowed in uploaded SVGs") and
+`Violation::$message` names what was found ("`<script>` is not allowed in uploaded SVGs") and
 stops. It does not add "re-export without editing data" or similar hints. The application
 knows its users and its design tools; the library does not. `Violation::TEMPLATES` holds
 every message as an `sprintf` template keyed by code, so an application can translate or

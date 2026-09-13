@@ -151,7 +151,8 @@ final class SvgValidator
     private const CSS_FORBIDDEN = '/\\\\|@import|@charset|image\(|image-set\(|src\(|expression\(|-moz-binding|behavior\s*:/i';
 
     // url( in CSS that is not #id and not an embedded font (data:font/... or data:;base64,...), with up to 40 chars of context
-    private const CSS_URL_NOT_ALLOWED = '/url\(\s*+["\']?+\s*+(?!#|data:font\/|data:;base64,)[^)]{0,40}/i';
+    // (u so the 40 counts characters, not bytes: a cut inside a multibyte character would make detail invalid UTF-8)
+    private const CSS_URL_NOT_ALLOWED = '/url\(\s*+["\']?+\s*+(?!#|data:font\/|data:;base64,)[^)]{0,40}/iu';
 
     // a URL scheme at the start of a value: javascript:, data:, https:
     private const SCHEME = '/^\s*[a-z][a-z0-9+.\-]*:/i';

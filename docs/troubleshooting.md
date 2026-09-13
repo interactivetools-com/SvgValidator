@@ -55,7 +55,7 @@ is why the closing parenthesis is missing.
 **Fix:** the same: embed the font (`src: url(data:font/woff2;base64,...)` passes) or
 convert the text to outlines.
 
-### "<flowRoot> is not allowed in uploaded SVGs"
+### "`<flowRoot>` is not allowed in uploaded SVGs"
 
 **What happened:** older Inkscape versions saved text drawn with a dragged text box as
 `<flowRoot>`, an element from a draft of SVG 1.2 that no browser implements. The text
@@ -64,7 +64,7 @@ would have been invisible in every browser.
 **Fix:** in Inkscape, select the text and use Text → Convert to Text (Inkscape 1.0+), or
 Path → Object to Path, then save again.
 
-### "<foreignObject> is not allowed in uploaded SVGs"
+### "`<foreignObject>` is not allowed in uploaded SVGs"
 
 **What happened:** the file holds HTML inside the SVG. Diagram tools (draw.io, Excalidraw
 in some modes) export formatted text labels this way, because HTML wraps text and SVG does
@@ -87,7 +87,7 @@ inert inside an `<img>`; opened directly it is a clickable link, so it is refuse
 
 These come from files that were written or edited in a text editor, or copied from a web page.
 
-### "The root <svg> element must declare xmlns=\"http://www.w3.org/2000/svg\", but it has none"
+### "The root `<svg>` element must declare xmlns=\"http://www.w3.org/2000/svg\", but it has none"
 
 **What happened:** the root element is `<svg>` but has no `xmlns` attribute. Inside an HTML
 page a browser fills that in; as a file on its own it is an unknown XML element and renders

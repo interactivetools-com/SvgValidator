@@ -432,17 +432,23 @@ unknown elements although Chrome would tolerate them.
   file reports the errors found before the broken chunk, then `malformed-xml` last.
 - **50 errors and the check stops.** Nothing is read past the fiftieth, including a parse
   error later in the file.
-- **`detail` and `message` are unencoded text from the file.** Always HTML-encode on output.
+- **`detail` and `message` are unencoded text from the file.** Always valid UTF-8, but they
+  can hold `</script>`, quotes and backticks. HTML-encode for a page. A JSON response with
+  `Content-Type: application/json` needs nothing extra. Inside a `<script>` block:
+
+  ```php
+  $json = json_encode($violation->message, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
+  ```
 - **Element and attribute names are case-sensitive**; `on*` detection, URL schemes, data
   image types and CSS tokens are case-insensitive.
 - **`href` is trimmed before checking**, so `href="  #a"` passes; `href=""` rejects with
   `(empty)`.
 - **Not checked:** whether a `#id` target exists, the file extension, the MIME type, file
   size, CSS selectors and properties, and references made through CSS classes.
-- **Serving an accepted file:** it is still XML the browser will render. Serve uploads with
-  `X-Content-Type-Options: nosniff` and a `Content-Security-Policy` that forbids script, and
-  refuse `.svgz` and HTML uploads at the extension check; this library does not look at
-  either.
+- **Serving an accepted file:** it is safe to open directly with no special headers.
+  `X-Content-Type-Options: nosniff` and `Content-Security-Policy: sandbox` add a second
+  layer in case a rule is ever bypassed. Refuse `.svgz` and HTML uploads at the extension
+  check; this library does not look at either.
 - **Not for inline SVG.** An accepted file is safe to serve as its own document or through
   `<img>`. Pasting SVG source into an HTML page is a different threat model (the page's
   origin, the page's scripts) and is not what these rules were built for.

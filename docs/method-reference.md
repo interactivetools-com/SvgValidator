@@ -16,11 +16,11 @@ Contents:
 
 Three static methods; the class cannot be instantiated.
 
-| Method                                                                               | Returns  | Description                                                                                                                                                              |
-|--------------------------------------------------------------------------------------|----------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [`SvgValidator::checkFile(string $path)`](getting-started.md#your-first-check---checkfile) | `Result` | Streams the file at `$path` through every rule. A path that is not a readable file gives a result with one `file-unreadable` error; nothing throws                       |
-| [`SvgValidator::checkString(string $svg)`](getting-started.md#checking-a-string---checkstring) | `Result` | The same check on SVG source in a string. Same result as `checkFile()` for the same bytes                                                                                |
-| [`SvgValidator::rules()`](what-gets-through.md)                                      | `array`  | The allowlists, keyed `elements`, `attributes`, `namespacedAttributes` (by namespace URI), `inertNamespaces`, `imageElements`, `dataImageTypes`. Read-only: the lists are constants |
+| Method                                                                                         | Returns  | Description                                                                                                                                                                         |
+|------------------------------------------------------------------------------------------------|----------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`SvgValidator::checkFile(string $path)`](getting-started.md#your-first-check---checkfile)     | `Result` | Streams the file at `$path` through every rule. A path that is not a readable file gives a result with one `file-unreadable` error; nothing throws                                  |
+| [`SvgValidator::checkString(string $svg)`](getting-started.md#checking-a-string---checkstring) | `Result` | The same check on SVG source in a string. Same result as `checkFile()` for the same bytes                                                                                           |
+| [`SvgValidator::rules()`](what-gets-through.md)                                                | `array`  | The allowlists, keyed `elements`, `attributes`, `namespacedAttributes` (by namespace URI), `inertNamespaces`, `imageElements`, `dataImageTypes`. Read-only: the lists are constants |
 
 Neither check looks at the file name, extension, MIME type or size. Check those at upload
 time; [Security Model](security-model.md#at-upload-time) says what to refuse.
@@ -29,10 +29,10 @@ time; [Security Model](security-model.md#at-upload-time) says what to refuse.
 
 What both check methods return. Two readonly properties, set in the constructor.
 
-| Property           | Type          | Description                                                                                                                              |
-|--------------------|---------------|------------------------------------------------------------------------------------------------------------------------------------------|
-| `$result->ok`      | `bool`        | `true` when `$errors` is empty                                                                                                            |
-| `$result->errors`  | `Violation[]` | One entry per distinct problem (same `code` and `detail` reported once), in file order, at most 50. `malformed-xml` is always the last entry when present |
+| Property          | Type          | Description                                                                                                                                               |
+|-------------------|---------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `$result->ok`     | `bool`        | `true` when `$errors` is empty                                                                                                                            |
+| `$result->errors` | `Violation[]` | One entry per distinct problem (same `code` and `detail` reported once), in file order, at most 50. `malformed-xml` is always the last entry when present |
 
 The prolog checks (`file-unreadable`, `not-svg`, `not-utf8`, `doctype-not-allowed`) stop
 the check, so those arrive as the only error.
@@ -41,13 +41,13 @@ the check, so those arrive as the only error.
 
 One rule the file broke. Four readonly strings, plus the template table.
 
-| Member                    | Type     | Description                                                                                                                                 |
-|---------------------------|----------|---------------------------------------------------------------------------------------------------------------------------------------------|
-| `$violation->code`        | `string` | One of the 21 codes below. Never renamed once released, so application code can switch on it                                                |
-| `$violation->detail`      | `string` | What was found: an element or attribute name, a namespace, or the first 60 characters of a value (then `...`). Taken from the file, not HTML-encoded |
-| `$violation->template`    | `string` | The English message with one `%s` where the detail goes                                                                                     |
-| `$violation->message`     | `string` | `sprintf($template, $detail)`                                                                                                               |
-| `Violation::TEMPLATES`    | `array`  | Every template keyed by code, so a translation system can register them all up front                                                        |
+| Member                 | Type     | Description                                                                                                                                          |
+|------------------------|----------|------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `$violation->code`     | `string` | One of the 21 codes below. Never renamed once released, so application code can switch on it                                                         |
+| `$violation->detail`   | `string` | What was found: an element or attribute name, a namespace, or the first 60 characters of a value (then `...`). Taken from the file, not HTML-encoded |
+| `$violation->template` | `string` | The English message with one `%s` where the detail goes                                                                                              |
+| `$violation->message`  | `string` | `sprintf($template, $detail)`                                                                                                                        |
+| `Violation::TEMPLATES` | `array`  | Every template keyed by code, so a translation system can register them all up front                                                                 |
 
 To translate, run the template through your translation function and put the detail back:
 
@@ -88,8 +88,8 @@ rule with an example and the fix.
 
 Fixed values, not configurable.
 
-| Limit                                | Value         | Where it comes from                                   |
-|--------------------------------------|---------------|-------------------------------------------------------|
+| Limit                                | Value         | Where it comes from                                    |
+|--------------------------------------|---------------|--------------------------------------------------------|
 | Bytes searched for the root tag      | 64 KB         | SvgValidator; past this, `malformed-xml`               |
 | Errors reported per file             | 50            | SvgValidator; reading stops at the fiftieth            |
 | Embedded SVG nesting                 | 3 levels      | SvgValidator; the fourth level rejects                 |

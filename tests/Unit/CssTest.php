@@ -81,6 +81,15 @@ class CssTest extends SvgValidatorTestCase
         $this->assertRejects($this->svg('<rect style="' . htmlspecialchars($css, ENT_QUOTES) . '"/>'), 'css-not-allowed', $detail);
     }
 
+    /** The url( detail is cut at 40 characters, never inside a multibyte character, so it stays valid UTF-8 for json_encode(). */
+    public function testUrlDetailIsCutOnACharacterBoundary(): void
+    {
+        $url    = 'https://evil.example/' . str_repeat("\u{4E2D}", 30);   // 21 ASCII characters, then 3-byte characters
+        $detail = SvgValidator::checkString($this->svg("<style>.a{fill:url($url)}</style>"))->errors[0]->detail;
+        $this->assertSame('url(' . mb_substr($url, 0, 40), $detail);
+        $this->assertTrue(mb_check_encoding($detail, 'UTF-8'));
+    }
+
     public static function bannedCssProvider(): array
     {
         return [
