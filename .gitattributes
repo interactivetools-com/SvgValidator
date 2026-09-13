@@ -6,6 +6,7 @@
 .gitattributes   export-ignore
 .github          export-ignore
 .gitignore       export-ignore
+benchmarks/**    export-ignore
 docs/**          export-ignore
 logo.svg         export-ignore
 phpunit.xml.dist export-ignore

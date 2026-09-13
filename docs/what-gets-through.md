@@ -139,12 +139,12 @@ XInclude and XML Events, which is where the historical attacks live.
 What a reference may point at, by where it appears. A same-file reference is `#` followed
 by the `id` of an element in the same file.
 
-| Where                                        | Allowed                                                                                     | Rejects with                |
-|----------------------------------------------|---------------------------------------------------------------------------------------------|-----------------------------|
-| `href` on any element but the two image ones | a same-file reference (`#id`)                                                               | `href-not-allowed`          |
-| `href` on the image elements (below)         | `#id`, or a base64 `data:` URL of one of the image types below                              | `image-href-not-allowed`    |
-| `url()` in any attribute except `style`      | `url(#id)`, quotes and whitespace allowed                                                   | `url-not-fragment`          |
-| `url()` in CSS (`<style>` or `style=`)       | `url(#id)`, or an embedded font: `url(data:font/...)`, `url(data:;base64,...)`              | `css-not-allowed`           |
+| Where                                        | Allowed                                                                        | Rejects with             |
+|----------------------------------------------|--------------------------------------------------------------------------------|--------------------------|
+| `href` on any element but the two image ones | a same-file reference (`#id`)                                                  | `href-not-allowed`       |
+| `href` on the image elements (below)         | `#id`, or a base64 `data:` URL of one of the image types below                 | `image-href-not-allowed` |
+| `url()` in any attribute except `style`      | `url(#id)`, quotes and whitespace allowed                                      | `url-not-fragment`       |
+| `url()` in CSS (`<style>` or `style=`)       | `url(#id)`, or an embedded font: `url(data:font/...)`, `url(data:;base64,...)` | `css-not-allowed`        |
 
 Image elements: <!-- rules:imageElements -->
 `image`, `feImage`

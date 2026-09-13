@@ -109,15 +109,15 @@ This behaviour landed in Chrome in June 2014 to match Firefox, which had it firs
 
 The three engines agree on everything an allowlist cares about. The differences:
 
-| Behaviour                          | Chrome                              | Firefox                                     | Safari                      |
-|------------------------------------|-------------------------------------|---------------------------------------------|-----------------------------|
-| `data:` loads inside the SVG       | allowed                             | allowed                                     | allowed                     |
-| `blob:` loads inside the SVG       | blocked                             | allowed                                     | blocked                     |
-| Relative URLs                      | never resolve (no base URL)         | resolve, then the load is blocked           | never resolve               |
-| `<foreignObject>` renders          | yes                                 | yes                                         | yes                         |
-| `<iframe>` or `<embed>` inside it  | no                                  | no                                          | no                          |
-| `:visited` matches                 | never                               | never                                       | never                       |
-| `<use href="data:...">`            | removed in Chrome 120               | removed in Firefox 122                      | never supported             |
+| Behaviour                         | Chrome                      | Firefox                           | Safari          |
+|-----------------------------------|-----------------------------|-----------------------------------|-----------------|
+| `data:` loads inside the SVG      | allowed                     | allowed                           | allowed         |
+| `blob:` loads inside the SVG      | blocked                     | allowed                           | blocked         |
+| Relative URLs                     | never resolve (no base URL) | resolve, then the load is blocked | never resolve   |
+| `<foreignObject>` renders         | yes                         | yes                               | yes             |
+| `<iframe>` or `<embed>` inside it | no                          | no                                | no              |
+| `:visited` matches                | never                       | never                             | never           |
+| `<use href="data:...">`           | removed in Chrome 120       | removed in Firefox 122            | never supported |
 
 The one place they differ, `blob:` URLs, does not matter here: the rules reject every URL
 scheme except `#id` and the embedded `data:` forms, so a `blob:` reference never reaches a
@@ -137,19 +137,19 @@ scheme-only way: the rules look at the URL, not at which element carries it.
 same file is opened directly, saved and reopened, or drawn by a server-side rasterizer.
 Wherever Chrome neutralizes something instead of refusing it, the rules refuse it:
 
-| Chrome in `<img>`                         | Same file opened directly       | Rule                                        |
-|-------------------------------------------|---------------------------------|---------------------------------------------|
-| `<script>` parsed, never runs             | runs                            | `element-not-allowed`                       |
-| `on*` attributes compile to nothing       | fire                            | `event-handler`                             |
-| `javascript:` href is inert               | navigates                       | `href-not-allowed`                          |
-| `<a href="https://...">` is inert         | clickable                       | `href-not-allowed`                          |
-| external `url()` silently blocked         | loads, phones home              | `url-not-fragment`, `css-not-allowed`       |
-| `<?xml-stylesheet href="#id"?>` processed | processed                       | `processing-instruction`                    |
-| `<foreignObject>` renders, no script      | scripts inside run              | `element-not-allowed`                       |
-| DTD entities expand                       | expand                          | `doctype-not-allowed`                       |
-| reference loops broken by the renderer    | hang or crash other renderers   | `reference-expansion-too-large`             |
-| `<!-->` is a comment to the XML parser    | an HTML parser closes it early  | `comment-not-allowed`                       |
-| SVG in `<image>` rendered in secure mode  | rasterizers give it no protection | checked with every rule                   |
+| Chrome in `<img>`                         | Same file opened directly         | Rule                                  |
+|-------------------------------------------|-----------------------------------|---------------------------------------|
+| `<script>` parsed, never runs             | runs                              | `element-not-allowed`                 |
+| `on*` attributes compile to nothing       | fire                              | `event-handler`                       |
+| `javascript:` href is inert               | navigates                         | `href-not-allowed`                    |
+| `<a href="https://...">` is inert         | clickable                         | `href-not-allowed`                    |
+| external `url()` silently blocked         | loads, phones home                | `url-not-fragment`, `css-not-allowed` |
+| `<?xml-stylesheet href="#id"?>` processed | processed                         | `processing-instruction`              |
+| `<foreignObject>` renders, no script      | scripts inside run                | `element-not-allowed`                 |
+| DTD entities expand                       | expand                            | `doctype-not-allowed`                 |
+| reference loops broken by the renderer    | hang or crash other renderers     | `reference-expansion-too-large`       |
+| `<!-->` is a comment to the XML parser    | an HTML parser closes it early    | `comment-not-allowed`                 |
+| SVG in `<image>` rendered in secure mode  | rasterizers give it no protection | checked with every rule               |
 
 **Looser than Chrome, or not mirrored.** `:hover`, `:visited` and `:focus` in CSS and
 `begin="click"` in SMIL are accepted. Chrome makes them do nothing in `<img>`; opened

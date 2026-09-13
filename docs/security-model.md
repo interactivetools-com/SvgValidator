@@ -142,14 +142,14 @@ on your pages keep working.
 
 ## Where the File Is Shown
 
-| Context                                   | What happens                                                                                                     |
-|-------------------------------------------|------------------------------------------------------------------------------------------------------------------|
-| `<img src="logo.svg">`                    | The target case. Script, interaction and outside loads are off in every browser; animation runs.                  |
-| CSS `background-image: url(logo.svg)`     | The same restrictions, and browsers also disable animation.                                                       |
-| Opened directly                           | A full document on your origin. An accepted file has nothing to run or load; the CSP header above makes that hold even if a rule is ever bypassed. |
-| Inline `<svg>` in an HTML page            | Not covered. The markup is part of the page. Sanitize on output.                                                 |
-| Server-side thumbnails (ImageMagick, librsvg) | No browser protection at all, which is why embedded SVG images get the full check. Keep the rasterizer patched. |
-| Email                                     | Gmail does not render SVG in any form, and Outlook on the web stopped in 2025. Send a PNG.                         |
+| Context                                       | What happens                                                                                                                                       |
+|-----------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------|
+| `<img src="logo.svg">`                        | The target case. Script, interaction and outside loads are off in every browser; animation runs.                                                   |
+| CSS `background-image: url(logo.svg)`         | The same restrictions, and browsers also disable animation.                                                                                        |
+| Opened directly                               | A full document on your origin. An accepted file has nothing to run or load; the CSP header above makes that hold even if a rule is ever bypassed. |
+| Inline `<svg>` in an HTML page                | Not covered. The markup is part of the page. Sanitize on output.                                                                                   |
+| Server-side thumbnails (ImageMagick, librsvg) | No browser protection at all, which is why embedded SVG images get the full check. Keep the rasterizer patched.                                    |
+| Email                                         | Gmail does not render SVG in any form, and Outlook on the web stopped in 2025. Send a PNG.                                                         |
 
 ## Reporting a Bypass
 

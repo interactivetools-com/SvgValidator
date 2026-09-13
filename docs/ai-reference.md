@@ -141,29 +141,29 @@ never change once released; message wording can.
 
 Every code, its template, and what `detail` holds. Templates are `Violation::TEMPLATES`.
 
-| Code                            | Template                                                                                   | `detail`                                                                                          |
-|---------------------------------|--------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------|
-| `file-unreadable`               | `Cannot read file %s`                                                                      | the file's basename                                                                               |
-| `not-svg`                       | `This is not an SVG file: it starts with %s`                                               | the first 20 bytes, control and non-ASCII bytes escaped, or `nothing (the file is empty)`         |
-| `not-utf8`                      | `SVG files must be UTF-8, this one is %s`                                                  | `UTF-16 or UTF-32` or `declared as ISO-8859-1` (the declared encoding)                            |
-| `malformed-xml`                 | `The SVG is not well-formed XML: %s`                                                       | libxml2's message (may contain a newline) plus ` (line N)`, or `no root element within the first 64 KB` |
-| `doctype-not-allowed`           | `The DOCTYPE declaration is not allowed because %s`                                        | `it contains an internal DTD subset (entity declarations)`                                        |
-| `processing-instruction`        | `Processing instructions like <?%s?> are not allowed`                                      | the instruction's target, such as `xml-stylesheet`                                                |
-| `comment-not-allowed`           | `A comment starting with <!--%s is not allowed, HTML parsers close it there`               | `>` or `->`                                                                                       |
-| `root-not-svg`                  | `The root element must be <svg>, not <%s>`                                                 | the root element's name as written                                                                |
-| `root-namespace-wrong`          | `The root <svg> element must declare xmlns="http://www.w3.org/2000/svg", but it has %s`    | `none` or `xmlns="..."` with the namespace found                                                  |
-| `element-not-allowed`           | `<%s> is not allowed in uploaded SVGs`                                                     | the element's local name, or its name as written when it has no namespace                         |
-| `namespace-not-allowed`         | `Elements from the XML namespace %s are not allowed`                                       | the namespace URI                                                                                 |
-| `event-handler`                 | `%s= event handler attributes are not allowed`                                             | the attribute name as written, such as `onload` or `xlink:onload`                                 |
-| `attribute-not-allowed`         | `The %s attribute is not allowed`                                                          | the attribute name as written, such as `tabindex` or `xml:base`                                   |
-| `href-not-allowed`              | `href must reference an element in the same file (#id), not %s`                            | the value, or `(empty)`                                                                           |
-| `image-href-not-allowed`        | `Image href must be #id or an embedded PNG, JPEG, GIF, WebP or SVG data: URL, not %s`      | the value, or `(empty)`                                                                           |
-| `embedded-svg-not-allowed`      | `An embedded SVG image was rejected: %s`                                                   | the inner file's message, `the data: URL is not valid base64`, or `SVG images nested more than 3 levels deep` |
-| `url-not-fragment`              | `url() in the %s attribute must reference an element in the same file (#id)`               | the attribute name                                                                                |
-| `reference-expansion-too-large` | `The references in this file %s`                                                           | `form a loop (#a -> #b -> #a)` or `expand to more than 100,000 elements`                          |
-| `css-not-allowed`               | `CSS containing %s is not allowed`                                                         | the banned token as matched, such as `@import`, `\`, or `url(https://example.com/a.css`           |
-| `animation-target-not-allowed`  | `Animating the %s attribute is not allowed`                                                | the `attributeName` value                                                                         |
-| `animation-value-not-allowed`   | `The %s animation attribute contains a URL or scheme`                                      | `from`, `to`, `by`, or `values`                                                                   |
+| Code                            | Template                                                                                | `detail`                                                                                                      |
+|---------------------------------|-----------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------|
+| `file-unreadable`               | `Cannot read file %s`                                                                   | the file's basename                                                                                           |
+| `not-svg`                       | `This is not an SVG file: it starts with %s`                                            | the first 20 bytes, control and non-ASCII bytes escaped, or `nothing (the file is empty)`                     |
+| `not-utf8`                      | `SVG files must be UTF-8, this one is %s`                                               | `UTF-16 or UTF-32` or `declared as ISO-8859-1` (the declared encoding)                                        |
+| `malformed-xml`                 | `The SVG is not well-formed XML: %s`                                                    | libxml2's message (may contain a newline) plus ` (line N)`, or `no root element within the first 64 KB`       |
+| `doctype-not-allowed`           | `The DOCTYPE declaration is not allowed because %s`                                     | `it contains an internal DTD subset (entity declarations)`                                                    |
+| `processing-instruction`        | `Processing instructions like <?%s?> are not allowed`                                   | the instruction's target, such as `xml-stylesheet`                                                            |
+| `comment-not-allowed`           | `A comment starting with <!--%s is not allowed, HTML parsers close it there`            | `>` or `->`                                                                                                   |
+| `root-not-svg`                  | `The root element must be <svg>, not <%s>`                                              | the root element's name as written                                                                            |
+| `root-namespace-wrong`          | `The root <svg> element must declare xmlns="http://www.w3.org/2000/svg", but it has %s` | `none` or `xmlns="..."` with the namespace found                                                              |
+| `element-not-allowed`           | `<%s> is not allowed in uploaded SVGs`                                                  | the element's local name, or its name as written when it has no namespace                                     |
+| `namespace-not-allowed`         | `Elements from the XML namespace %s are not allowed`                                    | the namespace URI                                                                                             |
+| `event-handler`                 | `%s= event handler attributes are not allowed`                                          | the attribute name as written, such as `onload` or `xlink:onload`                                             |
+| `attribute-not-allowed`         | `The %s attribute is not allowed`                                                       | the attribute name as written, such as `tabindex` or `xml:base`                                               |
+| `href-not-allowed`              | `href must reference an element in the same file (#id), not %s`                         | the value, or `(empty)`                                                                                       |
+| `image-href-not-allowed`        | `Image href must be #id or an embedded PNG, JPEG, GIF, WebP or SVG data: URL, not %s`   | the value, or `(empty)`                                                                                       |
+| `embedded-svg-not-allowed`      | `An embedded SVG image was rejected: %s`                                                | the inner file's message, `the data: URL is not valid base64`, or `SVG images nested more than 3 levels deep` |
+| `url-not-fragment`              | `url() in the %s attribute must reference an element in the same file (#id)`            | the attribute name                                                                                            |
+| `reference-expansion-too-large` | `The references in this file %s`                                                        | `form a loop (#a -> #b -> #a)` or `expand to more than 100,000 elements`                                      |
+| `css-not-allowed`               | `CSS containing %s is not allowed`                                                      | the banned token as matched, such as `@import`, `\`, or `url(https://example.com/a.css`                       |
+| `animation-target-not-allowed`  | `Animating the %s attribute is not allowed`                                             | the `attributeName` value                                                                                     |
+| `animation-value-not-allowed`   | `The %s animation attribute contains a URL or scheme`                                   | `from`, `to`, `by`, or `values`                                                                               |
 
 Values longer than 60 characters are cut at 60 and end with `...`.
 
@@ -385,16 +385,16 @@ http://www.w3.org/2001/XMLSchema-instance
 
 ## Limits
 
-| Limit                                  | Value   | Source                |
-|----------------------------------------|---------|-----------------------|
-| Bytes searched for the root tag        | 64 KB   | SvgValidator          |
-| Errors reported per file               | 50      | SvgValidator          |
-| Embedded SVG nesting                   | 3 levels | SvgValidator         |
-| Elements rendered through references   | 100,000 | SvgValidator          |
-| Value length in `detail`               | 60 characters | SvgValidator    |
-| Element nesting depth                  | 256     | libxml2 default       |
-| Single text node                       | 10 MB   | libxml2 default       |
-| File size                              | none    | streamed; cap it at upload time |
+| Limit                                | Value         | Source                          |
+|--------------------------------------|---------------|---------------------------------|
+| Bytes searched for the root tag      | 64 KB         | SvgValidator                    |
+| Errors reported per file             | 50            | SvgValidator                    |
+| Embedded SVG nesting                 | 3 levels      | SvgValidator                    |
+| Elements rendered through references | 100,000       | SvgValidator                    |
+| Value length in `detail`             | 60 characters | SvgValidator                    |
+| Element nesting depth                | 256           | libxml2 default                 |
+| Single text node                     | 10 MB         | libxml2 default                 |
+| File size                            | none          | streamed; cap it at upload time |
 
 ## How the Rules Compare to Chrome
 
@@ -403,17 +403,17 @@ interaction and every fetch that is not a `data:` URL at render time. The rules 
 **stricter** wherever that protection is render-time only and disappears when the file is
 opened directly or rasterized on a server:
 
-| Chrome in `<img>`                          | Rule here                       |
-|--------------------------------------------|---------------------------------|
-| `<script>` parsed, never runs              | `element-not-allowed`           |
-| `on*` attributes ignored                   | `event-handler`                 |
-| `javascript:` and `https:` hrefs inert     | `href-not-allowed`              |
-| external `url()` silently not loaded       | `url-not-fragment`, `css-not-allowed` |
-| `<?xml-stylesheet href="#id"?>` processed  | `processing-instruction`        |
-| `<foreignObject>` rendered without script  | `element-not-allowed`           |
-| DTD entities expanded                      | `doctype-not-allowed`           |
-| reference loops broken by the renderer     | `reference-expansion-too-large` |
-| SVG inside `<image>` rendered in secure mode | checked with every rule       |
+| Chrome in `<img>`                            | Rule here                             |
+|----------------------------------------------|---------------------------------------|
+| `<script>` parsed, never runs                | `element-not-allowed`                 |
+| `on*` attributes ignored                     | `event-handler`                       |
+| `javascript:` and `https:` hrefs inert       | `href-not-allowed`                    |
+| external `url()` silently not loaded         | `url-not-fragment`, `css-not-allowed` |
+| `<?xml-stylesheet href="#id"?>` processed    | `processing-instruction`              |
+| `<foreignObject>` rendered without script    | `element-not-allowed`                 |
+| DTD entities expanded                        | `doctype-not-allowed`                 |
+| reference loops broken by the renderer       | `reference-expansion-too-large`       |
+| SVG inside `<image>` rendered in secure mode | checked with every rule               |
 
 **Looser than Chrome, or not mirrored:** `:hover`, `:visited`, `:focus` in CSS and
 `begin="click"` in SMIL are accepted (Chrome makes them do nothing in `<img>`; opened directly

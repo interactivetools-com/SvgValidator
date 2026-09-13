@@ -24,6 +24,7 @@ whichever matches your task.
 - [Security Model](security-model.md) - What an SVG can do, what this library prevents, what it does not, and the headers to serve accepted files with.
 - [How Browsers Handle SVG](how-browsers-handle-svg.md) - What Chrome, Firefox and Safari do with an SVG in `<img>`, where the rules mirror them and where they are stricter.
 - [Method Reference](method-reference.md) - `checkFile()`, `checkString()`, `rules()`, and the `Result` and `Violation` fields.
+- [Performance](performance.md) - 0.02 ms per icon, 10 ms per megabyte, and memory that does not grow with the file. Measured, with the script to rerun.
 - [AI Reference](ai-reference.md) - The complete API and every rule in one dense file, written for AI coding assistants.
 
 ---

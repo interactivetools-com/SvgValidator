@@ -23,8 +23,9 @@ renderer when the same file is opened directly. It never rewrites the file.
 - **Real files pass.** 3,460 of 3,460 simple-icons and 1,583 of 1,679 resvg test files are
   accepted (the rest reject by design: external links, entities, reference loops). Inkscape,
   Illustrator, Affinity, Sketch and Visio metadata is on the allowlist.
-- **Streams, never rewrites.** XMLReader reads the file once with constant memory and returns
-  a list of up to 50 distinct problems. Nothing throws for a bad file.
+- **Streams, never rewrites.** XMLReader reads the file once, at about 100 MB/s with memory
+  that does not grow with the file, and returns a list of up to 50 distinct problems.
+  Nothing throws for a bad file.
 
 ## Why Reject Instead of Clean
 
@@ -57,6 +58,7 @@ Full guides and references ([browse on GitHub](https://github.com/interactivetoo
     - [Security Model](docs/security-model.md) - what an SVG can do, what this prevents, what it does not, and how to serve accepted files
     - [How Browsers Handle SVG](docs/how-browsers-handle-svg.md) - what Chrome, Firefox and Safari do with an SVG in `<img>`, with the spec quotes
     - [Method Reference](docs/method-reference.md) - `checkFile()`, `checkString()`, `rules()`, `Result`, `Violation`
+    - [Performance](docs/performance.md) - 0.02 ms per icon, 10 ms per megabyte, memory that does not grow with the file
     - [AI Reference](docs/ai-reference.md) - the complete API and every rule in one dense file, written for AI coding assistants
 
 ## Quick Start

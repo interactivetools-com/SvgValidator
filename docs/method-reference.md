@@ -101,4 +101,4 @@ Fixed values, not configurable.
 
 ---
 
-[← How Browsers Handle SVG](how-browsers-handle-svg.md) | [Documentation Index](README.md) | [Next: AI Reference →](ai-reference.md)
+[← How Browsers Handle SVG](how-browsers-handle-svg.md) | [Documentation Index](README.md) | [Next: Performance →](performance.md)
