@@ -347,10 +347,10 @@ unicode-bidi vector-effect visibility white-space word-spacing writing-mode
 **`namespacedAttributes`**, keyed by namespace URI:
 
 <!-- rules:namespacedAttributes -->
-| Namespace | Attributes |
-|---|---|
+| Namespace                              | Attributes            |
+|----------------------------------------|-----------------------|
 | `http://www.w3.org/XML/1998/namespace` | `id`, `lang`, `space` |
-| `http://www.w3.org/1999/xlink` | `href`, `title` |
+| `http://www.w3.org/1999/xlink`         | `href`, `title`       |
 <!-- /rules:namespacedAttributes -->
 
 **`inertNamespaces`**: elements and attributes in these pass without inspection (except

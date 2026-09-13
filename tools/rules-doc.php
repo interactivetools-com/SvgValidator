@@ -15,6 +15,9 @@ declare(strict_types=1);
 namespace Itools\SvgValidator\Tools\RulesDoc;
 
 use Itools\SvgValidator\SvgValidator;
+use function renderMdTable;
+
+require_once __DIR__ . '/shared-md-table.php';
 
 const PAGES = ['docs/what-gets-through.md', 'docs/ai-reference.md'];
 const WIDTH = 100;
@@ -58,11 +61,11 @@ function wrap(array $names): string
 /** @param array<string, string[]> $byNamespace */
 function table(array $byNamespace): string
 {
-    $rows = ["| Namespace | Attributes |", "|---|---|"];
+    $rows = [];
     foreach ($byNamespace as $namespace => $names) {
-        $rows[] = "| `$namespace` | " . implode(', ', array_map(fn(string $name) => "`$name`", $names)) . " |";
+        $rows[] = ["`$namespace`", implode(', ', array_map(fn(string $name) => "`$name`", $names))];
     }
-    return implode("\n", $rows);
+    return rtrim(renderMdTable(['Namespace', 'Attributes'], $rows), "\n");
 }
 
 if (realpath($argv[0] ?? '') === __FILE__) {

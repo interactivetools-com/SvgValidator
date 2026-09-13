@@ -97,10 +97,10 @@ The only prefixed attributes allowed on SVG elements, by namespace. `xmlns` decl
 always pass. `xlink:href` follows the same rules as `href`.
 
 <!-- rules:namespacedAttributes -->
-| Namespace | Attributes |
-|---|---|
+| Namespace                              | Attributes            |
+|----------------------------------------|-----------------------|
 | `http://www.w3.org/XML/1998/namespace` | `id`, `lang`, `space` |
-| `http://www.w3.org/1999/xlink` | `href`, `title` |
+| `http://www.w3.org/1999/xlink`         | `href`, `title`       |
 <!-- /rules:namespacedAttributes -->
 
 Not on the list, on purpose: `xml:base`, `xlink:show`, `xlink:actuate`.

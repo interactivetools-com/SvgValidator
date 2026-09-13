@@ -26,7 +26,7 @@ use function renderMdTable;
 require __DIR__ . '/../src/Violation.php';
 require __DIR__ . '/../src/Result.php';
 require __DIR__ . '/../src/SvgValidator.php';
-require __DIR__ . '/shared-md-table.php';
+require __DIR__ . '/../tools/shared-md-table.php';
 
 const RUNS       = 7;
 const SIZES      = ['1 KB' => 1024, '100 KB' => 102400, '1 MB' => 1048576, '10 MB' => 10485760, '50 MB' => 52428800];
