@@ -16,8 +16,8 @@ declare(strict_types=1);
  * text is saved as LICENSE next to the files, and SOURCE.json records where the files came
  * from, which commit, and what the tally should expect of them.
  *
- * Nothing under corpus/ is ever copied into tests/: some of these sets are GPL or LGPL. Our
- * own design-tool exports go in corpus/own/, by hand.
+ * Nothing under corpus/ is ever copied into tests/: some of these sets are GPL or LGPL.
+ * Design-tool exports go in corpus/own/: tools/fetch-commons.php fills corpus/own/commons/.
  */
 
 const CORPUS_DIR = __DIR__ . '/../corpus';

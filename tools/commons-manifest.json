@@ -1,0 +1,950 @@
+{
+    "source": "Wikimedia Commons",
+    "how": "per tool, the 30 newest SVG files in the deep category \"Created with <tool>\", files over 3000000 bytes skipped; php tools/fetch-commons.php --relist",
+    "license": "per file below; Commons files are CC0, CC BY, CC BY-SA or public domain",
+    "listed": "2026-09-13T19:58:47-07:00",
+    "files": {
+        "adobe-illustrator/Albiano_d'Ivrea-Stemma.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Albiano_d'Ivrea-Stemma.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/c/cc/Albiano_d%27Ivrea-Stemma.svg",
+            "license": "CC BY-SA 4.0",
+            "bytes": 198111
+        },
+        "adobe-illustrator/Aztec_god_Zacatzontli.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Aztec_god_Zacatzontli.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/a/a5/Aztec_god_Zacatzontli.svg",
+            "license": "CC BY 4.0",
+            "bytes": 226074
+        },
+        "adobe-illustrator/Bangla_WikiConference_2026_logo_en.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Bangla_WikiConference_2026_logo_en.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/3/37/Bangla_WikiConference_2026_logo_en.svg",
+            "license": "CC BY-SA 4.0",
+            "bytes": 21532
+        },
+        "adobe-illustrator/Blason_de_la_ville_de_Pignans_(Var).svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Blason_de_la_ville_de_Pignans_(Var).svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/c/c2/Blason_de_la_ville_de_Pignans_%28Var%29.svg",
+            "license": "CC BY 4.0",
+            "bytes": 203326
+        },
+        "adobe-illustrator/Bundesanstalt_f\u00fcr_Wasserbau_Logo.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Bundesanstalt_f\u00fcr_Wasserbau_Logo.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/2/27/Bundesanstalt_f%C3%BCr_Wasserbau_Logo.svg",
+            "license": "Public domain",
+            "bytes": 9473
+        },
+        "adobe-illustrator/CNN_(White).svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:CNN_(White).svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/c/c2/CNN_%28White%29.svg",
+            "license": "Public domain",
+            "bytes": 3886
+        },
+        "adobe-illustrator/Cascinette_d'Ivrea-Stemma.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Cascinette_d'Ivrea-Stemma.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/4/49/Cascinette_d%27Ivrea-Stemma.svg",
+            "license": "CC BY-SA 4.0",
+            "bytes": 200779
+        },
+        "adobe-illustrator/Claussen-Simon-Stiftung-logo.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Claussen-Simon-Stiftung-logo.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/d/d7/Claussen-Simon-Stiftung-logo.svg",
+            "license": "Public domain",
+            "bytes": 8663
+        },
+        "adobe-illustrator/Coat_of_Arms_of_the_Serbian_Orthodox_Eparchy_of_Canada.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Coat_of_Arms_of_the_Serbian_Orthodox_Eparchy_of_Canada.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/2/24/Coat_of_Arms_of_the_Serbian_Orthodox_Eparchy_of_Canada.svg",
+            "license": "CC0",
+            "bytes": 293874
+        },
+        "adobe-illustrator/Demorganlaws-1.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Demorganlaws-1.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/6/60/Demorganlaws-1.svg",
+            "license": "Public domain",
+            "bytes": 6546
+        },
+        "adobe-illustrator/Demorganlaws-2.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Demorganlaws-2.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/4/49/Demorganlaws-2.svg",
+            "license": "Public domain",
+            "bytes": 7467
+        },
+        "adobe-illustrator/EparchyofSaskatoonCoatofArms2025.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:EparchyofSaskatoonCoatofArms2025.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/f/fc/EparchyofSaskatoonCoatofArms2025.svg",
+            "license": "CC0",
+            "bytes": 395506
+        },
+        "adobe-illustrator/Grand_Prairie,_Texas_Logo.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Grand_Prairie,_Texas_Logo.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/5/52/Grand_Prairie%2C_Texas_Logo.svg",
+            "license": "Public domain",
+            "bytes": 19072
+        },
+        "adobe-illustrator/IPA_logo_2026_blue.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:IPA_logo_2026_blue.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/b/b3/IPA_logo_2026_blue.svg",
+            "license": "Public domain",
+            "bytes": 65437
+        },
+        "adobe-illustrator/Iseo-Stemma.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Iseo-Stemma.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/a/a7/Iseo-Stemma.svg",
+            "license": "CC BY-SA 4.0",
+            "bytes": 193552
+        },
+        "adobe-illustrator/Localization_of_Turkey_in_EU.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Localization_of_Turkey_in_EU.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/b/b6/Localization_of_Turkey_in_EU.svg",
+            "license": "CC BY-SA 3.0",
+            "bytes": 196480
+        },
+        "adobe-illustrator/PR_old_7725.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:PR_old_7725.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/f/f9/PR_old_7725.svg",
+            "license": "CC BY-SA 3.0",
+            "bytes": 193082
+        },
+        "adobe-illustrator/PR_tertiary_7725.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:PR_tertiary_7725.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/9/9c/PR_tertiary_7725.svg",
+            "license": "Public domain",
+            "bytes": 2977
+        },
+        "adobe-illustrator/Sheikah_Language.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Sheikah_Language.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/0/00/Sheikah_Language.svg",
+            "license": "Public domain",
+            "bytes": 24207
+        },
+        "adobe-illustrator/Shield_of_Botswana.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Shield_of_Botswana.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/2/21/Shield_of_Botswana.svg",
+            "license": "Public domain",
+            "bytes": 37455
+        },
+        "adobe-illustrator/Silver_medal_icon_(G_initial).svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Silver_medal_icon_(G_initial).svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/d/dd/Silver_medal_icon_%28G_initial%29.svg",
+            "license": "CC BY-SA 4.0",
+            "bytes": 677
+        },
+        "adobe-illustrator/US_Veterans_Health_Administration_logo.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:US_Veterans_Health_Administration_logo.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/4/49/US_Veterans_Health_Administration_logo.svg",
+            "license": "Public domain",
+            "bytes": 823875
+        },
+        "adobe-illustrator/Wiki_Loves_Bangla_2026_\u2014_Daily_Uploads.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Wiki_Loves_Bangla_2026_\u2014_Daily_Uploads.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/6/6e/Wiki_Loves_Bangla_2026_%E2%80%94_Daily_Uploads.svg",
+            "license": "CC BY-SA 4.0",
+            "bytes": 20127
+        },
+        "adobe-illustrator/Wiktionnaire_en_fran\u00e7ais_-_7_millions.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Wiktionnaire_en_fran\u00e7ais_-_7_millions.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/1/1e/Wiktionnaire_en_fran%C3%A7ais_-_7_millions.svg",
+            "license": "CC BY-SA 4.0",
+            "bytes": 141478
+        },
+        "adobe-illustrator/Worldwide_Universities_Network_logo_(2026).svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Worldwide_Universities_Network_logo_(2026).svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/f/f4/Worldwide_Universities_Network_logo_%282026%29.svg",
+            "license": "Public domain",
+            "bytes": 5898
+        },
+        "affinity-designer/2025_Portuguese_legislative_election_district_results.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:2025_Portuguese_legislative_election_district_results.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/c/cb/2025_Portuguese_legislative_election_district_results.svg",
+            "license": "CC BY-SA 4.0",
+            "bytes": 386349
+        },
+        "affinity-designer/Baden-W\u00fcrttemberg_2026_Erststimme.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Baden-W\u00fcrttemberg_2026_Erststimme.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/c/c3/Baden-W%C3%BCrttemberg_2026_Erststimme.svg",
+            "license": "CC BY-SA 4.0",
+            "bytes": 152171
+        },
+        "affinity-designer/Baden-W\u00fcrttemberg_2026_Zweitstimme.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Baden-W\u00fcrttemberg_2026_Zweitstimme.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/5/52/Baden-W%C3%BCrttemberg_2026_Zweitstimme.svg",
+            "license": "CC BY-SA 4.0",
+            "bytes": 152183
+        },
+        "affinity-designer/Bundestagswahl_2013_Zweitstimmen_Gr\u00fcne.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Bundestagswahl_2013_Zweitstimmen_Gr\u00fcne.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/6/62/Bundestagswahl_2013_Zweitstimmen_Gr%C3%BCne.svg",
+            "license": "CC BY-SA 4.0",
+            "bytes": 339272
+        },
+        "affinity-designer/Bundestagswahl_2013_Zweitstimmen_NPD.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Bundestagswahl_2013_Zweitstimmen_NPD.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/7/71/Bundestagswahl_2013_Zweitstimmen_NPD.svg",
+            "license": "CC BY-SA 4.0",
+            "bytes": 337996
+        },
+        "affinity-designer/Bundestagswahl_2013_Zweitstimmen_Piraten.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Bundestagswahl_2013_Zweitstimmen_Piraten.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/6/6d/Bundestagswahl_2013_Zweitstimmen_Piraten.svg",
+            "license": "CC BY-SA 4.0",
+            "bytes": 338046
+        },
+        "affinity-designer/Bundestagswahl_2013_Zweitstimmen_SPD.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Bundestagswahl_2013_Zweitstimmen_SPD.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/2/21/Bundestagswahl_2013_Zweitstimmen_SPD.svg",
+            "license": "CC BY-SA 4.0",
+            "bytes": 340523
+        },
+        "affinity-designer/Bundestagswahl_2017_Erststimme.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Bundestagswahl_2017_Erststimme.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/7/74/Bundestagswahl_2017_Erststimme.svg",
+            "license": "CC BY-SA 4.0",
+            "bytes": 1287476
+        },
+        "affinity-designer/Bundestagswahl_2017_Wahlbeteiligung.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Bundestagswahl_2017_Wahlbeteiligung.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/b/b5/Bundestagswahl_2017_Wahlbeteiligung.svg",
+            "license": "CC BY-SA 4.0",
+            "bytes": 1288170
+        },
+        "affinity-designer/Bundestagswahl_2017_Zweitstimme.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Bundestagswahl_2017_Zweitstimme.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/1/11/Bundestagswahl_2017_Zweitstimme.svg",
+            "license": "CC BY-SA 4.0",
+            "bytes": 1287192
+        },
+        "affinity-designer/Bundestagswahl_2017_Zweitstimmen_AfD.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Bundestagswahl_2017_Zweitstimmen_AfD.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/0/0e/Bundestagswahl_2017_Zweitstimmen_AfD.svg",
+            "license": "CC BY-SA 4.0",
+            "bytes": 1289230
+        },
+        "affinity-designer/Bundestagswahl_2017_Zweitstimmen_CDUCSU.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Bundestagswahl_2017_Zweitstimmen_CDUCSU.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/c/c2/Bundestagswahl_2017_Zweitstimmen_CDUCSU.svg",
+            "license": "CC BY-SA 4.0",
+            "bytes": 1290262
+        },
+        "affinity-designer/Bundestagswahl_2017_Zweitstimmen_FDP.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Bundestagswahl_2017_Zweitstimmen_FDP.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/b/b5/Bundestagswahl_2017_Zweitstimmen_FDP.svg",
+            "license": "CC BY-SA 4.0",
+            "bytes": 1287695
+        },
+        "affinity-designer/Bundestagswahl_2017_Zweitstimmen_Gr\u00fcne.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Bundestagswahl_2017_Zweitstimmen_Gr\u00fcne.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/4/47/Bundestagswahl_2017_Zweitstimmen_Gr%C3%BCne.svg",
+            "license": "CC BY-SA 4.0",
+            "bytes": 1288353
+        },
+        "affinity-designer/Bundestagswahl_2017_Zweitstimmen_Linke.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Bundestagswahl_2017_Zweitstimmen_Linke.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/4/47/Bundestagswahl_2017_Zweitstimmen_Linke.svg",
+            "license": "CC BY-SA 4.0",
+            "bytes": 1288917
+        },
+        "affinity-designer/Bundestagswahl_2017_Zweitstimmen_SPD.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Bundestagswahl_2017_Zweitstimmen_SPD.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/e/e6/Bundestagswahl_2017_Zweitstimmen_SPD.svg",
+            "license": "CC BY-SA 4.0",
+            "bytes": 1289173
+        },
+        "affinity-designer/Bundestagswahl_2021_Erststimme.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Bundestagswahl_2021_Erststimme.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/b/b1/Bundestagswahl_2021_Erststimme.svg",
+            "license": "CC BY-SA 4.0",
+            "bytes": 1269878
+        },
+        "affinity-designer/Bundestagswahl_2021_Teilwiederholung_Berlin.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Bundestagswahl_2021_Teilwiederholung_Berlin.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/6/64/Bundestagswahl_2021_Teilwiederholung_Berlin.svg",
+            "license": "CC BY-SA 4.0",
+            "bytes": 2097229
+        },
+        "affinity-designer/Bundestagswahl_2021_Wahlbeteiligung.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Bundestagswahl_2021_Wahlbeteiligung.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/b/b1/Bundestagswahl_2021_Wahlbeteiligung.svg",
+            "license": "CC BY-SA 4.0",
+            "bytes": 1271327
+        },
+        "affinity-designer/Bundestagswahl_2021_Zweitstimme.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Bundestagswahl_2021_Zweitstimme.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/2/21/Bundestagswahl_2021_Zweitstimme.svg",
+            "license": "CC BY-SA 4.0",
+            "bytes": 1269885
+        },
+        "affinity-designer/Bundestagswahl_2021_Zweitstimmen_AfD.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Bundestagswahl_2021_Zweitstimmen_AfD.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/c/cc/Bundestagswahl_2021_Zweitstimmen_AfD.svg",
+            "license": "CC BY-SA 4.0",
+            "bytes": 1270990
+        },
+        "affinity-designer/Bundestagswahl_2021_Zweitstimmen_CDUCSU.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Bundestagswahl_2021_Zweitstimmen_CDUCSU.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/1/1e/Bundestagswahl_2021_Zweitstimmen_CDUCSU.svg",
+            "license": "CC BY-SA 4.0",
+            "bytes": 1271219
+        },
+        "affinity-designer/Bundestagswahl_2021_Zweitstimmen_FDP.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Bundestagswahl_2021_Zweitstimmen_FDP.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/2/24/Bundestagswahl_2021_Zweitstimmen_FDP.svg",
+            "license": "CC BY-SA 4.0",
+            "bytes": 1269536
+        },
+        "affinity-designer/Bundestagswahl_2021_Zweitstimmen_FW.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Bundestagswahl_2021_Zweitstimmen_FW.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/5/59/Bundestagswahl_2021_Zweitstimmen_FW.svg",
+            "license": "CC BY-SA 4.0",
+            "bytes": 1269557
+        },
+        "affinity-designer/Bundestagswahl_2021_Zweitstimmen_Gr\u00fcne.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Bundestagswahl_2021_Zweitstimmen_Gr\u00fcne.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/2/29/Bundestagswahl_2021_Zweitstimmen_Gr%C3%BCne.svg",
+            "license": "CC BY-SA 4.0",
+            "bytes": 1271626
+        },
+        "affinity-designer/Bundestagswahl_2021_Zweitstimmen_Linke.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Bundestagswahl_2021_Zweitstimmen_Linke.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/f/fb/Bundestagswahl_2021_Zweitstimmen_Linke.svg",
+            "license": "CC BY-SA 4.0",
+            "bytes": 1269732
+        },
+        "affinity-designer/Bundestagswahl_2021_Zweitstimmen_SPD.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Bundestagswahl_2021_Zweitstimmen_SPD.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/6/64/Bundestagswahl_2021_Zweitstimmen_SPD.svg",
+            "license": "CC BY-SA 4.0",
+            "bytes": 1270891
+        },
+        "affinity-designer/Bundestagswahl_2021_Zweitstimmen_Tierschutz.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Bundestagswahl_2021_Zweitstimmen_Tierschutz.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/e/ee/Bundestagswahl_2021_Zweitstimmen_Tierschutz.svg",
+            "license": "CC BY-SA 4.0",
+            "bytes": 1269085
+        },
+        "affinity-designer/Bundestagswahl_2021_Zweitstimmen_dieBasis.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Bundestagswahl_2021_Zweitstimmen_dieBasis.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/7/7c/Bundestagswahl_2021_Zweitstimmen_dieBasis.svg",
+            "license": "CC BY-SA 4.0",
+            "bytes": 1269235
+        },
+        "affinity-designer/Lotteria_logo_(2024).svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Lotteria_logo_(2024).svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/e/e2/Lotteria_logo_%282024%29.svg",
+            "license": "Public domain",
+            "bytes": 1505
+        },
+        "coreldraw/+Jakarta_Logo_(Symbol_only).svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:+Jakarta_Logo_(Symbol_only).svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/d/d0/%2BJakarta_Logo_%28Symbol_only%29.svg",
+            "license": "Public domain",
+            "bytes": 15422
+        },
+        "coreldraw/ADA_Ja\u00e9n.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:ADA_Ja\u00e9n.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/a/a2/ADA_Ja%C3%A9n.svg",
+            "license": "Public domain",
+            "bytes": 276304
+        },
+        "coreldraw/Banjarmasin_Logo_(Black_Variant).svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Banjarmasin_Logo_(Black_Variant).svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/e/eb/Banjarmasin_Logo_%28Black_Variant%29.svg",
+            "license": "Public domain",
+            "bytes": 76542
+        },
+        "coreldraw/Bosnian_and_Herzegovinian_fleur-de-lis_(2011).svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Bosnian_and_Herzegovinian_fleur-de-lis_(2011).svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/3/3c/Bosnian_and_Herzegovinian_fleur-de-lis_%282011%29.svg",
+            "license": "Public domain",
+            "bytes": 2424
+        },
+        "coreldraw/ESCOM_Computer_GmbH_Logo.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:ESCOM_Computer_GmbH_Logo.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/d/de/ESCOM_Computer_GmbH_Logo.svg",
+            "license": "CC BY-SA 3.0",
+            "bytes": 4137
+        },
+        "coreldraw/ESMC_logo.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:ESMC_logo.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/1/15/ESMC_logo.svg",
+            "license": "CC BY 3.0",
+            "bytes": 1970
+        },
+        "coreldraw/FNF_logo_awa_2026.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:FNF_logo_awa_2026.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/b/bf/FNF_logo_awa_2026.svg",
+            "license": "CC BY-SA 4.0",
+            "bytes": 27634
+        },
+        "coreldraw/Factor_IG_Signature.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Factor_IG_Signature.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/b/bd/Factor_IG_Signature.svg",
+            "license": "CC0",
+            "bytes": 4365
+        },
+        "coreldraw/Flag_of_Telemark_(2023).svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Telemark_(2023).svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/8/8d/Flag_of_Telemark_%282023%29.svg",
+            "license": "CC BY-SA 4.0",
+            "bytes": 3600
+        },
+        "coreldraw/Horst_Bartnig_2011a_RK01.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Horst_Bartnig_2011a_RK01.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/3/37/Horst_Bartnig_2011a_RK01.svg",
+            "license": "CC BY-SA 4.0",
+            "bytes": 10771
+        },
+        "coreldraw/Horst_Bartnig_2021a_RK01.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Horst_Bartnig_2021a_RK01.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/b/b6/Horst_Bartnig_2021a_RK01.svg",
+            "license": "CC BY-SA 4.0",
+            "bytes": 8772
+        },
+        "coreldraw/Level_Scheme_Technetium-99_RK01.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Level_Scheme_Technetium-99_RK01.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/1/12/Level_Scheme_Technetium-99_RK01.svg",
+            "license": "CC BY-SA 4.0",
+            "bytes": 86447
+        },
+        "coreldraw/Logo_Forschungszentrum_Rossendorf_1992-2002.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Logo_Forschungszentrum_Rossendorf_1992-2002.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/6/63/Logo_Forschungszentrum_Rossendorf_1992-2002.svg",
+            "license": "CC BY-SA 4.0",
+            "bytes": 14661
+        },
+        "coreldraw/Mayan_languages_tree_es.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Mayan_languages_tree_es.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/7/7f/Mayan_languages_tree_es.svg",
+            "license": "CC0",
+            "bytes": 128669
+        },
+        "coreldraw/Neutron_reflector_RK01.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Neutron_reflector_RK01.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/7/71/Neutron_reflector_RK01.svg",
+            "license": "CC BY-SA 4.0",
+            "bytes": 2616
+        },
+        "coreldraw/Norm-en.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Norm-en.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/e/e4/Norm-en.svg",
+            "license": "CC BY-SA 4.0",
+            "bytes": 29406
+        },
+        "coreldraw/Norm-ru.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Norm-ru.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/3/3e/Norm-ru.svg",
+            "license": "CC BY-SA 4.0",
+            "bytes": 28774
+        },
+        "coreldraw/Norm-zh.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Norm-zh.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/2/27/Norm-zh.svg",
+            "license": "CC BY-SA 4.0",
+            "bytes": 90256
+        },
+        "coreldraw/QL_217B,_VNM.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:QL_217B,_VNM.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/7/79/QL_217B%2C_VNM.svg",
+            "license": "CC BY-SA 4.0",
+            "bytes": 3971
+        },
+        "coreldraw/QL_279C,_VNM.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:QL_279C,_VNM.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/7/77/QL_279C%2C_VNM.svg",
+            "license": "CC BY-SA 4.0",
+            "bytes": 4897
+        },
+        "coreldraw/Rosario_del_Saladillo_-_Mapa_Argentina.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Rosario_del_Saladillo_-_Mapa_Argentina.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/b/b5/Rosario_del_Saladillo_-_Mapa_Argentina.svg",
+            "license": "CC BY-SA 4.0",
+            "bytes": 574860
+        },
+        "coreldraw/Saale-Holzland-Kreis_Flagge.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Saale-Holzland-Kreis_Flagge.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/c/c5/Saale-Holzland-Kreis_Flagge.svg",
+            "license": "Public domain",
+            "bytes": 7187
+        },
+        "coreldraw/Silicon_Image_logo(March_2006).svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Silicon_Image_logo(March_2006).svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/f/f1/Silicon_Image_logo%28March_2006%29.svg",
+            "license": "CC BY-SA 3.0",
+            "bytes": 3997
+        },
+        "coreldraw/Subject-en.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Subject-en.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/e/e9/Subject-en.svg",
+            "license": "CC BY-SA 4.0",
+            "bytes": 50259
+        },
+        "coreldraw/System-en.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:System-en.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/8/80/System-en.svg",
+            "license": "CC BY-SA 4.0",
+            "bytes": 29645
+        },
+        "coreldraw/TheOpenRoad_logo_(special).svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:TheOpenRoad_logo_(special).svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/0/05/TheOpenRoad_logo_%28special%29.svg",
+            "license": "Public domain",
+            "bytes": 20788
+        },
+        "coreldraw/The_national_vertical_flag_of_the_Bosniaks_of_Sand\u017eak.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:The_national_vertical_flag_of_the_Bosniaks_of_Sand\u017eak.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/9/97/The_national_vertical_flag_of_the_Bosniaks_of_Sand%C5%BEak.svg",
+            "license": "Public domain",
+            "bytes": 8374
+        },
+        "coreldraw/Vorder\u00f6sterreich_ca._1780.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Vorder\u00f6sterreich_ca._1780.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/3/35/Vorder%C3%B6sterreich_ca._1780.svg",
+            "license": "CC BY-SA 4.0",
+            "bytes": 53419
+        },
+        "coreldraw/WAM_Postcard_Guidelines.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:WAM_Postcard_Guidelines.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/6/68/WAM_Postcard_Guidelines.svg",
+            "license": "CC BY-SA 4.0",
+            "bytes": 96907
+        },
+        "coreldraw/Waldst\u00e4dte_Vorder\u00f6sterreich.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Waldst\u00e4dte_Vorder\u00f6sterreich.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/b/bd/Waldst%C3%A4dte_Vorder%C3%B6sterreich.svg",
+            "license": "CC BY-SA 4.0",
+            "bytes": 8431
+        },
+        "figma/Candy_Bytes_Alert.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Candy_Bytes_Alert.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/1/19/Candy_Bytes_Alert.svg",
+            "license": "CC BY 4.0",
+            "bytes": 1134
+        },
+        "figma/Candy_Bytes_Bell.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Candy_Bytes_Bell.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/5/53/Candy_Bytes_Bell.svg",
+            "license": "CC BY 4.0",
+            "bytes": 1561
+        },
+        "figma/Candy_Bytes_Boom.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Candy_Bytes_Boom.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/6/69/Candy_Bytes_Boom.svg",
+            "license": "CC BY 4.0",
+            "bytes": 2637
+        },
+        "figma/Candy_Bytes_Calendar.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Candy_Bytes_Calendar.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/b/b0/Candy_Bytes_Calendar.svg",
+            "license": "CC BY 4.0",
+            "bytes": 1324
+        },
+        "figma/Candy_Bytes_Chart_Up.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Candy_Bytes_Chart_Up.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/7/70/Candy_Bytes_Chart_Up.svg",
+            "license": "CC BY 4.0",
+            "bytes": 900
+        },
+        "figma/Candy_Bytes_Clock.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Candy_Bytes_Clock.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/4/4f/Candy_Bytes_Clock.svg",
+            "license": "CC BY 4.0",
+            "bytes": 997
+        },
+        "figma/Candy_Bytes_Cog.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Candy_Bytes_Cog.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/d/d3/Candy_Bytes_Cog.svg",
+            "license": "CC BY 4.0",
+            "bytes": 3193
+        },
+        "figma/Candy_Bytes_Coin.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Candy_Bytes_Coin.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/7/7a/Candy_Bytes_Coin.svg",
+            "license": "CC BY 4.0",
+            "bytes": 1026
+        },
+        "figma/Candy_Bytes_Envelope.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Candy_Bytes_Envelope.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/b/b1/Candy_Bytes_Envelope.svg",
+            "license": "CC BY 4.0",
+            "bytes": 849
+        },
+        "figma/Candy_Bytes_Eyes.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Candy_Bytes_Eyes.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/d/de/Candy_Bytes_Eyes.svg",
+            "license": "CC BY 4.0",
+            "bytes": 1992
+        },
+        "figma/Candy_Bytes_Fire.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Candy_Bytes_Fire.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/6/60/Candy_Bytes_Fire.svg",
+            "license": "CC BY 4.0",
+            "bytes": 1932
+        },
+        "figma/Candy_Bytes_Flower.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Candy_Bytes_Flower.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/f/f8/Candy_Bytes_Flower.svg",
+            "license": "CC BY 4.0",
+            "bytes": 3441
+        },
+        "figma/Candy_Bytes_Gift.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Candy_Bytes_Gift.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/5/5e/Candy_Bytes_Gift.svg",
+            "license": "CC BY 4.0",
+            "bytes": 2013
+        },
+        "figma/Candy_Bytes_Globe.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Candy_Bytes_Globe.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/e/e6/Candy_Bytes_Globe.svg",
+            "license": "CC BY 4.0",
+            "bytes": 2692
+        },
+        "figma/Candy_Bytes_Heart.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Candy_Bytes_Heart.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/9/95/Candy_Bytes_Heart.svg",
+            "license": "CC BY 4.0",
+            "bytes": 1567
+        },
+        "figma/Candy_Bytes_House.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Candy_Bytes_House.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/e/e9/Candy_Bytes_House.svg",
+            "license": "CC BY 4.0",
+            "bytes": 1369
+        },
+        "figma/Candy_Bytes_Key.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Candy_Bytes_Key.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/e/ef/Candy_Bytes_Key.svg",
+            "license": "CC BY 4.0",
+            "bytes": 1564
+        },
+        "figma/Candy_Bytes_Lightbulb.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Candy_Bytes_Lightbulb.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/f/fe/Candy_Bytes_Lightbulb.svg",
+            "license": "CC BY 4.0",
+            "bytes": 1316
+        },
+        "figma/Candy_Bytes_Lightning_Bolt.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Candy_Bytes_Lightning_Bolt.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/7/7b/Candy_Bytes_Lightning_Bolt.svg",
+            "license": "CC BY 4.0",
+            "bytes": 1093
+        },
+        "figma/Candy_Bytes_Link.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Candy_Bytes_Link.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/2/2b/Candy_Bytes_Link.svg",
+            "license": "CC BY 4.0",
+            "bytes": 2810
+        },
+        "figma/Candy_Bytes_Trash.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Candy_Bytes_Trash.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/2/23/Candy_Bytes_Trash.svg",
+            "license": "CC BY 4.0",
+            "bytes": 1492
+        },
+        "figma/Candy_Bytes_Trophy.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Candy_Bytes_Trophy.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/7/77/Candy_Bytes_Trophy.svg",
+            "license": "CC BY 4.0",
+            "bytes": 2189
+        },
+        "figma/Candy_Bytes_Unlock.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Candy_Bytes_Unlock.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/d/de/Candy_Bytes_Unlock.svg",
+            "license": "CC BY 4.0",
+            "bytes": 1139
+        },
+        "figma/Candy_Bytes_Yes.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Candy_Bytes_Yes.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/1/18/Candy_Bytes_Yes.svg",
+            "license": "CC BY 4.0",
+            "bytes": 1013
+        },
+        "figma/Cold_Temperature_Airport.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Cold_Temperature_Airport.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/d/d6/Cold_Temperature_Airport.svg",
+            "license": "CC0",
+            "bytes": 71800
+        },
+        "figma/DND_Alignment_Chart.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:DND_Alignment_Chart.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/3/3c/DND_Alignment_Chart.svg",
+            "license": "CC0",
+            "bytes": 99425
+        },
+        "figma/Interception_Procedure.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Interception_Procedure.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/7/78/Interception_Procedure.svg",
+            "license": "CC0",
+            "bytes": 14246
+        },
+        "figma/Lead_Lag_Green_Phase.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Lead_Lag_Green_Phase.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/c/cf/Lead_Lag_Green_Phase.svg",
+            "license": "CC0",
+            "bytes": 57074
+        },
+        "figma/TLDR_Visual_Aid.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:TLDR_Visual_Aid.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/3/36/TLDR_Visual_Aid.svg",
+            "license": "CC BY-SA 4.0",
+            "bytes": 7598
+        },
+        "figma/Traffic_Signal_Components_(United_States).svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Traffic_Signal_Components_(United_States).svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/c/cc/Traffic_Signal_Components_%28United_States%29.svg",
+            "license": "CC0",
+            "bytes": 33867
+        },
+        "inkscape/AUT_Untertilliach_COA.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:AUT_Untertilliach_COA.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/a/a1/AUT_Untertilliach_COA.svg",
+            "license": "Public domain",
+            "bytes": 32378
+        },
+        "inkscape/Bandera_de_Pudahuel_(1975).svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Bandera_de_Pudahuel_(1975).svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/f/fb/Bandera_de_Pudahuel_%281975%29.svg",
+            "license": "CC BY-SA 4.0",
+            "bytes": 150971
+        },
+        "inkscape/British_Indian_Ocean_Territory_-_coat_of_arms.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:British_Indian_Ocean_Territory_-_coat_of_arms.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/4/48/British_Indian_Ocean_Territory_-_coat_of_arms.svg",
+            "license": "CC BY-SA 4.0",
+            "bytes": 897336
+        },
+        "inkscape/Cab_Calloway_Signature.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Cab_Calloway_Signature.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/b/b1/Cab_Calloway_Signature.svg",
+            "license": "Public domain",
+            "bytes": 18330
+        },
+        "inkscape/Company_of_Watermen_and_Lightermen_Arms.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Company_of_Watermen_and_Lightermen_Arms.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/d/d4/Company_of_Watermen_and_Lightermen_Arms.svg",
+            "license": "CC BY-SA 4.0",
+            "bytes": 317530
+        },
+        "inkscape/Desierto_de_Chihuahua.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Desierto_de_Chihuahua.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/1/1d/Desierto_de_Chihuahua.svg",
+            "license": "CC BY-SA 4.0",
+            "bytes": 854681
+        },
+        "inkscape/Duke_Ellington_Signature.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Duke_Ellington_Signature.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/5/54/Duke_Ellington_Signature.svg",
+            "license": "Public domain",
+            "bytes": 23853
+        },
+        "inkscape/Meat_Proxy_Explanation_Japanese.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Meat_Proxy_Explanation_Japanese.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/5/53/Meat_Proxy_Explanation_Japanese.svg",
+            "license": "CC BY-SA 4.0",
+            "bytes": 490354
+        },
+        "inkscape/Oakville,_Ontario_Arms.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Oakville,_Ontario_Arms.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/0/0f/Oakville%2C_Ontario_Arms.svg",
+            "license": "CC BY-SA 4.0",
+            "bytes": 251150
+        },
+        "inkscape/Plutchik's_Emotional_Wheel.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Plutchik's_Emotional_Wheel.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/f/f1/Plutchik%27s_Emotional_Wheel.svg",
+            "license": "Public domain",
+            "bytes": 43603
+        },
+        "inkscape/The_White_House_logo_under_Trump_2.0.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:The_White_House_logo_under_Trump_2.0.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/1/18/The_White_House_logo_under_Trump_2.0.svg",
+            "license": "Public domain",
+            "bytes": 1545800
+        },
+        "inkscape/The_White_House_logo_under_Trump_2.0_(embedded_text).svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:The_White_House_logo_under_Trump_2.0_(embedded_text).svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/a/ac/The_White_House_logo_under_Trump_2.0_%28embedded_text%29.svg",
+            "license": "Public domain",
+            "bytes": 1526013
+        },
+        "sketch/ANYbotics_logo.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:ANYbotics_logo.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/c/c1/ANYbotics_logo.svg",
+            "license": "Public domain",
+            "bytes": 3804
+        },
+        "sketch/Ads_partial_logo_dark_background.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Ads_partial_logo_dark_background.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/b/bb/Ads_partial_logo_dark_background.svg",
+            "license": "Public domain",
+            "bytes": 7757
+        },
+        "sketch/Allen_Memorial_Art_Museum_logo.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Allen_Memorial_Art_Museum_logo.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/4/42/Allen_Memorial_Art_Museum_logo.svg",
+            "license": "Public domain",
+            "bytes": 7075
+        },
+        "sketch/Aylo_logo.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Aylo_logo.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/4/4a/Aylo_logo.svg",
+            "license": "Public domain",
+            "bytes": 4876
+        },
+        "sketch/BART_Track_Map.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:BART_Track_Map.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/6/63/BART_Track_Map.svg",
+            "license": "CC BY-SA 4.0",
+            "bytes": 155943
+        },
+        "sketch/Baroque_Recorder_Fingering_Chart.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Baroque_Recorder_Fingering_Chart.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/7/79/Baroque_Recorder_Fingering_Chart.svg",
+            "license": "CC0",
+            "bytes": 442867
+        },
+        "sketch/Boats.com_logo.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Boats.com_logo.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/b/be/Boats.com_logo.svg",
+            "license": "Public domain",
+            "bytes": 9233
+        },
+        "sketch/CHE_Ch\u00e9nens_COA.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:CHE_Ch\u00e9nens_COA.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/e/e2/CHE_Ch%C3%A9nens_COA.svg",
+            "license": "Public domain",
+            "bytes": 10044
+        },
+        "sketch/Canon_logo.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Canon_logo.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/8/8d/Canon_logo.svg",
+            "license": "Public domain",
+            "bytes": 4859
+        },
+        "sketch/Chilling_Effects_logo.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Chilling_Effects_logo.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/7/71/Chilling_Effects_logo.svg",
+            "license": "Public domain",
+            "bytes": 41711
+        },
+        "sketch/Composition-7.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Composition-7.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/0/0b/Composition-7.svg",
+            "license": "CC0",
+            "bytes": 43534
+        },
+        "sketch/Downdetector_Logo_2.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Downdetector_Logo_2.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/9/9c/Downdetector_Logo_2.svg",
+            "license": "Public domain",
+            "bytes": 7150
+        },
+        "sketch/FairWear-logo.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:FairWear-logo.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/6/6c/FairWear-logo.svg",
+            "license": "Public domain",
+            "bytes": 4415
+        },
+        "sketch/Girls_Who_Code_Logo.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Girls_Who_Code_Logo.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/6/6f/Girls_Who_Code_Logo.svg",
+            "license": "Public domain",
+            "bytes": 8390
+        },
+        "sketch/LJOBW_Logo_2.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:LJOBW_Logo_2.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/1/17/LJOBW_Logo_2.svg",
+            "license": "Public domain",
+            "bytes": 22021
+        },
+        "sketch/Letterboxd-Logo-H-Pos-RGB.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Letterboxd-Logo-H-Pos-RGB.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/b/b7/Letterboxd-Logo-H-Pos-RGB.svg",
+            "license": "Public domain",
+            "bytes": 5742
+        },
+        "sketch/Letterboxd_2018_logo_(vertical).svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Letterboxd_2018_logo_(vertical).svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/9/93/Letterboxd_2018_logo_%28vertical%29.svg",
+            "license": "Public domain",
+            "bytes": 7305
+        },
+        "sketch/Local_Guides_2015_icon.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Local_Guides_2015_icon.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/2/2a/Local_Guides_2015_icon.svg",
+            "license": "Public domain",
+            "bytes": 38705
+        },
+        "sketch/Logo_Pro_Grigioni_Italiano.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Logo_Pro_Grigioni_Italiano.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/4/49/Logo_Pro_Grigioni_Italiano.svg",
+            "license": "Public domain",
+            "bytes": 22516
+        },
+        "sketch/Logo_Salmoiraghi_&_Vigan\u00f2.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Logo_Salmoiraghi_&_Vigan\u00f2.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/0/0c/Logo_Salmoiraghi_%26_Vigan%C3%B2.svg",
+            "license": "Public domain",
+            "bytes": 20819
+        },
+        "sketch/NHK_NEWS_WEB_logo.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:NHK_NEWS_WEB_logo.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/d/dd/NHK_NEWS_WEB_logo.svg",
+            "license": "Public domain",
+            "bytes": 8171
+        },
+        "sketch/NIKKEI_BUSINESS_Logo.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:NIKKEI_BUSINESS_Logo.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/2/2d/NIKKEI_BUSINESS_Logo.svg",
+            "license": "Public domain",
+            "bytes": 29760
+        },
+        "sketch/Nanoracks_LLC_Logo_2020.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Nanoracks_LLC_Logo_2020.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/c/c2/Nanoracks_LLC_Logo_2020.svg",
+            "license": "Public domain",
+            "bytes": 3024
+        },
+        "sketch/Ontario_Lottery_and_Gaming_Corporation_logo.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Ontario_Lottery_and_Gaming_Corporation_logo.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/c/c5/Ontario_Lottery_and_Gaming_Corporation_logo.svg",
+            "license": "Public domain",
+            "bytes": 6739
+        },
+        "sketch/Piaggio_Group_logo.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Piaggio_Group_logo.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/9/98/Piaggio_Group_logo.svg",
+            "license": "Public domain",
+            "bytes": 14770
+        },
+        "sketch/PlanGrid_logo.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:PlanGrid_logo.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/3/30/PlanGrid_logo.svg",
+            "license": "Public domain",
+            "bytes": 1023
+        },
+        "sketch/Scratch_S.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Scratch_S.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/b/b1/Scratch_S.svg",
+            "license": "Public domain",
+            "bytes": 5786
+        },
+        "sketch/Stanley_Steemer_logo.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Stanley_Steemer_logo.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/b/b0/Stanley_Steemer_logo.svg",
+            "license": "Public domain",
+            "bytes": 13228
+        },
+        "sketch/StitcherLogo.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:StitcherLogo.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/2/25/StitcherLogo.svg",
+            "license": "Public domain",
+            "bytes": 4997
+        },
+        "sketch/Sygic_logo.svg": {
+            "page": "https://commons.wikimedia.org/wiki/File:Sygic_logo.svg",
+            "url": "https://upload.wikimedia.org/wikipedia/commons/a/a4/Sygic_logo.svg",
+            "license": "Public domain",
+            "bytes": 7119
+        }
+    }
+}
