@@ -53,7 +53,7 @@ An accepted file, shown through an <img> tag or opened as its own document,
 stays inside what current Chrome, Firefox and Safari allow an SVG image to
 do: it cannot run script, cannot load anything outside itself, and cannot
 interact with the page or navigate. The same file is safe in a server-side
-rasterizer such as librsvg or resvg. docs/how-browsers-handle-svg.md is the
+rasterizer such as librsvg or resvg. docs/internal/browser-research.md is the
 reference for what the browsers allow; docs/ai-reference.md lists every rule
 and allowlist and is the specification.
 
@@ -105,8 +105,7 @@ PROMPT
 
 codex-security scan . "${paths[@]}" \
     --knowledge-base docs/ai-reference.md \
-    --knowledge-base docs/security-model.md \
-    --knowledge-base docs/what-gets-rejected.md \
-    --knowledge-base docs/how-browsers-handle-svg.md \
+    --knowledge-base docs/errors.md \
+    --knowledge-base docs/internal/browser-research.md \
     --scan-prompt-file "$prompt_file" \
     "$@"

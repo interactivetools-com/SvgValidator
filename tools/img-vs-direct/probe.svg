@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Probe file for tools/img-vs-direct/index.html. It carries, on purpose, the things
+  SvgValidator rejects, so a browser can show what they do in <img> and what they do when
+  the same file is opened directly. Every effect is visible on the drawing itself; nothing
+  leaves the file. SvgValidator::checkFile() on this file reports element-not-allowed,
+  event-handler and href-not-allowed.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" width="320" height="200"
+     onload="document.getElementById('frame').setAttribute('stroke', '#c00')">
+  <style>
+    text { font: 14px sans-serif; }
+    #hover { fill: #ccc; }
+    #hover:hover { fill: #fc0; }
+  </style>
+  <rect id="frame" x="2" y="2" width="316" height="196" fill="#fff" stroke="#999" stroke-width="4"/>
+  <text x="16" y="36">script: <tspan id="script-status" fill="#393">did not run</tspan></text>
+  <text x="16" y="66">onload: <tspan id="onload-hint">red frame if it fired</tspan></text>
+  <rect id="hover" x="16" y="84" width="120" height="36"/>
+  <text x="24" y="108" pointer-events="none">hover me</text>
+  <a href="https://example.com/">
+    <rect x="160" y="84" width="140" height="36" fill="#369"/>
+    <text x="170" y="108" fill="#fff">link to example.com</text>
+  </a>
+  <text x="16" y="170" fill="#666">grey frame and "did not run" is the &lt;img&gt; case</text>
+  <script>document.getElementById('script-status').textContent = 'RAN';
+          document.getElementById('script-status').setAttribute('fill', '#c00');</script>
+</svg>

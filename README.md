@@ -10,62 +10,18 @@ https://github.com/interactivetools-com/SvgValidator/blob/main/docs/ai-reference
 
 # SvgValidator: Reject SVG Uploads That Could Run Script
 
-SvgValidator checks an uploaded SVG file against what browsers allow an SVG to do inside an
-`<img>` tag, and rejects anything that could run script, load an outside resource, or hang a
-renderer when the same file is opened directly. It never rewrites the file.
-
-- **Scripts cannot get through.** `<script>`, every `on*` attribute, `javascript:` in any
-  URL, `<foreignObject>`, and DTD entity declarations are rejected before the file is stored.
-- **Can't load anything from outside.** Every `href` must be a same-file reference (`#id`),
-  or on `<image>` an embedded `data:` image, and every CSS `url()` must be `#id` or an
-  embedded font: the same rule as Chrome's `<img>` mode.
-- **Renderer bombs are caught.** Reference loops and `<use>` or pattern chains that would
-  render more than 100,000 elements are rejected, and so is a file that needs more than
-  100,000 records to track (ids and references). libxml2's own limits (256 levels of nesting, 10 MB per text node)
-  apply too.
-- **Real files pass.** 3,460 of 3,460 simple-icons and 1,583 of 1,679 resvg test files are
-  accepted (the rest reject by design: external links, entities, reference loops). 146 of
-  157 design-tool exports from Wikimedia Commons (Illustrator, Inkscape, Affinity Designer,
-  Figma, Sketch, CorelDRAW) are accepted; the rest embed SVG fonts, which no browser
-  renders. Inkscape, Illustrator, Affinity Designer, Sketch and Visio metadata is on the
-  allowlist. Counts from the 2026-09-13 tally.
-- **Streams, never rewrites.** XMLReader reads the file once, at about 100 MB/s with memory
-  that does not grow with the file, and returns a list of up to 50 distinct problems.
-  Nothing throws for a bad file.
+SvgValidator checks an uploaded SVG file and rejects it if it could run script, load an outside
+resource, or hang a renderer. Browsers block the same things when an SVG is shown through an
+`<img>` tag, but not when the file is opened on its own; SvgValidator checks the file, so it is
+safe either way. It never rewrites the file.
 
 ## Why Reject Instead of Clean
 
-An SVG sanitizer strips what it does not like and hands back a changed file. That works for
-HTML a person never sees, and badly for a logo: the uploader has the source in a design tool,
-and a file that renders differently from what they exported is a support ticket nobody can
-explain.
-
-A rejection with a reason costs a re-export. A cleaned file that still contains something the
-filter did not know about costs an XSS. Every rule here is an allowlist, so anything new is
-rejected until someone adds it.
-
-The yardstick is Chrome's `<img>` mode: SVG 2 calls it secure animated mode, and it says which
-references are external and which are not. Where Chrome only neutralizes something at render
-time (script, event handlers, external links), SvgValidator rejects it, because that protection
-is gone the moment the file is opened directly or fed to a server-side rasterizer.
-
-## Documentation
-
-Full guides and references ([browse on GitHub](https://github.com/interactivetools-com/SvgValidator)):
-
-- **The Basics** (read in order)
-    - [Getting Started](docs/getting-started.md) - install, your first `checkFile()`, and reading a `Result`
-    - [What Gets Rejected](docs/what-gets-rejected.md) - every rule in plain English, with an example and the fix
-    - [What Gets Through](docs/what-gets-through.md) - the allowlists: elements, attributes, namespaces, URL forms
-- **Everyday Use**
-    - [Common Patterns](docs/common-patterns.md) - upload handlers, showing errors, translating codes, checking your own files
-    - [Troubleshooting](docs/troubleshooting.md) - exact messages as headings, what happened, and the fix
-- **Lookup**
-    - [Security Model](docs/security-model.md) - what an SVG can do, what this prevents, what it does not, and how to serve accepted files
-    - [How Browsers Handle SVG](docs/how-browsers-handle-svg.md) - what Chrome, Firefox and Safari do with an SVG in `<img>`, with the spec quotes
-    - [Method Reference](docs/method-reference.md) - `checkFile()`, `checkString()`, `rules()`, `Result`, `Violation`
-    - [Performance](docs/performance.md) - 0.02 ms per icon, 10 ms per megabyte, memory that does not grow with the file
-    - [AI Reference](docs/ai-reference.md) - the complete API and every rule in one dense file, written for AI coding assistants
+A sanitizer strips what it does not like and hands back a changed file, and a logo that renders
+differently from what the designer exported is a support ticket nobody can explain. A rejection
+with a reason costs a re-export; a cleaned file that still holds something the filter did not
+know about costs an XSS. Every rule here is an allowlist, so anything new is rejected until
+someone adds it.
 
 ## Quick Start
 
@@ -78,24 +34,86 @@ composer require itools/svgvalidator
 ```php
 use Itools\SvgValidator\SvgValidator;
 
-$result = SvgValidator::checkFile($_FILES['logo']['tmp_name']);
+// upload.php: check the file, then store the original bytes
+$result = SvgValidator::checkFile($_FILES['logo']['tmp_name']);   // nothing throws: a missing path is a rejection too
 if (!$result->ok) {
     foreach ($result->errors as $violation) {
         echo htmlspecialchars($violation->message), "<br>";   // <script> is not allowed in uploaded SVGs
     }
     exit;
 }
-move_uploaded_file($_FILES['logo']['tmp_name'], 'uploads/logo.svg');   // the original bytes, unchanged
+move_uploaded_file($_FILES['logo']['tmp_name'], 'uploads/logo.svg');
+
+// logo.php: serve it with the headers browsers need
+header('Content-Type: image/svg+xml');
+header('X-Content-Type-Options: nosniff');    // never guess another type from the contents
+header('Content-Security-Policy: sandbox');   // no script and no cookies, even if a rule is ever bypassed
+readfile('uploads/logo.svg');
 ```
+
+If Apache or nginx serves the upload folder directly, set the same two extra headers there for
+`.svg` files. The rest of the API:
+
+```php
+$result->ok;                       // true when nothing was found
+$result->errors;                   // Violation[], one per distinct problem, in file order
+$violation->code;                  // 'element-not-allowed', stable across releases, so switch on it
+$violation->detail;                // 'script', text from the file, so encode it before output
+$violation->message;               // '<script> is not allowed in uploaded SVGs'
+$violation->template;              // '<%s> is not allowed in uploaded SVGs', for translation with Violation::TEMPLATES
+SvgValidator::checkString($svg);   // the same check on SVG source in a string
+SvgValidator::rules();             // the allowlists, for reading; the rules have no options
+```
+
+## What It Blocks
+
+- **Script and event handlers.** `<script>`, every `on*` attribute, `javascript:` URLs and
+  `<foreignObject>`: a browser runs them the moment the file is opened directly.
+- **Anything that loads from outside the file.** Every `href` and `url()` must point at `#id`
+  or an embedded `data:` image or font: an outside load tells another server who opened the
+  file, and Chrome refuses it in `<img>` mode anyway.
+- **DTD entity declarations.** An entity can expand to markup no other rule sees, or to
+  gigabytes of text.
+- **Reference loops and expansion bombs.** A few dozen `<use>` or pattern references can
+  render billions of elements; browsers cap that, server-side rasterizers hang.
+- **XML an HTML parser reads differently.** A `<!-->` comment, or CDATA holding `>` inside
+  `<title>` or `<desc>`, ends early in an HTML parser, and what follows is live markup if the
+  file is ever served as `text/html`.
+
+## What It Does Not Check
+
+- **File size.** The file is streamed, so a huge upload passes in a few MB of memory. Cap the
+  size at upload time.
+- **Extension and MIME type.** Only the bytes are read. Refuse `.svgz`, `.html` and `.xml`
+  uploads yourself.
+- **Whether the picture is sensible.** Blank, enormous, offensive, or another site's logo all
+  pass.
+- **Renderer bugs.** An accepted file is still parsed by libxml2, a browser, or ImageMagick.
+  Keep the rasterizer patched.
+- **SVG pasted inline into HTML.** That makes the markup part of the page. Sanitize on output
+  with DOMPurify instead.
+- **Files served with the wrong headers.** Served as `text/html`, or with the type left for
+  the browser to guess, any SVG is a page. Send the headers in the quick start.
 
 ## When You Might Not Want SvgValidator
 
-- **You must accept SVG from the public and cannot ask for a re-export.** A rejection is
-  only useful when someone can fix the file. Use a sanitizer such as
-  [enshrined/svg-sanitize](https://github.com/darylldoyle/svg-sanitizer) and re-check its
+- **You must accept SVG from the public and cannot ask for a re-export.** Use a sanitizer such
+  as [enshrined/svg-sanitize](https://github.com/darylldoyle/svg-sanitizer) and re-check its
   output with SvgValidator.
 - **You put SVG source inline in HTML pages.** That is a different threat model: the page's
-  origin and the page's scripts. Sanitize on output with DOMPurify instead.
+  origin and the page's scripts. Sanitize on output with DOMPurify.
+
+A check costs less than receiving the upload did; the measurements are in
+[benchmarks/results.md](benchmarks/results.md). The rules are tested against real exports from
+Illustrator, Inkscape, Figma, Affinity Designer, Sketch and CorelDRAW.
+
+## Documentation
+
+Full docs ([browse on GitHub](https://github.com/interactivetools-com/SvgValidator)):
+
+- [Error codes and fixes](docs/errors.md) - every message, and what to change in the file or the design tool
+- [AI reference](docs/ai-reference.md) - the complete API and every rule in one file, written for AI coding assistants
+- [Changelog](CHANGELOG.md)
 
 ## Related Libraries
 

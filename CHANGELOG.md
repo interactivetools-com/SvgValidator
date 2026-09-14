@@ -1,38 +1,27 @@
 # SvgValidator Changelog
 
-> **Upgrading?** See [UPGRADING.md](UPGRADING.md) for the checks that matter,
-> per version - tagged releases roll up every change since the previous tag.
-> Versions bundled with CMS Builder are marked on their sections.
+> Tagged releases roll up every change since the previous tag. Versions bundled with
+> CMS Builder are marked on their sections. Error codes are never renamed once released,
+> so code that switches on `$violation->code` needs no changes between versions.
 
 ## [UNRELEASED]
 
-First release. SvgValidator checks an uploaded SVG file against what browsers allow an SVG
-to do inside an `<img>` tag and rejects anything that could run script, load an outside
-resource, or hang a renderer. It never rewrites the file.
+First release. SvgValidator checks an uploaded SVG file and rejects it if it could run
+script, load an outside resource, or hang a renderer. It never rewrites the file. The
+[README](README.md) says what it blocks and what it does not check.
 
 ### Added
 
-- **Three static methods:** `SvgValidator::checkFile($path)`, `SvgValidator::checkString($svg)`,
-  and `SvgValidator::rules()`. Nothing throws for a bad file; a missing path returns a
-  result with `file-unreadable`.
-- **A `Result` with `ok` and `errors`**, and a `Violation` with `code`, `detail`, `template`
-  and `message`. Errors are deduplicated by code and detail and capped at 50.
-  `Violation::TEMPLATES` holds every message template for translation.
-- **22 error codes**, one per rule, listed in [docs/what-gets-rejected.md](docs/what-gets-rejected.md).
+- **`SvgValidator::checkFile($path)`, `checkString($svg)` and `rules()`.** Nothing throws
+  for a bad file; a missing path is a `file-unreadable` rejection.
+- **`Result` with `ok` and `errors`, `Violation` with `code`, `detail`, `template` and
+  `message`.** One error per distinct problem, at most 50. `Violation::TEMPLATES` holds
+  every message template for translation.
+- **One error code per rule**, listed with its fix in [docs/errors.md](docs/errors.md).
   Codes are stable from this release on.
-- **Allowlists** for elements, attributes, prefixed attributes, design-tool namespaces, URL
-  forms, CSS tokens and animation targets, matched to Chrome's `<img>` mode and stricter
-  where that protection is render-time only. Calibrated against about 5,000 files from
-  sixteen public test suites and icon sets.
-- **Embedded SVG images** (`data:image/svg+xml`) get the full check, three levels deep, for
-  server-side rasterizers.
-- **Reference loops and expansion bombs** are rejected: every same-file reference that
-  renders its target is followed, and a loop or more than 100,000 rendered elements fails
-  with `reference-expansion-too-large`. The check's own bookkeeping is capped at 100,000
-  records (ids and references), so a file cannot exhaust the check's memory either.
-- **Seven size limits as public static properties** (`SvgValidator::$maxExpandedElements`
-  and the others in [docs/method-reference.md](docs/method-reference.md#limits)), for the
-  application with an unusual file. The rules themselves have no options.
+- **Size limits as public static properties** (`SvgValidator::$maxExpandedElements` and
+  the others in [docs/ai-reference.md](docs/ai-reference.md#limits)). The rules themselves
+  have no options.
 
 ### Requirements
 

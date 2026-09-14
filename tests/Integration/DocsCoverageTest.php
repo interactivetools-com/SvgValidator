@@ -10,13 +10,13 @@ use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 
 /**
- * Every public method, property and constant of the three classes appears in
- * docs/method-reference.md and docs/ai-reference.md, found by reflection so a new member
- * cannot ship undocumented.
+ * Every public method, property and constant of the three classes appears in README.md
+ * and docs/ai-reference.md, found by reflection so a new member cannot ship undocumented.
+ * Every page under docs/ is linked from the README, so none can go unlisted.
  */
 class DocsCoverageTest extends TestCase
 {
-    private const PAGES = ['docs/method-reference.md', 'docs/ai-reference.md'];
+    private const PAGES = ['README.md', 'docs/ai-reference.md'];
 
     /** @return iterable<string, array{string, string}> page and the text the member must appear as */
     public static function memberProvider(): iterable
@@ -50,15 +50,12 @@ class DocsCoverageTest extends TestCase
         $this->assertStringContainsString($member, $markdown, "$member is missing from $page");
     }
 
-    public function testEveryDocsPageIsInTheIndex(): void
+    public function testEveryDocsPageIsLinkedFromTheReadme(): void
     {
-        $index = file_get_contents(__DIR__ . '/../../docs/README.md');
+        $readme = file_get_contents(__DIR__ . '/../../README.md');
         foreach (glob(__DIR__ . '/../../docs/*.md') as $path) {
             $name = basename($path);
-            if ($name === 'README.md') {
-                continue;
-            }
-            $this->assertStringContainsString("]($name)", $index, "docs/README.md does not link to $name");
+            $this->assertStringContainsString("](docs/$name)", $readme, "README.md does not link to docs/$name");
         }
     }
 }

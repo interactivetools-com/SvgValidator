@@ -3,12 +3,12 @@
 declare(strict_types=1);
 
 /*
- * Rewrites the allowlist blocks in docs/what-gets-through.md and docs/ai-reference.md from
- * SvgValidator::rules(), so the docs cannot drift from the code. Each block sits between
+ * Rewrites the allowlist blocks in docs/ai-reference.md from SvgValidator::rules(), so the
+ * docs cannot drift from the code. Each block sits between
  * <!-- rules:NAME --> and <!-- /rules:NAME --> markers, where NAME is a key of rules();
  * everything else on the page is written by hand.
  *
- *     php tools/rules-doc.php            # rewrite both pages
+ *     php tools/rules-doc.php            # rewrite the page
  *     php tools/rules-doc.php --check    # exit 1 naming any page that is out of date (RulesDocTest does the same)
  */
 
@@ -19,7 +19,7 @@ use function renderMdTable;
 
 require_once __DIR__ . '/shared-md-table.php';
 
-const PAGES = ['docs/what-gets-through.md', 'docs/ai-reference.md'];
+const PAGES = ['docs/ai-reference.md'];
 const WIDTH = 100;
 
 /** The page with every marked block regenerated. Unmarked text is returned as is. */

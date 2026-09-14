@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>SVG in img versus opened directly</title>
+<style>
+  body { font: 15px/1.5 sans-serif; max-width: 760px; margin: 2em auto; padding: 0 1em; color: #222; }
+  h2 { margin-top: 2em; font-size: 1.1em; }
+  .probe { width: 320px; height: 200px; border: 1px dashed #bbb; }
+  .bg { background: url(probe.svg) no-repeat; }
+  code { background: #f3f3f3; padding: 0 .3em; }
+  table { border-collapse: collapse; }
+  td, th { border: 1px solid #ddd; padding: .3em .6em; text-align: left; }
+</style>
+</head>
+<body>
+
+<h1>The same SVG three ways</h1>
+
+<p><code>probe.svg</code> carries a <code>&lt;script&gt;</code>, an <code>onload</code>
+handler, a <code>:hover</code> rule and a link to another site, all of which SvgValidator
+rejects. Shown through <code>&lt;img&gt;</code> a browser blocks every one of them at
+render time. Opened directly the same file runs them all. That difference is why the rules
+reject what a browser merely neutralizes. This page exists to check the difference is still
+there; see docs/internal/browser-research.md, section 8.</p>
+
+<p>Serve the folder over HTTP, with Apache or any other server, so the direct open gets a
+real <code>image/svg+xml</code> response. Without a server:</p>
+
+<pre>php -S localhost:8000 -t tools/img-vs-direct</pre>
+
+<h2>1. Through an img tag</h2>
+<img class="probe" src="probe.svg" alt="probe SVG shown through an img tag">
+
+<h2>2. As a CSS background image</h2>
+<div class="probe bg"></div>
+
+<h2>3. Opened directly</h2>
+<p><a href="probe.svg" target="_blank">Open probe.svg in a new tab</a></p>
+
+<h2>What to expect (2026-09, Chrome, Firefox and Safari agree)</h2>
+<table>
+  <tr><th>Effect</th><th>img and background</th><th>Opened directly</th></tr>
+  <tr><td>script</td><td>"did not run", green</td><td>"RAN", red</td></tr>
+  <tr><td>onload handler</td><td>grey frame</td><td>red frame</td></tr>
+  <tr><td>:hover rule</td><td>stays grey</td><td>turns yellow under the mouse</td></tr>
+  <tr><td>link</td><td>not clickable</td><td>opens example.com</td></tr>
+</table>
+
+<p>If a browser ever shows the right-hand column as the left-hand column when the file is
+opened directly, Chromium issue 40094872 has shipped in that browser. The rules do not
+change either way: other browsers and server-side rasterizers still see the file as a
+full document.</p>
+
+</body>
+</html>

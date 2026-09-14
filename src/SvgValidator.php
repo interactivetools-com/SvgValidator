@@ -12,9 +12,10 @@ use function addcslashes, array_key_last, array_keys, array_map, array_pop, arra
 use const LIBXML_NONET, PHP_OS_FAMILY;
 
 /**
- * Checks an uploaded SVG against what browsers allow for SVG in an <img> tag, and rejects
- * anything that could run script, load an outside resource, or hang a renderer when the
- * same file is opened directly. The file is streamed and never modified.
+ * Checks an uploaded SVG file and rejects it if it could run script, load an outside
+ * resource, or hang a renderer. Browsers block the same things for an SVG in an <img> tag,
+ * but not when the file is opened on its own; this checks the file, so it is safe either
+ * way. The file is streamed and never modified.
  *
  *     $result = SvgValidator::checkFile($_FILES['logo']['tmp_name']);
  *     if (!$result->ok) {
@@ -28,8 +29,8 @@ use const LIBXML_NONET, PHP_OS_FAMILY;
  *
  * Every rule is an allowlist. Elements, attributes, XML namespaces, URL forms, and CSS
  * functions not on a list are rejected, so a new browser feature is closed until it is
- * added here. docs/what-gets-rejected.md explains each rule and docs/what-gets-through.md
- * shows the lists.
+ * added here. docs/errors.md has the fix for each code and docs/ai-reference.md every rule
+ * and list.
  */
 final class SvgValidator
 {
@@ -40,7 +41,7 @@ final class SvgValidator
     private const XML_NS   = 'http://www.w3.org/XML/1998/namespace';
     private const XMLNS_NS = 'http://www.w3.org/2000/xmlns/';
 
-    /** Elements allowed in the SVG namespace. Not here on purpose: script, foreignObject, handler, iframe, font, tref, cursor. */
+    /** Elements allowed in the SVG namespace. Not here on purpose: script, foreignObject, handler, listener, iframe, embed, font (and the other SVG font elements), tref, cursor, animateColor, discard. */
     private const ELEMENTS = [
         // structure
         'svg', 'g', 'defs', 'symbol', 'use', 'title', 'desc', 'metadata', 'switch', 'a', 'view', 'style',

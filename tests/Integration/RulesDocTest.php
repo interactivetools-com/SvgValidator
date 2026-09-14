@@ -10,9 +10,9 @@ use function Itools\SvgValidator\Tools\RulesDoc\render;
 require_once __DIR__ . '/../../tools/rules-doc.php';   // loaded here, not in setUpBeforeClass(), because the data provider runs first
 
 /**
- * The allowlist blocks in docs/what-gets-through.md and docs/ai-reference.md are generated
- * from SvgValidator::rules() by tools/rules-doc.php. This test regenerates them and fails
- * when the page on disk differs, so a change to a list in src/ cannot ship without the docs.
+ * The allowlist blocks in docs/ai-reference.md are generated from SvgValidator::rules() by
+ * tools/rules-doc.php. This test regenerates them and fails when the page on disk differs,
+ * so a change to a list in src/ cannot ship without the docs.
  */
 class RulesDocTest extends TestCase
 {

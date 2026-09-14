@@ -1,10 +1,8 @@
-| Text in one `<style>` element        | 1 MB          | SvgValidator                    |
-or `need more than 100,000 records to track (ids and references)` # SvgValidator AI Reference
+# SvgValidator AI Reference
 
 This is a consolidated reference for AI coding assistants: the complete API and every
-rejection rule in one file, covering SvgValidator 1.0. For human-friendly docs with
-explanations, see
-[Getting Started](https://github.com/interactivetools-com/SvgValidator/blob/main/docs/getting-started.md).
+rejection rule in one file, covering SvgValidator 1.0. For human-friendly docs, see the
+[README](https://github.com/interactivetools-com/SvgValidator).
 
 Contents:
 
@@ -28,11 +26,11 @@ Contents:
 
 ## What SvgValidator Is
 
-SvgValidator checks an uploaded SVG file and answers one question: does it stay inside what
-Chrome allows an SVG to do when shown through an `<img>` tag? A file that could run script,
-load anything from outside itself, or hang a renderer is **rejected with a list of reasons**.
-The file is **never modified**: there is no cleaned output, and the caller stores the original
-bytes or refuses the upload.
+SvgValidator checks an uploaded SVG file and rejects it if it could run script, load anything
+from outside itself, or hang a renderer, **with a list of reasons**. Chrome blocks the same
+things when an SVG is shown through an `<img>` tag, but not when the file is opened on its
+own; SvgValidator checks the file, so it is safe either way. The file is **never modified**:
+there is no cleaned output, and the caller stores the original bytes or refuses the upload.
 
 Every rule is an allowlist, except CSS, which is scanned for a short list of tokens.
 Elements, attributes, XML namespaces, URL forms and animation targets not on a list are
@@ -218,8 +216,8 @@ For every element, by its namespace:
   XInclude, XML Events, and anything unknown.
 
 Not allowed on purpose, so never add them to a file to "fix" a rejection: `script`,
-`foreignObject`, `handler`, `iframe`, `font`, `tref`, `cursor`, `animateColor`, `discard`.
-A nested `<svg>` is fine.
+`foreignObject`, `handler`, `listener`, `iframe`, `embed`, `font` (and the other SVG font
+elements), `tref`, `cursor`, `animateColor`, `discard`. A nested `<svg>` is fine.
 
 ## Rules: Attributes
 

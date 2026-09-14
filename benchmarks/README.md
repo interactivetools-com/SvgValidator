@@ -21,5 +21,6 @@ allocations, which `memory_get_peak_usage()` cannot see. The corpus is timed in 
 process, three passes, fastest time per file.
 
 The sanitizer comparison needs `enshrined/svg-sanitize` installed somewhere outside this
-repository (it is GPL licensed and is never a dependency here). Point `--sanitizer` at
-that install's `vendor/autoload.php`.
+repository. It is GPL licensed: running it for a timing comparison on your own machine is a
+use the license allows, but it is never a dependency here and none of its code ships with
+this MIT library. Point `--sanitizer` at that install's `vendor/autoload.php`.
