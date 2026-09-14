@@ -50,6 +50,18 @@ class StructureTest extends SvgValidatorTestCase
         $this->assertTrue(SvgValidator::checkFile($this->tempFile($this->svg()))->ok);
     }
 
+    /** libxml2 decodes %XX in a path as if it were a URL; a real file named with %27 must still open. */
+    public function testPathWithPercentAndSpace(): void
+    {
+        $path = $this->tempFile($this->svg()) . ' d%27Ivrea 50%_off.svg';
+        file_put_contents($path, $this->svg());
+        try {
+            $this->assertTrue(SvgValidator::checkFile($path)->ok);
+        } finally {
+            unlink($path);
+        }
+    }
+
     //endregion
     //region Before the Root Tag
 

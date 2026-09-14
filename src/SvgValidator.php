@@ -7,8 +7,8 @@ use Closure;
 use XMLReader;
 
 // import built-ins so calls resolve at compile time instead of per-call lookups; NamespacedCallsTest keeps this list exact
-use function addcslashes, array_key_last, array_keys, array_map, array_pop, array_values, base64_decode, basename, count, explode, file_get_contents, implode, in_array, is_file, is_readable, libxml_clear_errors, libxml_get_errors, libxml_use_internal_errors, min, number_format, preg_match, preg_match_all, str_starts_with, strcasecmp, stripos, strlen, strpos, strspn, strtolower, substr, substr_compare, trim;
-use const LIBXML_NONET;
+use function addcslashes, array_key_last, array_keys, array_map, array_pop, array_values, base64_decode, basename, count, explode, file_get_contents, implode, in_array, is_file, is_readable, libxml_clear_errors, libxml_get_errors, libxml_use_internal_errors, min, number_format, preg_match, preg_match_all, rawurlencode, str_starts_with, strcasecmp, stripos, strlen, strpos, strspn, strtolower, substr, substr_compare, trim;
+use const LIBXML_NONET, PHP_OS_FAMILY;
 
 /**
  * Checks an uploaded SVG against what browsers allow for SVG in an <img> tag, and rejects
@@ -178,7 +178,25 @@ final class SvgValidator
         if ($head === false) {
             return new Result([new Violation('file-unreadable', basename($path))]);
         }
-        return (new self(0))->check($head, fn(XMLReader $reader) => $reader->open($path, null, LIBXML_NONET));
+        return (new self(0))->check($head, fn(XMLReader $reader) => $reader->open(self::fileUri($path), null, LIBXML_NONET));
+    }
+
+    /**
+     * The path in the form XMLReader::open() needs. PHP's XML loaders (XMLReader::open(),
+     * DOMDocument::load(), simplexml_load_file()) hand the string to libxml2, which takes "a
+     * filename or URL" and decodes %XX in it as if it were a URL. Plain file functions such as
+     * file_get_contents() do not. So a file named 50%_off.svg is looked up as 50_off.svg and
+     * never found. Encoding each folder and file name first makes that decode give back the
+     * real name. Windows skips the decode (C: reads as a URL scheme), so it gets the path as is.
+     */
+    private static function fileUri(string $path): string
+    {
+        if (PHP_OS_FAMILY === 'Windows') {
+            return $path;
+        }
+        $segments = explode('/', $path);
+        $encoded  = array_map(rawurlencode(...), $segments);
+        return implode('/', $encoded);
     }
 
     /**
