@@ -98,7 +98,8 @@ foreach (Violation::TEMPLATES as $code => $template) {
 ## Logging Rejections
 
 Log the code and the detail, not the message: the code is stable and greppable, and the
-detail is what the file actually contained.
+detail is what the file actually contained. A detail is always one line: a line break in
+the file comes out as `\n`, so a rejected file cannot add lines to the log.
 
 ```php
 if (!$result->ok) {

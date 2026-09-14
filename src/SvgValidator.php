@@ -291,6 +291,11 @@ final class SvgValidator
         if (count($this->errors) >= self::$maxErrors) {
             return;   // the read loop stops at the cap too, but one element can add several errors before it checks
         }
+        // one line of valid UTF-8 whatever the file held, so a log line or an error page can show it as is
+        $detail = addcslashes($detail, "\0..\37\177");
+        if (!preg_match('//u', $detail)) {
+            $detail = addcslashes($detail, "\200..\377");
+        }
         $this->errors["$code\0$detail"] ??= new Violation($code, $detail);
     }
 

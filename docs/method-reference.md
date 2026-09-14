@@ -45,7 +45,7 @@ One rule the file broke. Four readonly strings, plus the template table.
 | Member                 | Type     | Description                                                                                                                                          |
 |------------------------|----------|------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `$violation->code`     | `string` | One of the 21 codes below. Never renamed once released, so application code can switch on it                                                         |
-| `$violation->detail`   | `string` | What was found: an element or attribute name, a namespace, or the first 60 characters of a value (then `...`). Taken from the file, not HTML-encoded |
+| `$violation->detail`   | `string` | What was found: an element or attribute name, a namespace, or the first 60 characters of a value (then `...`). Taken from the file, not HTML-encoded; always one line of valid UTF-8, control characters and invalid bytes escaped (`\n`, `\351`) |
 | `$violation->template` | `string` | The English message with one `%s` where the detail goes                                                                                              |
 | `$violation->message`  | `string` | `sprintf($template, $detail)`                                                                                                                        |
 | `Violation::TEMPLATES` | `array`  | Every template keyed by code, so a translation system can register them all up front                                                                 |

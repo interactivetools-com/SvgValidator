@@ -82,6 +82,24 @@ class ResultTest extends SvgValidatorTestCase
         $this->assertSame('This is not an SVG file: it starts with a<b>c', $violation->message);
     }
 
+    /** Whatever the file held, a detail is one line of valid UTF-8, so a log line or an error page can show it as is. */
+    #[DataProvider('controlCharacterProvider')]
+    public function testDetailIsOneLineOfValidUtf8(string $svg, string $code, string $detail): void
+    {
+        $this->assertRejects($svg, $code, $detail);
+    }
+
+    public static function controlCharacterProvider(): array
+    {
+        $svg = 'xmlns="http://www.w3.org/2000/svg"';
+        return [
+            'newline in an href'            => ["<svg $svg><use href=\"a&#10;b\"/></svg>", 'href-not-allowed', 'a\nb'],
+            'newline inside a CSS token'    => ["<svg $svg><style>behavior\n:x</style></svg>", 'css-not-allowed', 'behavior\n:'],
+            'tab and CR in a CSS url'       => ["<svg $svg><style>a{fill:url(https://x\t\ry)}</style></svg>", 'css-not-allowed', 'url(https://x\t\ny'],   // XML turns CR into LF
+            'invalid UTF-8 in the encoding' => ["<?xml version=\"1.0\" encoding=\"caf\xE9\"?><svg $svg/>", 'not-utf8', 'declared as caf\351'],
+        ];
+    }
+
     /** Every detail taken from the file is cut at 60 characters, whichever rule reports it; fixed words around it stay. */
     #[DataProvider('longDetailProvider')]
     public function testDetailFromTheFileIsCutAtSixty(string $svg, string $code, string $endsWith): void

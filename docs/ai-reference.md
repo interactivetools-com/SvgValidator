@@ -464,8 +464,9 @@ unknown elements although Chrome would tolerate them.
   file reports the errors found before the broken chunk, then `malformed-xml` last.
 - **50 errors and the check stops.** Nothing is read past the fiftieth, including a parse
   error later in the file.
-- **`detail` and `message` are unencoded text from the file.** Always valid UTF-8, but they
-  can hold `</script>`, quotes and backticks. HTML-encode for a page. A JSON response with
+- **`detail` and `message` are unencoded text from the file.** Always one line of valid
+  UTF-8 (control characters and bytes that are not UTF-8 are escaped, as `\n` or `\351`),
+  but they can hold `</script>`, quotes and backticks. HTML-encode for a page. A JSON response with
   `Content-Type: application/json` needs nothing extra. Inside a `<script>` block:
 
   ```php
