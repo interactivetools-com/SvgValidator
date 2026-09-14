@@ -174,10 +174,13 @@ function gitlabListing(array $source): array
     ];
 }
 
+/** Files to download: by extension and the source's pattern, and never a name that could write outside its corpus folder. */
 function wanted(string $path, array $source): bool
 {
     $extension = strtolower(pathinfo($path, PATHINFO_EXTENSION));
-    return in_array($extension, $source['keep'], true) && (!isset($source['match']) || preg_match($source['match'], $path));
+    return in_array($extension, $source['keep'], true)
+        && (!isset($source['match']) || preg_match($source['match'], $path))
+        && !preg_match('~\\\\|(^|/)\.\.(/|$)~', $path);   // a backslash (git allows it in a name, Windows reads it as a separator) or a .. segment
 }
 
 /** Where a file goes under corpus/<name>/: as listed, or under the folder's last segment when the source has several folders. */
