@@ -103,9 +103,13 @@ final class SvgValidator
         'text-rendering', 'unicode-bidi', 'vector-effect', 'visibility', 'white-space', 'word-spacing', 'writing-mode',
     ];
 
-    /** Prefixed attributes allowed, by namespace. Not here on purpose: xml:base, xlink:actuate, xlink:show. */
+    /**
+     * Prefixed attributes allowed, by namespace. Not here on purpose: xml:base, xlink:actuate,
+     * xlink:show, and xml:id, which browsers ignore but Batik resolves as an id; allowing it would
+     * give a reference bomb ids the expansion check does not count.
+     */
     private const NAMESPACED_ATTRIBUTES = [
-        self::XML_NS   => ['id', 'lang', 'space'],
+        self::XML_NS   => ['lang', 'space'],
         self::XLINK_NS => ['href', 'title'],
     ];
 

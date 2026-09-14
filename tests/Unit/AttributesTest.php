@@ -51,7 +51,6 @@ class AttributesTest extends SvgValidatorTestCase
     public static function namespacedAttributeProvider(): array
     {
         return [
-            'xml:id'      => ['xml:id="a"'],
             'xml:lang'    => ['xml:lang="en"'],
             'xml:space'   => ['xml:space="preserve"'],
             'xlink:href'  => ['xlink:href="#a"'],
@@ -102,6 +101,7 @@ class AttributesTest extends SvgValidatorTestCase
             'cursor'                 => ['<rect cursor="pointer"/>', 'cursor'],
             'src'                    => ['<image src="x.png"/>', 'src'],
             'xml:base'               => ['<g xml:base="http://example.com/"/>', 'xml:base'],
+            'xml:id'                 => ['<use href="#a"/><g xml:id="a"/>', 'xml:id'],   // Batik resolves it as an id, the expansion check does not
             'xlink:show'             => ['<a href="#a" xlink:show="new"/>', 'xlink:show'],
             'xlink:actuate'          => ['<a href="#a" xlink:actuate="onLoad"/>', 'xlink:actuate'],
             'xml events'             => ['<rect ev:event="load"/>', 'ev:event'],

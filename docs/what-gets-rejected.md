@@ -241,13 +241,14 @@ Chrome.
 
 An attribute on an SVG element that is not in the
 [attributes list](what-gets-through.md#attributes), not `data-*` or `aria-*`, and not one
-of the five allowed prefixed names (`xml:id`, `xml:lang`, `xml:space`, `xlink:href`,
-`xlink:title`). The detail is the name as written.
+of the four allowed prefixed names (`xml:lang`, `xml:space`, `xlink:href`, `xlink:title`).
+The detail is the name as written.
 
 Never on the list, on purpose: `tabindex` (makes an element focusable, which is interaction),
 `target` (where a link opens), `crossorigin` (fetch behavior), `cursor` (loads a cursor
 file), `xml:base` (changes what every relative URL means), `xlink:show` and `xlink:actuate`
-(open links automatically).
+(open links automatically), `xml:id` (browsers ignore it, but Batik treats it as an id, and
+the reference-expansion check counts only `id`).
 
 ```xml
 <svg xmlns="http://www.w3.org/2000/svg">

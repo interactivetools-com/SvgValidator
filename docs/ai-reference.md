@@ -224,8 +224,8 @@ For every attribute on an element in the SVG namespace, in this order:
    including inert ones) rejects with `event-handler`. No allowed attribute starts with `on`.
 3. An attribute in an inert namespace passes.
 4. An unprefixed name must be in the [attributes allowlist](#allowlists) or start with
-   `data-` or `aria-`. A prefixed name must be one of `xml:id`, `xml:lang`, `xml:space`,
-   `xlink:href`, `xlink:title`. Anything else rejects with `attribute-not-allowed`. Names are
+   `data-` or `aria-`. A prefixed name must be one of `xml:lang`, `xml:space`, `xlink:href`,
+   `xlink:title`. Anything else rejects with `attribute-not-allowed`. Names are
    case-sensitive.
 5. The value is then checked: `href` and `xlink:href` per [URLs](#rules-urls), `style` per
    [CSS](#rules-css), every other value for `url(` per [URLs](#rules-urls), and on animation
@@ -363,10 +363,10 @@ unicode-bidi vector-effect visibility white-space word-spacing writing-mode
 **`namespacedAttributes`**, keyed by namespace URI:
 
 <!-- rules:namespacedAttributes -->
-| Namespace                              | Attributes            |
-|----------------------------------------|-----------------------|
-| `http://www.w3.org/XML/1998/namespace` | `id`, `lang`, `space` |
-| `http://www.w3.org/1999/xlink`         | `href`, `title`       |
+| Namespace                              | Attributes      |
+|----------------------------------------|-----------------|
+| `http://www.w3.org/XML/1998/namespace` | `lang`, `space` |
+| `http://www.w3.org/1999/xlink`         | `href`, `title` |
 <!-- /rules:namespacedAttributes -->
 
 **`inertNamespaces`**: elements and attributes in these pass without inspection (except

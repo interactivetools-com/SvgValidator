@@ -204,7 +204,7 @@ class ResultTest extends SvgValidatorTestCase
         $this->assertNotContains('script', $rules['elements']);
         $this->assertNotContains('foreignObject', $rules['elements']);
         $this->assertSame([], preg_grep('/^on/i', $rules['attributes']));
-        $this->assertSame(['id', 'lang', 'space'], $rules['namespacedAttributes']['http://www.w3.org/XML/1998/namespace']);
+        $this->assertSame(['lang', 'space'], $rules['namespacedAttributes']['http://www.w3.org/XML/1998/namespace']);
         $this->assertSame(['href', 'title'], $rules['namespacedAttributes']['http://www.w3.org/1999/xlink']);
         $this->assertSame(['image', 'feImage'], $rules['imageElements']);
         $this->assertSame(['png', 'jpeg', 'jpg', 'gif', 'webp', 'svg+xml'], $rules['dataImageTypes']);

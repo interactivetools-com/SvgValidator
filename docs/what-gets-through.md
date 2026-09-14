@@ -99,13 +99,14 @@ The only prefixed attributes allowed on SVG elements, by namespace. `xmlns` decl
 always pass. `xlink:href` follows the same rules as `href`.
 
 <!-- rules:namespacedAttributes -->
-| Namespace                              | Attributes            |
-|----------------------------------------|-----------------------|
-| `http://www.w3.org/XML/1998/namespace` | `id`, `lang`, `space` |
-| `http://www.w3.org/1999/xlink`         | `href`, `title`       |
+| Namespace                              | Attributes      |
+|----------------------------------------|-----------------|
+| `http://www.w3.org/XML/1998/namespace` | `lang`, `space` |
+| `http://www.w3.org/1999/xlink`         | `href`, `title` |
 <!-- /rules:namespacedAttributes -->
 
-Not on the list, on purpose: `xml:base`, `xlink:show`, `xlink:actuate`.
+Not on the list, on purpose: `xml:base`, `xlink:show`, `xlink:actuate`, and `xml:id`, which
+browsers ignore but Batik resolves as an id; the reference-expansion check counts only `id`.
 
 ## Inert Namespaces
 
