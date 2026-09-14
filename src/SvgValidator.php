@@ -8,7 +8,7 @@ use LibXMLError;
 use XMLReader;
 
 // import built-ins so calls resolve at compile time instead of per-call lookups; NamespacedCallsTest keeps this list exact
-use function addcslashes, array_key_last, array_keys, array_map, array_pop, array_push, array_values, base64_decode, basename, count, explode, file_get_contents, implode, in_array, is_file, is_readable, libxml_clear_errors, libxml_get_errors, libxml_use_internal_errors, min, number_format, preg_match, preg_match_all, rawurlencode, str_contains, str_starts_with, strcasecmp, stripos, strlen, strpos, strspn, strtolower, strval, substr, substr_compare, trim;
+use function addcslashes, array_key_last, array_keys, array_map, array_pop, array_push, array_values, base64_decode, basename, count, explode, file_get_contents, implode, in_array, is_file, is_readable, libxml_clear_errors, libxml_get_errors, libxml_use_internal_errors, min, number_format, preg_match, preg_match_all, rawurlencode, str_contains, str_starts_with, strcasecmp, stripos, strlen, strpos, strrchr, strspn, strtolower, strval, substr, substr_compare, trim;
 use const LIBXML_NONET, PHP_OS_FAMILY;
 
 /**
@@ -142,7 +142,7 @@ final class SvgValidator
     private const IMAGE_ELEMENTS = ['image', 'feImage'];
 
     private const ANIMATION_ELEMENTS         = ['animate', 'set', 'animateTransform', 'animateMotion'];
-    private const ANIMATION_TARGETS_DENIED   = ['href', 'xlink:href', 'style', 'class'];
+    private const ANIMATION_TARGETS_DENIED   = ['href', 'style', 'class'];   // matched without any prefix, so xlink:href and q:href are both href
     private const ANIMATION_VALUE_ATTRIBUTES = ['from', 'to', 'by', 'values'];
 
     //endregion
@@ -796,7 +796,8 @@ final class SvgValidator
     {
         if ($attribute === 'attributeName') {
             $target = trim($value);
-            if (in_array($target, self::ANIMATION_TARGETS_DENIED, true) || stripos($target, 'on') === 0) {
+            $local  = substr(strrchr(":$target", ':'), 1);   // the name after the last colon; any prefix can be bound to XLink
+            if (in_array($local, self::ANIMATION_TARGETS_DENIED, true) || stripos($local, 'on') === 0) {
                 $this->fail('animation-target-not-allowed', self::excerpt($target));
             }
             return;

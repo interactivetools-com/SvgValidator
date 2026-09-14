@@ -374,9 +374,10 @@ rule above has run. Two rules close that.
 
 ### Animating a Checked Attribute - `animation-target-not-allowed`
 
-The `attributeName` of an animation element may not be `href`, `xlink:href`, `style`,
-`class`, or anything starting with `on`. Everything else (`fill`, `opacity`, `d`,
-`transform`, `x`...) animates freely.
+The `attributeName` of an animation element may not be `href`, `style`, `class`, or
+anything starting with `on`. The name is matched after any prefix, so `xlink:href` and
+`q:href` are both `href`. Everything else (`fill`, `opacity`, `d`, `transform`, `x`...)
+animates freely.
 
 ```xml
 <svg xmlns="http://www.w3.org/2000/svg">

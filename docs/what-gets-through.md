@@ -194,8 +194,9 @@ In practice that means:
 
 `<animate>`, `<set>`, `<animateTransform>`, `<animateMotion>` and `<mpath>` are allowed, and
 so is every timing and value attribute. Chrome runs SMIL animation in `<img>` mode. Two
-limits: `attributeName` may not be `href`, `xlink:href`, `style`, `class` or an `on*`
-name, and no item in `from`, `to`, `by` or `values` may start with a URL scheme.
+limits: `attributeName` may not be `href`, `style`, `class` or an `on*` name, with or
+without a prefix such as `xlink:`, and no item in `from`, `to`, `by` or `values` may start
+with a URL scheme.
 `begin="click"` and the other event-based timings are accepted; Chrome ignores them in
 `<img>` mode, and nothing loads or runs when they fire.
 

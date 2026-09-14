@@ -276,8 +276,9 @@ properties, `:hover`, `:visited`, `@media`, `@keyframes` and `!important` are no
 
 On `<animate>`, `<set>`, `<animateTransform>` and `<animateMotion>`:
 
-- **`attributeName`** (trimmed) rejects with `animation-target-not-allowed` when it is
-  `href`, `xlink:href`, `style`, `class`, or starts with `on` (case-insensitive).
+- **`attributeName`** (trimmed, and with any `prefix:` removed, so `xlink:href` and
+  `q:href` are both `href`) rejects with `animation-target-not-allowed` when it is `href`,
+  `style`, `class`, or starts with `on` (case-insensitive). The detail is the name as written.
 - **`from`, `to`, `by`, `values`** reject with `animation-value-not-allowed` when any
   `;`-separated item starts (after whitespace) with a URL scheme, `letter` then letters,
   digits, `+`, `.` or `-`, then `:`. `values="0;1"` and `to="red"` pass; `to="javascript:x"`
