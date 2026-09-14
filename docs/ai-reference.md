@@ -1,3 +1,4 @@
+| Text in one `<style>` element        | 1 MB          | SvgValidator                    |
 or `need more than 100,000 records to track (ids and references)` # SvgValidator AI Reference
 
 This is a consolidated reference for AI coding assistants: the complete API and every
@@ -162,8 +163,8 @@ Every code, its template, and what `detail` holds. Templates are `Violation::TEM
 | `image-href-not-allowed`        | `Image href must be #id or an embedded PNG, JPEG, GIF, WebP or SVG data: URL, not %s`   | the value, or `(empty)`                                                                                                                                         |
 | `embedded-svg-not-allowed`      | `An embedded SVG image was rejected: %s`                                                | the inner file's message, `the data: URL is not valid base64`, or `SVG images nested more than 3 levels deep`                                                   |
 | `url-not-fragment`              | `url() in the %s attribute must reference an element in the same file (#id)`            | the attribute name                                                                                                                                              |
-| `reference-expansion-too-large` | `The references in this file %s`                                                        | `form a loop (#a -> #b -> #a)`, `expand to more than 100,000 elements`, or `need more than 100,000 records to track (ids and references)` |
-| `css-not-allowed`               | `CSS containing %s is not allowed`                                                      | the banned token as matched, such as `@import`, `\`, or `url(https://example.com/a.css`                                                                         |
+| `reference-expansion-too-large` | `The references in this file %s`                                                        | `form a loop (#a -> #b -> #a)`, `expand to more than 100,000 elements`, or `need more than 100,000 records to track (ids and references)`                       |
+| `css-not-allowed`               | `CSS containing %s is not allowed`                                                      | the banned token as matched (`@import`, `\`, `url(https://example.com/a.css`) or `more than 1,000,000 bytes`                                                    |
 | `animation-target-not-allowed`  | `Animating the %s attribute is not allowed`                                             | the `attributeName` value                                                                                                                                       |
 | `animation-value-not-allowed`   | `The %s animation attribute contains a URL or scheme`                                   | `from`, `to`, `by`, or `values`                                                                                                                                 |
 
@@ -269,6 +270,9 @@ child elements) and to every `style` attribute. Two regular expressions, case-in
 2. `url(` whose target, after optional whitespace and quote, does not start with `#`,
    `data:font/`, or `data:;base64,` rejects with the `url(` and up to 40 characters after it
    as the detail.
+3. More than 1,000,000 bytes of text in one `<style>` element rejects with
+   `more than 1,000,000 bytes` as the detail. The text is held whole until the closing tag,
+   so the limit keeps memory at 1 MB; the largest `<style>` in the corpus is 64 KB.
 
 So `fill: url(#p)` passes, `@font-face { src: url(data:font/woff2;base64,...) }` passes
 anywhere in the CSS, and `background: url(https://...)`, `@import`, and any escape sequence

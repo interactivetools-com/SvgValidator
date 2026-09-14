@@ -172,15 +172,19 @@ class ResultTest extends SvgValidatorTestCase
     {
         $maxErrors       = SvgValidator::$maxErrors;
         $maxDetailLength = SvgValidator::$maxDetailLength;
+        $maxStyleLength  = SvgValidator::$maxStyleLength;
         try {
             SvgValidator::$maxErrors       = 5;
             SvgValidator::$maxDetailLength = 10;
+            SvgValidator::$maxStyleLength  = 10;
             $result = SvgValidator::checkString($this->svg('<bad1/><bad2/><bad3/><bad4/><bad5/><bad6/><' . str_repeat('a', 20) . '/>'));
             $this->assertCount(5, $result->errors);
             $this->assertSame('aaaaaaaaaa...', SvgValidator::checkString($this->svg('<' . str_repeat('a', 20) . '/>'))->errors[0]->detail);
+            $this->assertSame('more than 10 bytes', SvgValidator::checkString($this->svg('<style>.a{fill:red}</style>'))->errors[0]->detail);
         } finally {
             SvgValidator::$maxErrors       = $maxErrors;
             SvgValidator::$maxDetailLength = $maxDetailLength;
+            SvgValidator::$maxStyleLength  = $maxStyleLength;
         }
     }
 

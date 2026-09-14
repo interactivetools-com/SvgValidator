@@ -173,6 +173,7 @@ final class SvgValidator
     public static int $prologLimit         = 65536;    // the root tag must start within this many bytes
     public static int $maxErrors           = 50;       // distinct errors reported per file
     public static int $maxEmbedDepth       = 3;        // SVG inside SVG inside SVG, then stop
+    public static int $maxStyleLength      = 1000000;  // bytes of text in one <style> element, held whole until its closing tag
     public static int $maxExpandedElements = 100000;   // elements the references in a file may add up to when expanded
     public static int $maxReferenceEntries = 100000;   // ids and (id, target) pairs the expansion check may hold; the same target inside the same id is one entry
     public static int $maxDetailLength     = 60;       // characters of a value quoted in an error message before "..."
@@ -439,7 +440,14 @@ final class SvgValidator
                 case XMLReader::CDATA:
                 case XMLReader::WHITESPACE:
                 case XMLReader::SIGNIFICANT_WHITESPACE:
-                    if ($styleDepth !== null) {
+                    if ($styleDepth === null) {
+                        break;
+                    }
+                    if (strlen($css) + strlen($reader->value) > self::$maxStyleLength) {
+                        $this->fail('css-not-allowed', 'more than ' . number_format(self::$maxStyleLength) . ' bytes');
+                        $styleDepth = null;   // the rest of this <style> is not collected
+                        $css        = '';
+                    } else {
                         $css .= $reader->value;   // browsers use the element's whole text content, child elements included
                     }
                     break;

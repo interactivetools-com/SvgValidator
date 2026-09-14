@@ -1,3 +1,4 @@
+| Text in one `<style>` element        | 1 MB          | SvgValidator; `css-not-allowed` above it               |
 # Method Reference
 
 Every public method, property and constant, with its type and what it returns. The three

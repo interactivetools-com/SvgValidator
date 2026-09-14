@@ -3,11 +3,11 @@
 Checking a typical icon takes 0.02 ms. Larger files go through at about 100 MB/s, so a
 1 MB illustration takes 10 ms and a 10 MB file 100 ms. Memory does not grow with the file:
 XMLReader streams it, so a 10 MB file adds nothing measurable to the PHP process and a
-50 MB file about 3 MB, where a DOM parser needs 443 MB. The one thing the check keeps per
-file, the ids and references for the expansion check, is capped at 100,000 records, a few
-MB. Files built to hang a renderer (a reference bomb, an entity-expansion DOCTYPE,
-100,000 levels of nesting) are rejected in under 0.2 ms each, because the check refuses
-them before anything expands.
+50 MB file about 3 MB, where a DOM parser needs 443 MB. The check keeps two things per
+file: the ids and references for the expansion check, capped at 100,000 records (a few
+MB), and the text of the open `<style>` element, capped at 1 MB. Files built to hang a
+renderer (a reference bomb, an entity-expansion DOCTYPE, 100,000 levels of nesting) are
+rejected in under 0.2 ms each, because the check refuses them before anything expands.
 
 All times on this page are in milliseconds (ms), thousandths of a second. For scale,
 response-time research puts the point where people start to notice a delay at about
@@ -68,8 +68,9 @@ median is 0.019 ms and the slowest, a 53 KB icon, 0.086 ms.
 
 The file is streamed. XMLReader hands the check one element at a time and never builds the
 document in memory. What stays in memory is the state the rules need: the open elements,
-which ids each element references (kept until the end of the file, since a target can be
-defined after the element that uses it), and the violations found, at most 50.
+the text of an open `<style>` until its closing tag (at most 1 MB), which ids each element
+references (kept until the end of the file, since a target can be defined after the element
+that uses it), and the violations found, at most 50.
 
 The table shows how much the PHP process's peak memory grew while it checked each file. It
 is measured in a fresh process so that libxml2's own allocations count, which

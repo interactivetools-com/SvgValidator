@@ -157,5 +157,16 @@ class CssTest extends SvgValidatorTestCase
         $this->assertAccepts($this->svg("<style>$markup</style>"));
     }
 
+    /** The text of one <style> is held until its closing tag, so its size is capped: one node, or the nodes a child element splits it into. */
+    public function testStyleTextLongerThanTheLimitIsRejected(): void
+    {
+        $text = fn(int $bytes) => str_repeat('x', $bytes);
+        $this->assertAccepts($this->svg('<style>' . $text(1000000) . '</style>'));
+        $this->assertRejects($this->svg('<style>' . $text(1000001) . '</style>'), 'css-not-allowed', 'more than 1,000,000 bytes');
+        $this->assertRejects($this->svg('<style>' . $text(600000) . '<title/>' . $text(400001) . '</style>'), 'css-not-allowed', 'more than 1,000,000 bytes');
+        $result = SvgValidator::checkString($this->svg('<style>' . $text(1000001) . '</style><style>@import "x";</style>'));
+        $this->assertSame(['more than 1,000,000 bytes', '@import'], array_column($result->errors, 'detail'));   // the next <style> is still checked
+    }
+
     //endregion
 }

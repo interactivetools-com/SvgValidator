@@ -357,6 +357,11 @@ Comments are not stripped first, so a banned token inside `/* */` still rejects:
 containing `/*` can fake a comment opener and hide a token behind it. Selectors,
 properties, `@media`, `@keyframes`, `:hover` and `!important` are not checked.
 
+A `<style>` element with more than 1 MB (1,000,000 bytes) of text rejects with
+`more than 1,000,000 bytes` as the detail. The element's text is held whole until its closing
+tag, so the limit keeps memory at 1 MB whatever the file does. The largest `<style>` in the
+corpus is 64 KB, an Illustrator export with embedded fonts.
+
 ```xml
 <svg xmlns="http://www.w3.org/2000/svg">
   <style>@import "https://fonts.example.com/roboto.css";</style>
