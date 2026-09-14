@@ -1,7 +1,7 @@
 {
     "name": "itools/svgvalidator",
     "description": "Rejects uploaded SVG files that could run script, load external resources, or hang a renderer: an allowlist validator matching what browsers permit for SVG in an <img> tag",
-    "keywords": ["php", "svg", "upload", "file-upload", "image-upload", "validator", "validation", "allowlist", "security", "xss", "svg-sanitizer", "sanitize", "xmlreader"],
+    "keywords": ["php", "svg", "xml", "upload", "file-upload", "image-upload", "upload-validation", "validator", "validation", "svg-validator", "allowlist", "security", "xss", "svg-sanitizer", "sanitize", "xmlreader", "libxml"],
     "type": "library",
     "homepage": "https://github.com/interactivetools-com/SvgValidator",
     "license": "MIT",
