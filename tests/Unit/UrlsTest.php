@@ -308,6 +308,8 @@ class UrlsTest extends SvgValidatorTestCase
             'nested a few levels'   => ['<circle id="a" r="1"/><g id="b"><use href="#a"/><use href="#a"/></g><g id="c"><use href="#b"/><use href="#b"/></g><use href="#c"/>'],
             'target defined later'  => ['<use href="#s"/><symbol id="s"><circle r="1"/></symbol>'],
             'unknown target'        => ['<use href="#nothing"/>'],
+            'encoded target'        => ['<circle id="a" r="1"/><use href="#%61"/>'],
+            'bad percent escape'    => ['<use href="#%zz"/>'],
             'xlink:href'            => ['<circle id="a" r="1"/><use xlink:href="#a"/>'],
             'loop in defs, nothing references it' => ['<defs><g id="a"><use href="#a"/></g></defs>'],   // never rendered, so never expanded, same as in a browser
             'bomb in a symbol, never used'        => ['<symbol id="s"><g id="l1">' . str_repeat('<use href="#l0"/>', 100) . '</g><g id="l2">' . str_repeat('<use href="#l1"/>', 100) . '</g><g id="l3">' . str_repeat('<use href="#l2"/>', 100) . '</g></symbol><circle id="l0" r="1"/>'],
@@ -343,6 +345,20 @@ class UrlsTest extends SvgValidatorTestCase
     public function testSelfReference(): void
     {
         $this->assertRejects($this->svg('<defs><g id="a"><use href="#a"/></g></defs><use href="#a"/>'), 'reference-expansion-too-large', 'form a loop (#a -> #a)');
+    }
+
+    /** Browsers percent-decode a fragment before the id lookup, so #%6C5 renders id="l5" and has to count as it. */
+    public function testEncodedFragmentCannotHideABomb(): void
+    {
+        $detail = 'expand to more than 100,000 elements';
+        $this->assertRejects(str_replace('href="#l', 'href="#%6C', $this->useTree(10, 5)), 'reference-expansion-too-large', $detail);
+        $this->assertRejects(str_replace('fill="url(#p', 'fill="url(#%70', $this->patternChain(10, 5)), 'reference-expansion-too-large', $detail);
+        $this->assertRejects(str_replace('fill="url(#p', 'style="fill:url(#%70', $this->patternChain(10, 5)), 'reference-expansion-too-large', $detail);
+    }
+
+    public function testEncodedFragmentLoop(): void
+    {
+        $this->assertRejects($this->svg('<g id="a"><use href="#%62"/></g><g id="b"><use href="#a"/></g><use href="#a"/>'), 'reference-expansion-too-large', 'form a loop (#b -> #a -> #b)');
     }
 
     public function testBombInDefsReferencedOnce(): void

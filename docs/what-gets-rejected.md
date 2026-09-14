@@ -430,11 +430,13 @@ on files like this.
 
 After the whole file is read, every reference that renders its target is followed:
 `url(#id)` in any attribute including `style`, and `href` on `<use>`, `<pattern>`,
-`<linearGradient>`, `<radialGradient>`, `<filter>` and `<feImage>`. A loop rejects with the
-path as the detail; more than 100,000 rendered elements rejects with
-`expand to more than 100,000 elements`. Content inside `<defs>`, `<symbol>`, `<pattern>`,
-`<mask>`, `<marker>`, `<clipPath>` and `<filter>` counts only when something references it,
-so a loop in a `<symbol>` nothing uses is accepted, the same as in a renderer.
+`<linearGradient>`, `<radialGradient>`, `<filter>` and `<feImage>`. A percent-encoded
+fragment counts as the id it decodes to (`href="#%61"` is `#a`), because browsers decode
+it before looking the id up. A loop rejects with the path as the detail; more than
+100,000 rendered elements rejects with `expand to more than 100,000 elements`. Content
+inside `<defs>`, `<symbol>`, `<pattern>`, `<mask>`, `<marker>`, `<clipPath>` and `<filter>`
+counts only when something references it, so a loop in a `<symbol>` nothing uses is
+accepted, the same as in a renderer.
 
 The bookkeeping for this check is capped as well, so a file cannot exhaust the check
 instead of the renderer. Every `id` is a record, so is every distinct target of an element

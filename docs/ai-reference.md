@@ -303,7 +303,8 @@ On `<animate>`, `<set>`, `<animateTransform>` and `<animateMotion>`:
 After the whole file is read (and only when it parsed cleanly), every same-file reference
 that renders its target is followed: `url(#id)` in any attribute including `style`, and
 `href` on `<use>`, `<pattern>`, `<linearGradient>`, `<radialGradient>`, `<filter>` and
-`<feImage>`. `<a href="#id">` and the animation elements are not followed.
+`<feImage>`. `<a href="#id">` and the animation elements are not followed. A percent-encoded
+fragment is decoded first (`#%61` is `#a`), as browsers do before the id lookup.
 
 - A loop (`#a` references `#b` which references `#a`, or `#a` references itself) rejects
   with `reference-expansion-too-large` and `form a loop (#a -> #b -> #a)`.
