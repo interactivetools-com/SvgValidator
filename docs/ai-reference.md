@@ -33,9 +33,9 @@ load anything from outside itself, or hang a renderer is **rejected with a list 
 The file is **never modified**: there is no cleaned output, and the caller stores the original
 bytes or refuses the upload.
 
-Every rule is an allowlist. Elements, attributes, XML namespaces, URL forms, CSS functions
-and animation targets not on a list are rejected. There are no options: every install checks
-the same way.
+Every rule is an allowlist, except CSS, which is scanned for a short list of tokens.
+Elements, attributes, XML namespaces, URL forms and animation targets not on a list are
+rejected. There are no options: every install checks the same way.
 
 ```php
 use Itools\SvgValidator\SvgValidator;
@@ -63,8 +63,9 @@ a path that is not a readable file returns a result with one `file-unreadable` e
 throws. Neither method looks at the file name, extension, or MIME type.
 
 `rules()` returns an array with the keys `elements`, `attributes`, `namespacedAttributes`
-(keyed by namespace URI), `inertNamespaces`, `imageElements`, and `dataImageTypes`. See
-[Allowlists](#allowlists). The lists are constants; changing the returned array changes nothing.
+(keyed by namespace URI), `inertNamespaces`, `inertProcessingInstructions`, `imageElements`,
+and `dataImageTypes`. See [Allowlists](#allowlists). The lists are constants; changing the
+returned array changes nothing.
 
 ### Result
 
@@ -95,10 +96,11 @@ All four properties are readonly strings.
 
 `detail` and `message` contain text from the uploaded file. HTML-encode them before output.
 
-To translate, run the template through your translation function and put the detail back:
+For translation, `template` goes through the translation function and `detail` goes back in
+with `sprintf()`. The template holds literal `<` and `>`, so the whole result is encoded:
 
 ```php
-echo sprintf(t($violation->template), htmlspecialchars($violation->detail));
+echo htmlspecialchars(sprintf(t($violation->template), $violation->detail));
 ```
 
 `Violation::TEMPLATES` lists every template by code so a translation system can register
@@ -141,36 +143,37 @@ never change once released; message wording can.
 
 Every code, its template, and what `detail` holds. Templates are `Violation::TEMPLATES`.
 
-| Code                            | Template                                                                                | `detail`                                                                                                      |
-|---------------------------------|-----------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------|
-| `file-unreadable`               | `Cannot read file %s`                                                                   | the file's basename                                                                                           |
-| `not-svg`                       | `This is not an SVG file: it starts with %s`                                            | the first 20 bytes, control and non-ASCII bytes escaped, or `nothing (the file is empty)`                     |
-| `not-utf8`                      | `SVG files must be UTF-8, this one is %s`                                               | `UTF-16 or UTF-32` or `declared as ISO-8859-1` (the declared encoding)                                        |
-| `malformed-xml`                 | `The SVG is not well-formed XML: %s`                                                    | libxml2's message (may contain a newline) plus ` (line N)`, or `no root element within the first 64 KB`       |
-| `doctype-not-allowed`           | `The DOCTYPE declaration is not allowed because %s`                                     | `it contains an internal DTD subset (entity declarations)`                                                    |
-| `processing-instruction`        | `Processing instructions like <?%s?> are not allowed`                                   | the instruction's target, such as `xml-stylesheet`                                                            |
-| `comment-not-allowed`           | `A comment starting with <!--%s is not allowed, HTML parsers close it there`            | `>` or `->`                                                                                                   |
-| `root-not-svg`                  | `The root element must be <svg>, not <%s>`                                              | the root element's name as written                                                                            |
-| `root-namespace-wrong`          | `The root <svg> element must declare xmlns="http://www.w3.org/2000/svg", but it has %s` | `none` or `xmlns="..."` with the namespace found                                                              |
-| `element-not-allowed`           | `<%s> is not allowed in uploaded SVGs`                                                  | the element's local name, or its name as written when it has no namespace                                     |
-| `namespace-not-allowed`         | `Elements from the XML namespace %s are not allowed`                                    | the namespace URI                                                                                             |
-| `event-handler`                 | `%s= event handler attributes are not allowed`                                          | the attribute name as written, such as `onload` or `xlink:onload`                                             |
-| `attribute-not-allowed`         | `The %s attribute is not allowed`                                                       | the attribute name as written, such as `tabindex` or `xml:base`                                               |
-| `href-not-allowed`              | `href must reference an element in the same file (#id), not %s`                         | the value, or `(empty)`                                                                                       |
-| `image-href-not-allowed`        | `Image href must be #id or an embedded PNG, JPEG, GIF, WebP or SVG data: URL, not %s`   | the value, or `(empty)`                                                                                       |
-| `embedded-svg-not-allowed`      | `An embedded SVG image was rejected: %s`                                                | the inner file's message, `the data: URL is not valid base64`, or `SVG images nested more than 3 levels deep` |
-| `url-not-fragment`              | `url() in the %s attribute must reference an element in the same file (#id)`            | the attribute name                                                                                            |
+| Code                            | Template                                                                                | `detail`                                                                                                                                                        |
+|---------------------------------|-----------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `file-unreadable`               | `Cannot read file %s`                                                                   | the file's basename                                                                                                                                             |
+| `not-svg`                       | `This is not an SVG file: it starts with %s`                                            | the first 20 bytes, control and non-ASCII bytes escaped, or `nothing (the file is empty)`                                                                       |
+| `not-utf8`                      | `SVG files must be UTF-8, this one is %s`                                               | `UTF-16 or UTF-32` or `declared as ISO-8859-1` (the declared encoding)                                                                                          |
+| `malformed-xml`                 | `The SVG is not well-formed XML: %s`                                                    | libxml2's message (may contain a newline) plus ` (line N)`, or `no root element within the first 64 KB`                                                         |
+| `doctype-not-allowed`           | `The DOCTYPE declaration is not allowed because %s`                                     | `it contains an internal DTD subset (entity declarations)`                                                                                                      |
+| `processing-instruction`        | `Processing instructions like <?%s?> are not allowed`                                   | the instruction's target, such as `xml-stylesheet`                                                                                                              |
+| `comment-not-allowed`           | `A comment starting with <!--%s is not allowed, HTML parsers close it there`            | `>` or `->`                                                                                                                                                     |
+| `root-not-svg`                  | `The root element must be <svg>, not <%s>`                                              | the root element's name as written                                                                                                                              |
+| `root-namespace-wrong`          | `The root <svg> element must declare xmlns="http://www.w3.org/2000/svg", but it has %s` | `none` or `xmlns="..."` with the namespace found                                                                                                                |
+| `element-not-allowed`           | `<%s> is not allowed in uploaded SVGs`                                                  | the element's local name, or its name as written when it has no namespace                                                                                       |
+| `namespace-not-allowed`         | `Elements from the XML namespace %s are not allowed`                                    | the namespace URI                                                                                                                                               |
+| `event-handler`                 | `%s= event handler attributes are not allowed`                                          | the attribute name as written, such as `onload` or `xlink:onload`                                                                                               |
+| `attribute-not-allowed`         | `The %s attribute is not allowed`                                                       | the attribute name as written, such as `tabindex` or `xml:base`                                                                                                 |
+| `href-not-allowed`              | `href must reference an element in the same file (#id), not %s`                         | the value, or `(empty)`                                                                                                                                         |
+| `image-href-not-allowed`        | `Image href must be #id or an embedded PNG, JPEG, GIF, WebP or SVG data: URL, not %s`   | the value, or `(empty)`                                                                                                                                         |
+| `embedded-svg-not-allowed`      | `An embedded SVG image was rejected: %s`                                                | the inner file's message, `the data: URL is not valid base64`, or `SVG images nested more than 3 levels deep`                                                   |
+| `url-not-fragment`              | `url() in the %s attribute must reference an element in the same file (#id)`            | the attribute name                                                                                                                                              |
 | `reference-expansion-too-large` | `The references in this file %s`                                                        | `form a loop (#a -> #b -> #a)`, `expand to more than 100,000 elements`, or `point at more than 100,000 distinct ids, counting each once per id it is nested in` |
-| `css-not-allowed`               | `CSS containing %s is not allowed`                                                      | the banned token as matched, such as `@import`, `\`, or `url(https://example.com/a.css`                       |
-| `animation-target-not-allowed`  | `Animating the %s attribute is not allowed`                                             | the `attributeName` value                                                                                     |
-| `animation-value-not-allowed`   | `The %s animation attribute contains a URL or scheme`                                   | `from`, `to`, `by`, or `values`                                                                               |
+| `css-not-allowed`               | `CSS containing %s is not allowed`                                                      | the banned token as matched, such as `@import`, `\`, or `url(https://example.com/a.css`                                                                         |
+| `animation-target-not-allowed`  | `Animating the %s attribute is not allowed`                                             | the `attributeName` value                                                                                                                                       |
+| `animation-value-not-allowed`   | `The %s animation attribute contains a URL or scheme`                                   | `from`, `to`, `by`, or `values`                                                                                                                                 |
 
 Values longer than 60 characters are cut at 60 and end with `...`.
 
 ## Rules: Structure
 
-Checked on the first 64 KB before parsing, then by the parser. Each of the first four stops
-the check, so it is the only error reported.
+Checked on the first 64 KB before parsing, then by the parser. Each of the first four ends
+the check. The first three arrive as the only error; `malformed-xml` ends the list after
+anything found earlier in the file.
 
 - **`not-utf8`**: a UTF-16 or UTF-32 byte order mark or null byte at the start, or an XML
   declaration whose `encoding` is anything but `utf-8` (case-insensitive). A UTF-8 byte order

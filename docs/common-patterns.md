@@ -12,7 +12,7 @@ Contents:
 - [Logging Rejections](#logging-rejections)
 - [Reacting to One Rule](#reacting-to-one-rule)
 - [Checking Files Already on Disk](#checking-files-already-on-disk)
-- [Pinning Your Own Files in a Test - `checkString()`](#pinning-your-own-files-in-a-test---checkstring)
+- [Checking Your Own Files in a Test - `checkString()`](#checking-your-own-files-in-a-test---checkstring)
 
 ## An Upload Handler - `checkFile()`
 
@@ -157,7 +157,7 @@ Two things to expect from real files: linked images (`image-href-not-allowed` wi
 name as the detail) and `<a>` links to a website (`href-not-allowed`). Both are covered on the
 [Troubleshooting](troubleshooting.md) page.
 
-## Pinning Your Own Files in a Test - `checkString()`
+## Checking Your Own Files in a Test - `checkString()`
 
 When a project ships its own SVG files (icons, a logo), a test that checks them keeps a
 future edit from adding something the upload rules would refuse:

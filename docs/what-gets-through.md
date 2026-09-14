@@ -1,9 +1,10 @@
 # What Gets Through
 
-The allowlists. Every element, attribute, namespace, URL form, CSS function and animation
-target has to be on one of these lists to pass; anything not listed is rejected with the
-code named in [What Gets Rejected](what-gets-rejected.md). Names are case-sensitive:
-`clipPath` is an element, `clippath` is not.
+The allowlists. Every element, attribute, namespace, URL form and animation target has to
+be on one of these lists to pass; anything not listed is rejected with the code named in
+[What Gets Rejected](what-gets-rejected.md). CSS is the one exception: it passes as written
+except for a short list of tokens (see [CSS](#css)). Names are case-sensitive: `clipPath`
+is an element, `clippath` is not.
 
 The lists below are generated from `SvgValidator::rules()` by `tools/rules-doc.php`, and a
 test fails when they fall out of step with the code. The same arrays are available at
@@ -133,7 +134,7 @@ http://www.w3.org/2001/XMLSchema-instance
 <!-- /rules:inertNamespaces -->
 
 Any other namespace is rejected with `namespace-not-allowed`. That includes XHTML, MathML,
-XInclude and XML Events, which is where the historical attacks live.
+XInclude and XML Events, where the historical attacks were.
 
 ## Inert Processing Instructions
 
@@ -147,11 +148,11 @@ xpacket
 ```
 <!-- /rules:inertProcessingInstructions -->
 
-`xpacket` is what Illustrator exports look like when they carry metadata:
-`<?xpacket begin="..." id="W5M0MpCehiHzreSzNTczkc9d"?>` before the root element and
-`<?xpacket end="w"?>` after it. The pair marks Adobe's XMP block (title, author, creator
-tool) so any program can find it by scanning bytes, in a JPEG or a PDF as much as in an
-SVG. The block itself sits in `<metadata>` under `adobe:ns:meta/`, an inert namespace.
+Illustrator exports that carry metadata have `<?xpacket begin="..." id="W5M0MpCehiHzreSzNTczkc9d"?>`
+before the root element and `<?xpacket end="w"?>` after it. The pair marks Adobe's XMP
+block (title, author, creator tool) so any program can find it by scanning bytes, in a JPEG
+or a PDF as much as in an SVG. The block itself is in `<metadata>` under `adobe:ns:meta/`,
+an inert namespace.
 
 ## URL Forms
 
@@ -196,9 +197,8 @@ In practice that means:
 so is every timing and value attribute. Chrome runs SMIL animation in `<img>` mode. Two
 limits: `attributeName` may not be `href`, `style`, `class` or an `on*` name, with or
 without a prefix such as `xlink:`, and no item in `from`, `to`, `by` or `values` may start
-with a URL scheme or `//`.
-`begin="click"` and the other event-based timings are accepted; Chrome ignores them in
-`<img>` mode, and nothing loads or runs when they fire.
+with a URL scheme or `//`. Event-based timings such as `begin="click"` are accepted; Chrome
+ignores them in `<img>` mode, and nothing loads or runs when they fire.
 
 ## A File That Passes
 

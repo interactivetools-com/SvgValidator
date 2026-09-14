@@ -49,10 +49,11 @@ One rule the file broke. Four readonly strings, plus the template table.
 | `$violation->message`  | `string` | `sprintf($template, $detail)`                                                                                                                        |
 | `Violation::TEMPLATES` | `array`  | Every template keyed by code, so a translation system can register them all up front                                                                 |
 
-To translate, run the template through your translation function and put the detail back:
+For translation, `template` goes through the translation function and `detail` goes back in
+with `sprintf()`. The template holds literal `<` and `>`, so the whole result is encoded:
 
 ```php
-echo sprintf(t($violation->template), htmlspecialchars($violation->detail));
+echo htmlspecialchars(sprintf(t($violation->template), $violation->detail));
 ```
 
 ## Error Codes

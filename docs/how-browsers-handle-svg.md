@@ -1,6 +1,6 @@
 # How Browsers Handle SVG
 
-What a browser does with an SVG file shown through an `<img>` tag, where that behaviour is
+What a browser does with an SVG file shown through an `<img>` tag, where that behavior is
 written down, how the three engines differ, and how SvgValidator's rules relate to it: where
 they mirror Chrome, where they are stricter, and where they are looser. The short answers
 come first; the rest is for anyone who wants to check the rules against the sources.
@@ -59,7 +59,7 @@ used in place of a raster image, such as an HTML 'img' element". Expected, not m
 Images Level 4 does make it a requirement for SVG used as a CSS image (secure static, or
 secure animated if the browser animates images).
 
-Two definitions in SVG 2 shape the allowlists:
+Two definitions in SVG 2 are behind the allowlists:
 
 - **What counts as external.** External references are network access "except for:
   same-document URL references ... [and] data URL references". So `href="#gradient"`,
@@ -93,23 +93,23 @@ work as in a document.
 - **`<use>` is same-file only.** Since Chrome 120, `<use href="data:...">` is rejected as
   well; Firefox 122 followed, and Safari never supported it.
 - **Interaction.** The isolated page has no widget and no navigation, so link activation,
-  `javascript:` hrefs, `:hover`, `:focus` and `cursor` never come into play. Neither `:link`
+  `javascript:` hrefs, `:hover`, `:focus` and `cursor` never apply. Neither `:link`
   nor `:visited` matches.
 - **`<foreignObject>` renders**, and any `<iframe>`, `<object>`, `<embed>` or media inside it
-  is a dead end. Drawing such an image to a canvas taints the canvas.
+  loads nothing. Drawing such an image to a canvas taints the canvas.
 - **Animation runs**, driven by the image's own 60 Hz timer. CSS animation runs by a
   separate path. Only SVG used as a CSS image gets animation disabled.
-- **One live edge:** an external `<?xml-stylesheet?>` is blocked, but a same-document one
+- **One remaining case:** an external `<?xml-stylesheet?>` is blocked, but a same-document one
   (`href="#id"`) is still processed and can transform the document. SvgValidator rejects
   every processing instruction for this reason, except Adobe's inert `xpacket` XMP markers.
 
-This behaviour landed in Chrome in June 2014 to match Firefox, which had it first.
+Chrome added this in June 2014 to match Firefox, which had it first.
 
 ## Firefox and Safari
 
 The three engines agree on everything an allowlist cares about. The differences:
 
-| Behaviour                         | Chrome                      | Firefox                           | Safari          |
+| Behavior                          | Chrome                      | Firefox                           | Safari          |
 |-----------------------------------|-----------------------------|-----------------------------------|-----------------|
 | `data:` loads inside the SVG      | allowed                     | allowed                           | allowed         |
 | `blob:` loads inside the SVG      | blocked                     | allowed                           | blocked         |
@@ -143,7 +143,7 @@ Wherever Chrome neutralizes something instead of refusing it, the rules refuse i
 | `on*` attributes compile to nothing       | fire                              | `event-handler`                       |
 | `javascript:` href is inert               | navigates                         | `href-not-allowed`                    |
 | `<a href="https://...">` is inert         | clickable                         | `href-not-allowed`                    |
-| external `url()` silently blocked         | loads, phones home                | `url-not-fragment`, `css-not-allowed` |
+| external `url()` silently blocked         | loads from that server            | `url-not-fragment`, `css-not-allowed` |
 | `<?xml-stylesheet href="#id"?>` processed | processed                         | `processing-instruction`              |
 | `<foreignObject>` renders, no script      | scripts inside run                | `element-not-allowed`                 |
 | DTD entities expand                       | expand                            | `doctype-not-allowed`                 |

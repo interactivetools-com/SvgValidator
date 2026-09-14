@@ -34,8 +34,8 @@ the site's own origin. In that mode it can:
 
 ## What SvgValidator Prevents
 
-Every rule is an allowlist matched to what Chrome permits in `<img>` mode, and stricter
-where Chrome's protection is render-time only. An accepted file:
+The rules are allowlists matched to what Chrome permits in `<img>` mode, and stricter where
+Chrome's protection is render-time only. An accepted file:
 
 - **Contains no script.** No `<script>`, no `on*` attribute in any namespace, no
   `javascript:` in any `href`, no `<foreignObject>`, no `<?xml-stylesheet?>`, and no
@@ -51,7 +51,7 @@ where Chrome's protection is render-time only. An accepted file:
   libxml2's own limits (256 levels of nesting, 10 MB per text node) apply because the
   parser is never told to lift them.
 - **Renders the same in `<img>` and opened directly**, except for `:hover`, `:visited` and
-  `begin="click"`, which Chrome ignores in `<img>` and honours when the file is opened.
+  `begin="click"`, which Chrome ignores in `<img>` and honors when the file is opened.
   Nothing loads and nothing runs when they fire, so they are accepted.
 - **Has been checked all the way down.** An SVG embedded as a `data:` image inside the
   file gets the same check, three levels deep, for the sake of server-side rasterizers

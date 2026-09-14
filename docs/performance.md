@@ -141,9 +141,9 @@ benchmarks/run.sh
 benchmarks/run.sh --corpus=corpus   # add the real files, after php tools/fetch-corpus.php
 ```
 
-The numbers above are from a dedicated Linux x64 server (Intel Xeon E-2386G) on PHP 8.1.34
-and PHP 8.5.10 with libxml2 2.9.7, opcache on and JIT off. The raw output is in
-[benchmarks/results.md](../benchmarks/results.md).
+The numbers above are from a run on 2026-09-13 on a dedicated Linux x64 server (Intel Xeon
+E-2386G) on PHP 8.1.34 and PHP 8.5.10 with libxml2 2.9.7, opcache on and JIT off. The raw
+output is in [benchmarks/results.md](../benchmarks/results.md).
 
 Benchmark choices, stated plainly.
 

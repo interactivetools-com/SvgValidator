@@ -25,7 +25,8 @@ PHP build. There are no other dependencies.
 
 ## Your First Check - `checkFile()`
 
-Pass the path of the uploaded file. The result says whether it passed and, if not, why:
+`checkFile()` takes the path of the uploaded file. The result says whether it passed and, if
+not, why:
 
 ```php
 use Itools\SvgValidator\SvgValidator;
@@ -67,20 +68,22 @@ $violation->message;    // '<script> is not allowed in uploaded SVGs'  template 
 ```
 
 `code` is one of 21 fixed strings that never change between releases, so your code can react
-to a specific rule. `detail` is text taken from the uploaded file: an element name, an
+to a specific rule. Text from the uploaded file goes in `detail`: an element name, an
 attribute name, or the first 60 characters of a URL. It is not HTML-encoded, so encode it
 (or `message`) before output, as the example above does.
 
-The same problem is reported once: five `<script>` elements give one error, five different
-`onclick` attributes give five. A file that is not well-formed XML ends the list with
-`malformed-xml`, since nothing after a parse error can be checked.
+The same problem is reported once: five `<script>` elements give one error, and so do five
+`onclick` attributes; `onclick` and `onload` together give two. A file that is not
+well-formed XML ends the list with `malformed-xml`, since nothing after a parse error can be
+checked.
 
 ## The Mental Model
 
-Every rule is an allowlist. Elements, attributes, XML namespaces, URL forms, CSS functions
-and animation targets each have a list of what passes, and anything not on a list is
-rejected. A new browser feature is closed until someone adds it, which costs a re-export and
-a one-line change rather than an XSS.
+Every rule is an allowlist, except CSS. Elements, attributes, XML namespaces, URL forms and
+animation targets each have a list of what passes, and anything not on a list is rejected;
+CSS passes as written except the few tokens that could load or escape. A new browser
+feature is closed until someone adds it, which costs a re-export and a one-line change
+rather than an XSS.
 
 The lists match what Chrome lets an SVG do when it is shown through an `<img>` tag: no
 script, no interaction, and no loading of anything outside the file except `data:` URLs.
@@ -90,8 +93,9 @@ render time, such as a `<script>` element it parses but never runs, SvgValidator
 it, because that protection is gone the moment the file is opened directly.
 
 With that model, the rest of the rules are predictable: if a construct could run code,
-load something, or make the file render differently in an `<img>` than on its own, it is
-rejected. [What Gets Rejected](what-gets-rejected.md) lists every rule with an example.
+load something, or render differently in an `<img>` than on its own (hover and click effects
+excepted, since nothing loads or runs when they fire), it is rejected.
+[What Gets Rejected](what-gets-rejected.md) lists every rule with an example.
 
 ## Checking a String - `checkString()`
 
@@ -118,9 +122,9 @@ Image href must be #id or an embedded PNG, JPEG, GIF, WebP or SVG data: URL, not
 Each names the finding and stops. It does not tell the uploader what to do about it,
 because that depends on their design tool. [Common Patterns](common-patterns.md#adding-a-fix-hint-per-code)
 shows how to add a hint per code, and
-[Troubleshooting](troubleshooting.md) has the fix for each message. To translate the
-messages, run `template` through your translation function and put `detail` back in with
-`sprintf()`; `Violation::TEMPLATES` lists every template by code.
+[Troubleshooting](troubleshooting.md) has the fix for each message. For translation,
+`template` is the message with `%s` where the detail goes: translate it, then put `detail`
+back with `sprintf()`. `Violation::TEMPLATES` lists every template by code.
 
 ## What Next
 

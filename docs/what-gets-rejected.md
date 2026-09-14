@@ -24,7 +24,7 @@ Contents:
 ## The File Itself
 
 These checks run on the bytes before parsing starts, or come from the parser itself. Each of
-the first five stops the check, so it is the only error reported for that file.
+the first five ends the check, so it is the last error reported for that file.
 
 ### Cannot Read the File - `file-unreadable`
 
@@ -162,8 +162,8 @@ document, is rejected here and the check stops. The detail is the root element's
 
 The `<svg>` root must declare `xmlns="http://www.w3.org/2000/svg"`. Without it, a browser
 sees an unknown XML element and renders nothing, so the file was never going to display. A
-prefixed root (`<svg:svg xmlns:svg="...">`) is fine. The detail is `none`, or the namespace
-that was found.
+prefixed root (`<svg:svg xmlns:svg="...">`) is fine. The detail is `none`, or the
+`xmlns="..."` that was found.
 
 ```xml
 <svg width="10" height="10">
@@ -206,7 +206,7 @@ emit `<flowRoot>`), re-export with a newer version or convert the text to a path
 An element whose namespace is not SVG and not one of the design-tool namespaces the
 library ignores (see [inert namespaces](what-gets-through.md#inert-namespaces)). XHTML,
 MathML, XInclude, XML Events and anything unknown are rejected with the namespace URI as
-the detail. Those namespaces are exactly where the historical SVG attacks live.
+the detail. Those namespaces are where the historical SVG attacks were.
 
 ```xml
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:h="http://www.w3.org/1999/xhtml">
@@ -215,8 +215,8 @@ the detail. Those namespaces are exactly where the historical SVG attacks live.
 <!-- rejected: namespace-not-allowed, detail "http://www.w3.org/1999/xhtml" -->
 ```
 
-**Fix:** remove the element. Inkscape, Illustrator, Affinity, Sketch and Visio metadata is
-already ignored and never triggers this.
+**Fix:** remove the element. Inkscape, Illustrator, Affinity Designer, Sketch and Visio
+metadata is already ignored and never triggers this.
 
 ## Attributes
 
@@ -245,7 +245,7 @@ of the five allowed prefixed names (`xml:id`, `xml:lang`, `xml:space`, `xlink:hr
 `xlink:title`). The detail is the name as written.
 
 Never on the list, on purpose: `tabindex` (makes an element focusable, which is interaction),
-`target` (where a link opens), `crossorigin` (fetch behaviour), `cursor` (loads a cursor
+`target` (where a link opens), `crossorigin` (fetch behavior), `cursor` (loads a cursor
 file), `xml:base` (changes what every relative URL means), `xlink:show` and `xlink:actuate`
 (open links automatically).
 
@@ -363,8 +363,10 @@ properties, `@media`, `@keyframes`, `:hover` and `!important` are not checked.
 <!-- rejected: css-not-allowed, detail "@import" -->
 ```
 
-**Fix:** embed the font as a `data:font/woff2;base64,` URL inside `@font-face`, or remove
-the rule. Illustrator, Figma and Affinity all export embedded fonts on request.
+**Fix:** embed the font as a `data:font/woff2;base64,` URL inside `@font-face`, convert the
+text to outlines, or remove the rule.
+[Troubleshooting](troubleshooting.md#css-containing-import-is-not-allowed) has the export
+setting for each design tool.
 
 ## Animation
 
@@ -454,7 +456,7 @@ because that would need a selector engine.
 
 ## What Is Not Checked
 
-For the avoidance of doubt, since a validator is only useful when its limits are known:
+A validator is only useful when its limits are known, so here they are:
 
 - **Whether a `#id` target exists.** A dangling reference renders nothing and harms nothing.
 - **The file name, extension, MIME type or size.** Check those at upload time; the

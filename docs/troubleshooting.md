@@ -129,7 +129,7 @@ default.
 
 ## Gotchas
 
-### Cannot read file php3F.tmp
+### "Cannot read file php3F.tmp"
 
 The path passed to `checkFile()` was not a readable file. With `$_FILES`, the detail names
 the temporary file. The usual causes: the upload failed (check `$_FILES['logo']['error']`
