@@ -165,11 +165,13 @@ final class SvgValidator
     // a URL scheme at the start of a value: javascript:, data:, https:
     private const SCHEME = '/^\s*[a-z][a-z0-9+.\-]*:/i';
 
-    private const PROLOG_LIMIT     = 65536;    // the root tag must start within this many bytes
-    private const MAX_ERRORS       = 50;       // distinct errors reported per file
-    private const MAX_EMBED_DEPTH  = 3;        // SVG inside SVG inside SVG, then stop
-    private const MAX_EXPANDED_ELEMENTS = 100000;   // elements the references in a file may add up to when expanded
-    private const MAX_REFERENCE_ENTRIES = 100000;    // distinct (id, target) pairs the expansion check may hold; the same target inside the same id is one entry
+    // Limits. Public so an application with an unusual file can raise one; the memory a hostile file can cost rises with it.
+    public static int $prologLimit         = 65536;    // the root tag must start within this many bytes
+    public static int $maxErrors           = 50;       // distinct errors reported per file
+    public static int $maxEmbedDepth       = 3;        // SVG inside SVG inside SVG, then stop
+    public static int $maxExpandedElements = 100000;   // elements the references in a file may add up to when expanded
+    public static int $maxReferenceEntries = 100000;   // distinct (id, target) pairs the expansion check may hold; the same target inside the same id is one entry
+    public static int $maxDetailLength     = 60;       // characters of a value quoted in an error message before "..."
 
     //endregion
     //region Public API
@@ -185,7 +187,7 @@ final class SvgValidator
      */
     public static function checkFile(string $path): Result
     {
-        $firstBytes = is_file($path) && is_readable($path) ? file_get_contents($path, false, null, 0, self::PROLOG_LIMIT) : false;
+        $firstBytes = is_file($path) && is_readable($path) ? file_get_contents($path, false, null, 0, self::$prologLimit) : false;
         if ($firstBytes === false) {
             return new Result([new Violation('file-unreadable', basename($path))]);
         }
@@ -256,7 +258,7 @@ final class SvgValidator
 
     private static function checkEmbedded(string $svg, int $embedDepth): Result
     {
-        return (new self($embedDepth))->check(substr($svg, 0, self::PROLOG_LIMIT), fn(XMLReader $reader) => $reader->XML($svg, null, LIBXML_NONET), '');
+        return (new self($embedDepth))->check(substr($svg, 0, self::$prologLimit),fn(XMLReader $reader) => $reader->XML($svg, null, LIBXML_NONET), '');
     }
 
     /**
@@ -281,7 +283,7 @@ final class SvgValidator
 
     private function fail(string $code, string $detail): void
     {
-        if (count($this->errors) >= self::MAX_ERRORS) {
+        if (count($this->errors) >= self::$maxErrors) {
             return;   // the read loop stops at the cap too, but one element can add several errors before it checks
         }
         $this->errors["$code\0$detail"] ??= new Violation($code, $detail);
@@ -394,7 +396,7 @@ final class SvgValidator
         $styleDepth = null;   // depth of the open <style> while its text is being collected
         $css        = '';
 
-        while (count($this->errors) < self::MAX_ERRORS && $reader->read()) {
+        while (count($this->errors) < self::$maxErrors && $reader->read()) {
             switch ($reader->nodeType) {
                 case XMLReader::ELEMENT:
                     if ($isRoot) {
@@ -640,10 +642,10 @@ final class SvgValidator
      */
     private function tooManyReferences(): bool
     {
-        if ($this->referenceEntries <= self::MAX_REFERENCE_ENTRIES) {
+        if ($this->referenceEntries <= self::$maxReferenceEntries) {
             return false;
         }
-        $this->fail('reference-expansion-too-large', 'point at more than ' . number_format(self::MAX_REFERENCE_ENTRIES) . ' distinct ids, counting each once per id it is nested in');
+        $this->fail('reference-expansion-too-large', 'point at more than ' . number_format(self::$maxReferenceEntries) . ' distinct ids, counting each once per id it is nested in');
         return true;
     }
 
@@ -660,7 +662,7 @@ final class SvgValidator
         if ($this->tooManyReferences()) {
             return;   // the graph stopped short, so there is nothing sound to expand
         }
-        $limit   = self::MAX_EXPANDED_ELEMENTS + 1;   // totals are capped here so a bomb cannot overflow an int
+        $limit   = self::$maxExpandedElements + 1;   // totals are capped here so a bomb cannot overflow an int
         $counted = [];   // id => elements rendered by one reference to it
         $loop    = null;
         $total   = 0;
@@ -669,8 +671,8 @@ final class SvgValidator
         }
         if ($loop !== null) {
             $this->fail('reference-expansion-too-large', 'form a loop (' . self::excerpt($loop) . ')');
-        } elseif ($total > self::MAX_EXPANDED_ELEMENTS) {
-            $this->fail('reference-expansion-too-large', 'expand to more than ' . number_format(self::MAX_EXPANDED_ELEMENTS) . ' elements');
+        } elseif ($total > self::$maxExpandedElements) {
+            $this->fail('reference-expansion-too-large', 'expand to more than ' . number_format(self::$maxExpandedElements) . ' elements');
         }
     }
 
@@ -759,8 +761,8 @@ final class SvgValidator
      */
     private function checkEmbeddedSvg(string $base64): void
     {
-        if ($this->embedDepth >= self::MAX_EMBED_DEPTH) {
-            $this->fail('embedded-svg-not-allowed', 'SVG images nested more than ' . self::MAX_EMBED_DEPTH . ' levels deep');
+        if ($this->embedDepth >= self::$maxEmbedDepth) {
+            $this->fail('embedded-svg-not-allowed', 'SVG images nested more than ' . self::$maxEmbedDepth . ' levels deep');
             return;
         }
         $svg = base64_decode($base64, true);
@@ -825,11 +827,11 @@ final class SvgValidator
         return false;
     }
 
-    /** The first 60 characters of a value for an error message, cut on a UTF-8 boundary. */
+    /** The first $maxDetailLength characters of a value for an error message, cut on a UTF-8 boundary. */
     private static function excerpt(string $value): string
     {
-        preg_match('/^.{0,60}/us', $value, $match);
-        $start = $match[0] ?? substr($value, 0, 60);
+        preg_match('/^.{0,' . self::$maxDetailLength . '}/us', $value, $match);
+        $start = $match[0] ?? substr($value, 0, self::$maxDetailLength);
         return strlen($start) < strlen($value) ? "$start..." : $start;
     }
 
