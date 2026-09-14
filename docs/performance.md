@@ -2,11 +2,12 @@
 
 Checking a typical icon takes 0.02 ms. Larger files go through at about 100 MB/s, so a
 1 MB illustration takes 10 ms and a 10 MB file 100 ms. Memory does not grow with the file:
-XMLReader streams it, and even a 50 MB file adds under 3 MB to the PHP process. The one
-thing the check keeps per file, the id-to-reference records for the expansion check, is
-capped at 100,000 entries, a few MB. Files built to hang a renderer (a reference bomb, an
-entity-expansion DOCTYPE, 100,000 levels of nesting) are rejected in under 0.2 ms each,
-because the check refuses them before anything expands.
+XMLReader streams it, so a 10 MB file adds nothing measurable to the PHP process and a
+50 MB file about 3 MB, where a DOM parser needs 443 MB. The one thing the check keeps per
+file, the id-to-reference records for the expansion check, is capped at 100,000 entries, a
+few MB. Files built to hang a renderer (a reference bomb, an entity-expansion DOCTYPE,
+100,000 levels of nesting) are rejected in under 0.2 ms each, because the check refuses
+them before anything expands.
 
 All times on this page are in milliseconds (ms), thousandths of a second. For scale,
 response-time research puts the point where people start to notice a delay at about
@@ -31,16 +32,16 @@ block, ten gradients in `<defs>`, then groups with transforms and paths with fil
 and class attributes until the file reaches the target size. Each time is the fastest of
 seven `checkFile()` calls.
 
-| File   | PHP 8.5  | PHP 8.1  |
+| File   | PHP 8.1  | PHP 8.5  |
 |--------|----------|----------|
-| 1 KB   | 0.087 ms | 0.10 ms  |
-| 100 KB | 1.04 ms  | 1.44 ms  |
-| 1 MB   | 10.1 ms  | 13.6 ms  |
-| 10 MB  | 99.7 ms  | 135.3 ms |
-| 50 MB  | 486.6 ms | 679.6 ms |
+| 1 KB   | 0.10 ms  | 0.087 ms |
+| 100 KB | 1.44 ms  | 1.04 ms  |
+| 1 MB   | 13.6 ms  | 10.1 ms  |
+| 10 MB  | 135.3 ms | 99.7 ms  |
+| 50 MB  | 679.6 ms | 486.6 ms |
 
-From 100 KB up the time is a straight line in the file size: about 100 MB/s on PHP 8.5 and
-74 MB/s on PHP 8.1.
+From 100 KB up the time is a straight line in the file size: about 74 MB/s on PHP 8.1 and
+100 MB/s on PHP 8.5.
 
 **The time goes with elements and attributes, not bytes.** A one-path icon costs 0.02 ms.
 The 1 KB file above costs four times that, because its ten gradients are thirty elements
@@ -75,13 +76,13 @@ is measured in a fresh process so that libxml2's own allocations count, which
 `memory_get_peak_usage()` cannot see. The last column is enshrined/svg-sanitize, which
 parses the same file into a DOM, for scale.
 
-| File   | SvgValidator, PHP 8.5 | SvgValidator, PHP 8.1 | svg-sanitize (DOM) |
+| File   | SvgValidator, PHP 8.1 | SvgValidator, PHP 8.5 | svg-sanitize (DOM) |
 |--------|-----------------------|-----------------------|--------------------|
-| 1 KB   | none measurable       | 684 KB                | 624 KB             |
-| 100 KB | none measurable       | 684 KB                | 1.2 MB             |
-| 1 MB   | none measurable       | 684 KB                | 9.2 MB             |
-| 10 MB  | none measurable       | 684 KB                | 94.2 MB            |
-| 50 MB  | 2.8 MB                | 3.2 MB                | 443.5 MB           |
+| 1 KB   | 684 KB                | none measurable       | 624 KB             |
+| 100 KB | 684 KB                | none measurable       | 1.2 MB             |
+| 1 MB   | 684 KB                | none measurable       | 9.2 MB             |
+| 10 MB  | 684 KB                | none measurable       | 94.2 MB            |
+| 50 MB  | 3.2 MB                | 2.8 MB                | 443.5 MB           |
 
 The 684 KB on PHP 8.1 is the same for every size: it is libxml2's parser setting itself up
 on first use, not the file. On PHP 8.5 the process's startup peak already covers it. A DOM
@@ -117,7 +118,7 @@ here.
 
 The exception is many large files in one run: checking a folder of files already on disk
 (the loop in [Common Patterns](common-patterns.md#checking-files-already-on-disk)), or a
-migration. Budget 10 ms per megabyte on PHP 8.5 and 14 ms on PHP 8.1, plus 0.02 ms per
+migration. Budget 14 ms per megabyte on PHP 8.1 and 10 ms on PHP 8.5, plus 0.02 ms per
 small file. A folder of 10,000 icons is about 0.2 s. A folder holding 500 MB of
 illustrations is about 5 s. Files made of tens of thousands of tiny elements cost up to
 six times that per megabyte.
@@ -140,8 +141,8 @@ benchmarks/run.sh
 benchmarks/run.sh --corpus=corpus   # add the real files, after php tools/fetch-corpus.php
 ```
 
-The numbers above are from a dedicated Linux x64 server (Intel Xeon E-2386G) on PHP 8.5.10
-and PHP 8.1.34 with libxml2 2.9.7, opcache on and JIT off. The raw output is in
+The numbers above are from a dedicated Linux x64 server (Intel Xeon E-2386G) on PHP 8.1.34
+and PHP 8.5.10 with libxml2 2.9.7, opcache on and JIT off. The raw output is in
 [benchmarks/results.md](../benchmarks/results.md).
 
 Benchmark choices, stated plainly.

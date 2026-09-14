@@ -88,7 +88,9 @@ move_uploaded_file($_FILES['logo']['tmp_name'], 'uploads/logo.svg');   // the or
 ## When You Might Not Want SvgValidator
 
 - **You must accept SVG from the public and cannot ask for a re-export.** A rejection is
-  only useful when someone can fix the file. Use a sanitizer and re-check its output.
+  only useful when someone can fix the file. Use a sanitizer such as
+  [enshrined/svg-sanitize](https://github.com/darylldoyle/svg-sanitizer) and re-check its
+  output with SvgValidator.
 - **You put SVG source inline in HTML pages.** That is a different threat model: the page's
   origin and the page's scripts. Sanitize on output with DOMPurify instead.
 
