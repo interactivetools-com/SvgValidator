@@ -30,7 +30,10 @@ done
 # needs no scratch file. It says what the library promises and what it does not
 # check on purpose; without that, the scanner reports the documented boundaries
 # (no MIME check, unencoded detail, files that render as nothing) as findings
-# instead of looking for a file that gets past the rules.
+# instead of looking for a file that gets past the rules. It states the intent (what
+# an accepted file may do in a browser) and asks for the browser behavior behind a
+# gap, not a working demonstration: workers turn attack vocabulary into attack
+# files, and OpenAI's content check refuses those workers mid-scan.
 prompt_file=$(mktemp)
 trap 'rm -f "$prompt_file"' EXIT
 cat > "$prompt_file" <<'PROMPT'
@@ -44,84 +47,60 @@ developer machine and never run in a deployed web application. Assess the
 current checkout for release readiness. Calibrate severity to the evidence;
 not every finding is a release blocker.
 
-Core security promises to verify:
+What the library promises
 
-- An accepted file cannot run script in any browser, whether shown through an
-  <img> tag or opened directly as its own document: no <script>, no attribute
-  whose local name starts with "on" in any namespace, no javascript: or any
-  other scheme in href, no <foreignObject>, no animation that can set a
-  forbidden attribute. Every rule is an allowlist (elements, attributes,
-  namespaces, URL forms, data: image types), so anything unknown is rejected.
-- An accepted file cannot load anything outside itself: href is a same-file
-  reference (#id) or, on image elements, an embedded data: image; CSS may not
-  @import, and url() in CSS may only be #id or an embedded font; no DOCTYPE
-  with an internal subset; no xml-stylesheet instruction; the parser runs with
-  LIBXML_NONET, DTD loading off, and entity substitution off.
-- An accepted file cannot hang a renderer: nesting depth, embedded data: SVG
-  depth (3 levels), reference chains through use, pattern, gradient, filter
-  and feImage elements (expansion capped at 100,000), and libxml2's own limits.
-- Every accepted file is safe by these rules alone, with no response headers.
-  The headers docs/security-model.md recommends are a second layer.
+An accepted file, shown through an <img> tag or opened as its own document,
+stays inside what current Chrome, Firefox and Safari allow an SVG image to
+do: it cannot run script, cannot load anything outside itself, and cannot
+interact with the page or navigate. The same file is safe in a server-side
+rasterizer such as librsvg or resvg. docs/how-browsers-handle-svg.md is the
+reference for what the browsers allow; docs/ai-reference.md lists every rule
+and allowlist and is the specification.
 
-Intended behavior, not findings:
+What to look for
 
-- Violation detail and message are unencoded text copied from the file; the
-  docs say to encode them for the output context. Flag a documentation
-  example that puts them into HTML, JavaScript or a log unencoded; do not
-  flag the library for returning them raw.
-- The library does not check the file name, extension, MIME type or size, and
-  the docs say the upload handler must. Do not report their absence.
-- A file that passes may render as nothing; the check is about safety, not
-  visibility.
-- References made through CSS class selectors are not followed when counting
-  reference expansion; docs/ai-reference.md lists this as a known gap.
-- A small malformed file reports only malformed-xml because libxml2 parses in
-  chunks; documented, not a bypass, because the file is rejected either way.
-- Rejecting more than Chrome's <img> mode would (external links, foreignObject,
-  unknown elements) is by design; over-strictness is not a security finding.
+A file the library accepts that a browser or rasterizer treats differently
+from what the rules assume. The likely places:
 
-Known limitations and finding criteria:
+- An allowed element, attribute, namespace or URL form that a browser can
+  make run script, fetch, or navigate. Name the browser and the behavior.
+- Something libxml2 reads one way and a browser another: namespace
+  handling, name case, xlink:href against href, entities, CDATA, the byte
+  order mark and encoding declaration, control bytes, invalid UTF-8, nested
+  data: SVG, and anything that lets the prolog or root checks see a
+  different document than the browser does.
+- Animation reaching an attribute the rules deny on the element itself.
+- A reference chain or nesting that the expansion counter or the depth
+  limits do not follow, so a browser tab or rasterizer hangs on an accepted
+  file.
 
-- A bypass is a file that this library accepts and that runs script, loads an
-  outside resource, or exhausts a renderer in current Chrome, Firefox or
-  Safari, in <img> or opened directly, or in a server-side rasterizer such as
-  librsvg or resvg. Give the concrete file, which rule should have caught it,
-  and why it did not.
-- Parser differences are the most likely source of a bypass: something
-  libxml2 reads one way and a browser another. Check namespace handling,
-  attribute and element name case, xlink:href against href, entity and CDATA
-  tricks, byte-order marks and encoding declarations, NUL and control bytes,
-  invalid UTF-8, nested data: SVG, and anything that could make the root
-  element or prolog checks see a different document than the browser does.
-- Treat the allowlists in SvgValidator::rules() as the specification. An
-  allowed element, attribute or namespace that can itself run script or fetch
-  in a browser is a finding; name the browser behavior.
-- For resource exhaustion in the library itself, establish how the input
-  controls the work: regular expressions with catastrophic backtracking on
-  attacker-controlled CSS or URLs, reference counting that a crafted file can
-  make quadratic, or memory that grows with input in a path meant to stream.
-  checkString() holds the whole string by definition; that is the caller's
-  choice, not a finding.
+For each, give the rule that should have applied, why it did not, the
+browser behavior with its source (a spec section or a web-platform test),
+and the smallest file that shows the gap with a harmless marker, such as a
+rectangle that renders red when the gap is real. A working demonstration is
+not wanted and not needed.
 
-Use prior findings as leads, not proof against the current checkout. Verify
-the current implementation and consolidate repeated manifestations of one
-root cause. Separate known documented risks, hardening suggestions, and
-confirmed current defects. Documentation is counterevidence, not an
-exemption: report contradictions, unsafe recommended usage, and new attack
-paths with concrete inputs, source-to-sink evidence, prerequisites, and
-validation limits.
+Do not report any of these, not as a finding, a note, or a hardening
+suggestion. They are documented decisions, and time spent on them is
+wasted:
 
-Prioritize, in order:
+- Violation detail and message are copied from the file, always one line of
+  valid UTF-8; the docs say to encode them for the output. The one thing to
+  flag is a documentation example that puts them into HTML or JavaScript
+  unencoded; the library returning them is correct.
+- File name, extension, MIME type and size are not checked; the docs make
+  them the upload handler's job.
+- A file that passes may render as nothing.
+- References made through CSS class selectors are not followed by the
+  expansion counter; a documented gap.
+- Rejecting more than Chrome's <img> mode would (external links,
+  foreignObject, unknown elements) is by design.
+- The library's own time and memory: reading is linear in file size, and
+  what it keeps is capped by documented limits.
 
-1. A file that passes and can run script or load an outside resource in a
-   browser or rasterizer: allowlist gaps, parser differences, encoding
-   tricks, animation reaching a forbidden attribute.
-2. A file that passes and can hang or crash a renderer: reference cycles or
-   expansion the counter misses, nesting the depth limits miss.
-3. Work in the library that is not bounded by the input size: regex
-   backtracking, reference counting, memory growth while streaming.
-4. Documentation examples that put a detail or message into an output
-   context unencoded.
+Use prior findings as leads, not proof. Verify the current implementation,
+consolidate one root cause reported several ways, and calibrate severity to
+what an accepted file can actually do.
 PROMPT
 
 codex-security scan . "${paths[@]}" \
