@@ -42,9 +42,9 @@ always embeds.
 Nothing outside the file may be loaded, and a browser would not load it in `<img>` mode
 anyway, so the text would have fallen back to a default font.
 
-**Fix:** embed the font or convert the text to outlines. Illustrator: "Fonts: SVG" with
-subsetting, or Type → Create Outlines before export. Figma: "Outline Text" on export.
-Inkscape: Path → Object to Path.
+**Fix:** embed the font as a `data:` URL in `@font-face`, or convert the text to outlines.
+Illustrator: "Fonts: Convert to Outlines" in the SVG options, or Type → Create Outlines
+before export. Figma: "Outline Text" on export. Inkscape: Path → Object to Path.
 
 ### "CSS containing url(https://fonts.example.com/roboto.woff2 is not allowed"
 
