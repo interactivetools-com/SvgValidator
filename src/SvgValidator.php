@@ -8,7 +8,7 @@ use LibXMLError;
 use XMLReader;
 
 // import built-ins so calls resolve at compile time instead of per-call lookups; NamespacedCallsTest keeps this list exact
-use function addcslashes, array_key_last, array_keys, array_map, array_pop, array_push, array_values, base64_decode, basename, count, explode, file_get_contents, implode, in_array, is_file, is_readable, libxml_clear_errors, libxml_get_errors, libxml_use_internal_errors, min, number_format, preg_match, preg_match_all, rawurlencode, str_contains, str_starts_with, strcasecmp, stripos, strlen, strpos, strrchr, strspn, strtolower, strval, substr, substr_compare, trim;
+use function addcslashes, array_key_last, array_keys, array_map, array_pop, array_push, array_values, base64_decode, basename, count, explode, file_get_contents, implode, in_array, is_file, is_readable, libxml_clear_errors, libxml_get_errors, libxml_use_internal_errors, ltrim, min, number_format, preg_match, preg_match_all, rawurlencode, str_contains, str_replace, str_starts_with, strcasecmp, stripos, strlen, strpos, strrchr, strspn, strtolower, strval, substr, substr_compare, trim;
 use const LIBXML_NONET, PHP_OS_FAMILY;
 
 /**
@@ -162,8 +162,8 @@ final class SvgValidator
     // (u so the 40 counts characters, not bytes: a cut inside a multibyte character would make detail invalid UTF-8)
     private const CSS_URL_NOT_ALLOWED = '/url\(\s*+["\']?+\s*+(?!#|data:font\/|data:;base64,)[^)]{0,40}/iu';
 
-    // a URL scheme at the start of a value: javascript:, data:, https:
-    private const SCHEME = '/^\s*[a-z][a-z0-9+.\-]*:/i';
+    // a URL at the start of an animation value: a scheme (javascript:, data:, https:) or a protocol-relative //host
+    private const ANIMATION_VALUE_URL = '/^(?:[a-z][a-z0-9+.\-]*:|\/\/)/i';
 
     // Limits. Public so an application with an unusual file can raise one; the memory a hostile file can cost rises with it.
     public static int $prologLimit         = 65536;    // the root tag must start within this many bytes
@@ -806,7 +806,8 @@ final class SvgValidator
         }
         if (in_array($attribute, self::ANIMATION_VALUE_ATTRIBUTES, true)) {
             foreach (explode(';', $value) as $item) {
-                if (preg_match(self::SCHEME, $item)) {
+                $item = ltrim(str_replace(["\t", "\n", "\r"], '', $item));   // browsers drop tab, CR and LF from a URL, so java<TAB>script: is javascript:
+                if (preg_match(self::ANIMATION_VALUE_URL, $item)) {
                     $this->fail('animation-value-not-allowed', $attribute);
                     return;
                 }

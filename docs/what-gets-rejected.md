@@ -389,11 +389,13 @@ animates freely.
 **Fix:** animate a presentation attribute instead, or switch between two elements with
 `visibility`.
 
-### Animation Values With a URL Scheme - `animation-value-not-allowed`
+### Animation Values With a URL - `animation-value-not-allowed`
 
 The `from`, `to`, `by` and `values` attributes may not contain an item that starts with a
-URL scheme (`javascript:`, `data:`, `https:`). Items in `values` are separated by `;`. The
-detail is the attribute name.
+URL scheme (`javascript:`, `data:`, `https:`) or with `//`, which browsers read as a URL on
+the page's own scheme. Tab and newline characters inside an item are ignored, as browsers
+ignore them in a URL, so `java&#x09;script:` still counts. Items in `values` are separated
+by `;`. The detail is the attribute name.
 
 ```xml
 <svg xmlns="http://www.w3.org/2000/svg">

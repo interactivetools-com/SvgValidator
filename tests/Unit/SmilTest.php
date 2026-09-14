@@ -39,6 +39,10 @@ class SmilTest extends SvgValidatorTestCase
             'animate the path data'   => ['<path d="M0 0h10"><animate attributeName="d" to="M0 0h20" dur="1s"/></path>'],
             'time-like value'         => ['<text><animate attributeName="x" values="12:00;13:00" dur="1s"/></text>'],
             'exponent number'         => ['<rect><animate attributeName="width" by="1e3" dur="1s"/></rect>'],
+            'spaces around items'     => ['<rect><animate attributeName="width" values="0 ; 1 ; 2" dur="1s"/></rect>'],
+            'space is not dropped'    => ['<rect><animate attributeName="fill" to="java script:x" dur="1s"/></rect>'],
+            'one leading slash'       => ['<rect><animate attributeName="fill" to="/x" dur="1s"/></rect>'],
+            'literal newline'         => ["<rect><animate attributeName=\"fill\" to=\"java\nscript:x\" dur=\"1s\"/></rect>"],   // XML turns it into a space before anyone sees it
         ];
     }
 
@@ -115,6 +119,10 @@ class SmilTest extends SvgValidatorTestCase
             'by data'                 => ['<rect><animate attributeName="fill" by="data:text/html,x"/></rect>', 'by'],
             'values, later item'      => ['<rect><animate attributeName="fill" values="red; javascript:alert(1)"/></rect>', 'values'],
             'values, last item'       => ['<rect><animate attributeName="fill" values="red;blue;data:x"/></rect>', 'values'],
+            'tab inside the scheme'   => ['<rect><set attributeName="fill" to="java&#x09;script:alert(1)"/></rect>', 'to'],
+            'newline inside, as ref'  => ['<rect><set attributeName="fill" to="java&#x0A;script:alert(1)"/></rect>', 'to'],
+            'protocol-relative'       => ['<rect><animate attributeName="fill" by="//evil.example/x"/></rect>', 'by'],
+            'protocol-relative later' => ['<rect><animate attributeName="fill" values="red; //evil.example/x"/></rect>', 'values'],
         ];
     }
 

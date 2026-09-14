@@ -281,8 +281,12 @@ On `<animate>`, `<set>`, `<animateTransform>` and `<animateMotion>`:
   `style`, `class`, or starts with `on` (case-insensitive). The detail is the name as written.
 - **`from`, `to`, `by`, `values`** reject with `animation-value-not-allowed` when any
   `;`-separated item starts (after whitespace) with a URL scheme, `letter` then letters,
-  digits, `+`, `.` or `-`, then `:`. `values="0;1"` and `to="red"` pass; `to="javascript:x"`
-  and `values="a;https://x"` reject.
+  digits, `+`, `.` or `-`, then `:`, or with `//`, which browsers read as a URL on the
+  page's own scheme. Tab, CR and LF inside an item are ignored first, as browsers ignore
+  them in a URL, so `java&#x09;script:` is `javascript:`. A literal newline never gets
+  that far: XML turns it into a space.
+  `values="0;1"` and `to="red"` pass; `to="javascript:x"`, `values="a;https://x"` and
+  `by="//x"` reject.
 
 `<mpath>` is allowed; its `href` follows the href rule.
 
