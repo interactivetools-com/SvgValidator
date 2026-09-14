@@ -16,11 +16,11 @@ Contents:
 
 Three static methods; the class cannot be instantiated.
 
-| Method                                                                                         | Returns  | Description                                                                                                                                                                         |
-|------------------------------------------------------------------------------------------------|----------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [`SvgValidator::checkFile(string $path)`](getting-started.md#your-first-check---checkfile)     | `Result` | Streams the file at `$path` through every rule. A path that is not a readable file gives a result with one `file-unreadable` error; nothing throws                                  |
-| [`SvgValidator::checkString(string $svg)`](getting-started.md#checking-a-string---checkstring) | `Result` | The same check on SVG source in a string. Same result as `checkFile()` for the same bytes                                                                                           |
-| [`SvgValidator::rules()`](what-gets-through.md)                                                | `array`  | The allowlists, keyed `elements`, `attributes`, `namespacedAttributes` (by namespace URI), `inertNamespaces`, `imageElements`, `dataImageTypes`. Read-only: the lists are constants |
+| Method                                                                                         | Returns  | Description                                                                                                                                                                                                        |
+|------------------------------------------------------------------------------------------------|----------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`SvgValidator::checkFile(string $path)`](getting-started.md#your-first-check---checkfile)     | `Result` | Streams the file at `$path` through every rule. A path that is not a readable file gives a result with one `file-unreadable` error; nothing throws                                                                 |
+| [`SvgValidator::checkString(string $svg)`](getting-started.md#checking-a-string---checkstring) | `Result` | The same check on SVG source in a string. Same result as `checkFile()` for the same bytes                                                                                                                          |
+| [`SvgValidator::rules()`](what-gets-through.md)                                                | `array`  | The allowlists, keyed `elements`, `attributes`, `namespacedAttributes` (by namespace URI), `inertNamespaces`, `inertProcessingInstructions`, `imageElements`, `dataImageTypes`. Read-only: the lists are constants |
 
 Neither check looks at the file name, extension, MIME type or size. Check those at upload
 time; [Security Model](security-model.md#at-upload-time) says what to refuse.

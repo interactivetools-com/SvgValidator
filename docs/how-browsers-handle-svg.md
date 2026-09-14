@@ -101,7 +101,7 @@ work as in a document.
   separate path. Only SVG used as a CSS image gets animation disabled.
 - **One live edge:** an external `<?xml-stylesheet?>` is blocked, but a same-document one
   (`href="#id"`) is still processed and can transform the document. SvgValidator rejects
-  every processing instruction for this reason.
+  every processing instruction for this reason, except Adobe's inert `xpacket` XMP markers.
 
 This behaviour landed in Chrome in June 2014 to match Firefox, which had it first.
 

@@ -158,7 +158,17 @@ class StructureTest extends SvgValidatorTestCase
             'after the xml declaration' => ['<?xml version="1.0"?><?xml-stylesheet href="#s"?>' . $open . '</svg>', 'xml-stylesheet'],
             'inside the document'       => [$open . '<?php echo 1; ?></svg>', 'php'],
             'after the root element'    => [$open . '</svg><?done?>', 'done'],
+            'target case matters'       => ['<?XPACKET begin=""?>' . $open . '</svg>', 'XPACKET'],
         ];
+    }
+
+    /** Adobe's XMP markers, as Illustrator writes them around the file and inside <metadata>. */
+    public function testXmpMarkersAccepted(): void
+    {
+        $begin = '<?xpacket begin="" id="W5M0MpCehiHzreSzNTczkc9d"?>';
+        $end   = '<?xpacket end="w"?>';
+        $this->assertAccepts($begin . $this->svg() . $end);
+        $this->assertAccepts($this->svg("<metadata>$begin<x:xmpmeta xmlns:x=\"adobe:ns:meta/\"/>$end</metadata>"));
     }
 
     //endregion

@@ -123,7 +123,7 @@ class ResultTest extends SvgValidatorTestCase
     public function testRulesLists(): void
     {
         $rules = SvgValidator::rules();
-        $this->assertSame(['elements', 'attributes', 'namespacedAttributes', 'inertNamespaces', 'imageElements', 'dataImageTypes'], array_keys($rules));
+        $this->assertSame(['elements', 'attributes', 'namespacedAttributes', 'inertNamespaces', 'inertProcessingInstructions', 'imageElements', 'dataImageTypes'], array_keys($rules));
         $this->assertContains('svg', $rules['elements']);
         $this->assertNotContains('script', $rules['elements']);
         $this->assertNotContains('foreignObject', $rules['elements']);

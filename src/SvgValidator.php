@@ -131,6 +131,13 @@ final class SvgValidator
         'http://www.w3.org/2001/XMLSchema-instance',
     ];
 
+    /**
+     * Processing instructions browsers ignore, by target. xpacket marks the start and end of
+     * the XMP metadata block Adobe tools write; nothing reads the marker. Every other target
+     * rejects, since xml-stylesheet attaches CSS.
+     */
+    private const INERT_PROCESSING_INSTRUCTIONS = ['xpacket'];
+
     /** The only elements whose href may be an embedded data: image. Every other href must be #id. */
     private const IMAGE_ELEMENTS = ['image', 'feImage'];
 
@@ -214,20 +221,21 @@ final class SvgValidator
 
     /**
      * Returns the allowlists as arrays, keyed by what they list: elements, attributes,
-     * namespacedAttributes, inertNamespaces, imageElements, dataImageTypes. For
-     * documentation and debugging; the rules themselves are not configurable.
+     * namespacedAttributes, inertNamespaces, inertProcessingInstructions, imageElements,
+     * dataImageTypes. For documentation and debugging; the rules themselves are not configurable.
      *
      * @return array<string, array>
      */
     public static function rules(): array
     {
         return [
-            'elements'             => self::ELEMENTS,
-            'attributes'           => self::ATTRIBUTES,
-            'namespacedAttributes' => self::NAMESPACED_ATTRIBUTES,
-            'inertNamespaces'      => self::INERT_NAMESPACES,
-            'imageElements'        => self::IMAGE_ELEMENTS,
-            'dataImageTypes'       => ['png', 'jpeg', 'jpg', 'gif', 'webp', 'svg+xml'],
+            'elements'                    => self::ELEMENTS,
+            'attributes'                  => self::ATTRIBUTES,
+            'namespacedAttributes'        => self::NAMESPACED_ATTRIBUTES,
+            'inertNamespaces'             => self::INERT_NAMESPACES,
+            'inertProcessingInstructions' => self::INERT_PROCESSING_INSTRUCTIONS,
+            'imageElements'               => self::IMAGE_ELEMENTS,
+            'dataImageTypes'              => ['png', 'jpeg', 'jpg', 'gif', 'webp', 'svg+xml'],
         ];
     }
 
@@ -425,7 +433,9 @@ final class SvgValidator
                     }
                     break;
                 case XMLReader::PI:
-                    $this->fail('processing-instruction', $reader->name);
+                    if (!in_array($reader->name, self::INERT_PROCESSING_INSTRUCTIONS, true)) {
+                        $this->fail('processing-instruction', $reader->name);
+                    }
                     break;
             }
         }

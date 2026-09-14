@@ -22,11 +22,10 @@ renderer when the same file is opened directly. It never rewrites the file.
   render more than 100,000 elements are rejected, so is a file with more than 100,000
   distinct id references, and libxml2's depth and size limits apply.
 - **Real files pass.** 3,460 of 3,460 simple-icons and 1,583 of 1,679 resvg test files are
-  accepted (the rest reject by design: external links, entities, reference loops). 145 of
+  accepted (the rest reject by design: external links, entities, reference loops). 146 of
   157 design-tool exports from Wikimedia Commons (Illustrator, Inkscape, Affinity Designer,
   Figma, Sketch, CorelDRAW) are accepted; the rest embed SVG fonts, which no browser
-  renders, or an XMP metadata block. Inkscape, Illustrator, Affinity, Sketch and Visio
-  metadata is on the allowlist.
+  renders. Inkscape, Illustrator, Affinity, Sketch and Visio metadata is on the allowlist.
 - **Streams, never rewrites.** XMLReader reads the file once, at about 100 MB/s with memory
   that does not grow with the file, and returns a list of up to 50 distinct problems.
   Nothing throws for a bad file.

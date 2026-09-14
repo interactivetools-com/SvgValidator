@@ -113,7 +113,9 @@ expands these entities in `<img>` mode, so this rule is stricter than Chrome.
 
 Any `<?target ...?>` in the file. The common one, `<?xml-stylesheet?>`, attaches a
 stylesheet; even a same-file `href="#style"` is a way to run CSS the `<style>` rules never
-saw. The `<?xml ...?>` declaration at the top is not a processing instruction and is fine.
+saw. The `<?xml ...?>` declaration at the top is not a processing instruction and is fine,
+and so is `<?xpacket ...?>`, the pair of markers Adobe tools put around their XMP metadata
+block, which nothing reads (see [What Gets Through](what-gets-through.md#inert-processing-instructions)).
 
 ```xml
 <?xml-stylesheet type="text/css" href="theme.css"?>

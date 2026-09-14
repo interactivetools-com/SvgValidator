@@ -185,8 +185,9 @@ the check, so it is the only error reported.
 - **`malformed-xml`**: the root tag does not start within 64 KB, or libxml2 reports any
   error or warning. Includes an undefined namespace prefix and invalid UTF-8 bytes. libxml2's
   own limits apply: element depth 256, a single text node 10 MB.
-- **`processing-instruction`**: any `<?target ...?>` anywhere, including `<?xml-stylesheet?>`.
-  The `<?xml ...?>` declaration itself is not a processing instruction and is fine.
+- **`processing-instruction`**: any `<?target ...?>` anywhere, including `<?xml-stylesheet?>`,
+  except the targets in `inertProcessingInstructions` (Adobe's `xpacket` XMP markers). The
+  `<?xml ...?>` declaration itself is not a processing instruction and is fine.
 - **`comment-not-allowed`**: a comment whose content starts with `>` or `->` (written
   `<!-->` or `<!--->`). All other comments are fine.
 - **`root-not-svg`**: the root element's local name is not `svg`. Stops the check.
@@ -378,6 +379,16 @@ http://schemas.microsoft.com/visio/2003/SVGExtensions/
 http://www.w3.org/2001/XMLSchema-instance
 ```
 <!-- /rules:inertNamespaces -->
+
+**`inertProcessingInstructions`**: `<?target ...?>` lines that pass, by target. `xpacket`
+is the pair of markers Adobe tools put around their XMP metadata block; nothing reads them.
+Every other target rejects with `processing-instruction`.
+
+<!-- rules:inertProcessingInstructions -->
+```text
+xpacket
+```
+<!-- /rules:inertProcessingInstructions -->
 
 **`imageElements`**: <!-- rules:imageElements -->
 `image`, `feImage`

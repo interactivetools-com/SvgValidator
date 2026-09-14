@@ -20,6 +20,7 @@ Contents:
 - [Attributes](#attributes)
 - [Prefixed Attributes](#prefixed-attributes)
 - [Inert Namespaces](#inert-namespaces)
+- [Inert Processing Instructions](#inert-processing-instructions)
 - [URL Forms](#url-forms)
 - [CSS](#css)
 - [Animation](#animation)
@@ -133,6 +134,24 @@ http://www.w3.org/2001/XMLSchema-instance
 
 Any other namespace is rejected with `namespace-not-allowed`. That includes XHTML, MathML,
 XInclude and XML Events, which is where the historical attacks live.
+
+## Inert Processing Instructions
+
+A processing instruction is a `<?target ...?>` line. Browsers act on one target,
+`xml-stylesheet`, which attaches CSS, so the rule is that processing instructions are
+rejected. Design tools write a few that nothing reads, and those pass, by target:
+
+<!-- rules:inertProcessingInstructions -->
+```text
+xpacket
+```
+<!-- /rules:inertProcessingInstructions -->
+
+`xpacket` is what Illustrator exports look like when they carry metadata:
+`<?xpacket begin="..." id="W5M0MpCehiHzreSzNTczkc9d"?>` before the root element and
+`<?xpacket end="w"?>` after it. The pair marks Adobe's XMP block (title, author, creator
+tool) so any program can find it by scanning bytes, in a JPEG or a PDF as much as in an
+SVG. The block itself sits in `<metadata>` under `adobe:ns:meta/`, an inert namespace.
 
 ## URL Forms
 
