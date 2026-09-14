@@ -94,13 +94,13 @@ different reason: a 100 MB file is checked in a few MB of memory and can pass.
 Files built to hang or exhaust a renderer, and what rejecting each one costs on PHP 8.5.
 None of them adds measurable memory.
 
-| File                                                                              | Size      | Rejected as                     | Time     |
-|-----------------------------------------------------------------------------------|-----------|---------------------------------|----------|
-| Reference bomb: seven layers of ten `<use>` elements, 10 million rectangles       | 1 KB      | `reference-expansion-too-large` | 0.12 ms  |
-| Reference loop: two groups that `<use>` each other                                | 165 bytes | `reference-expansion-too-large` | 0.026 ms |
-| Entity-expansion DOCTYPE (billion laughs): nine entity layers, a gigabyte of text | 583 bytes | `doctype-not-allowed`           | 0.004 ms |
-| 100,000 levels of nesting                                                         | 684 KB    | `malformed-xml`                 | 0.10 ms  |
-| 100,000 violations, one per element                                               | 6.5 MB    | `href-not-allowed`              | 0.18 ms  |
+| File                                                                         | Size      | Rejected as                     | Time     |
+|------------------------------------------------------------------------------|-----------|---------------------------------|----------|
+| Reference bomb: seven layers of ten `<use>` elements, 10 million rectangles  | 1 KB      | `reference-expansion-too-large` | 0.12 ms  |
+| Reference loop: two groups that `<use>` each other                           | 165 bytes | `reference-expansion-too-large` | 0.026 ms |
+| Entity-expansion DOCTYPE (billion laughs): nine entity layers, 30 GB of text | 583 bytes | `doctype-not-allowed`           | 0.004 ms |
+| 100,000 levels of nesting                                                    | 684 KB    | `malformed-xml`                 | 0.10 ms  |
+| 100,000 violations, one per element                                          | 6.5 MB    | `href-not-allowed`              | 0.18 ms  |
 
 Why they are cheap: the expansion check counts the elements under each id and multiplies
 along the references, with the total capped at 100,001, so a bomb is arithmetic on a few

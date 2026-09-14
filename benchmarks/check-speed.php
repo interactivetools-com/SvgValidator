@@ -235,7 +235,7 @@ function hostileFiles(): array
     }
     $bomb .= '</defs><use href="#l6"/></svg>';
 
-    // a billion laughs DOCTYPE: nine entity layers that expand to a gigabyte of text
+    // a billion laughs DOCTYPE: nine entity layers that expand to 30 GB of text
     $laughs = '<?xml version="1.0"?><!DOCTYPE svg [<!ENTITY a "' . str_repeat('lol', 10) . '">';
     for ($layer = 1; $layer <= 9; $layer++) {
         $laughs .= sprintf('<!ENTITY %s "%s">', chr(ord('a') + $layer), str_repeat('&' . chr(ord('a') + $layer - 1) . ';', 10));
