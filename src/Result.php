@@ -21,6 +21,7 @@ namespace Itools\SvgValidator;
  */
 final class Result
 {
+    /** true when $errors is empty */
     public readonly bool $ok;
 
     /** @param Violation[] $errors */

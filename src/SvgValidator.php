@@ -176,6 +176,8 @@ final class SvgValidator
 
     /**
      * Checks an SVG file on disk. Streams it, so memory use does not depend on file size.
+     * A path that is not a readable file gives a result with one file-unreadable error;
+     * nothing throws.
      *
      *     $result = SvgValidator::checkFile('/tmp/php3F.tmp');
      *
@@ -210,7 +212,7 @@ final class SvgValidator
     }
 
     /**
-     * Checks SVG source held in a string.
+     * Checks SVG source held in a string. Same result as checkFile() for the same bytes.
      *
      *     $result = SvgValidator::checkString('<svg xmlns="http://www.w3.org/2000/svg"/>');
      */
