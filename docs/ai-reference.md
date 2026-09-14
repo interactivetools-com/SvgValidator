@@ -255,15 +255,17 @@ three levels deep; a fourth level rejects.
 for `url(` followed by optional whitespace and an optional quote and then anything but `#`
 (case-insensitive). A match rejects with `url-not-fragment` and the attribute name.
 `fill="url(#gradient)"` and `fill="url( '#gradient' )"` pass; `fill="url(image.png)"` and
-`fill="url(https://...)"` reject. A backslash anywhere in the value rejects first, with
-`css-not-allowed` and `\` as the detail: presentation attributes take CSS escapes, so
-`fill="u\72l(...)"` is `url(...)` to a browser. `data-*` and `aria-*` values are not CSS and
-may contain a backslash.
+`fill="url(https://...)"` reject. The nine banned CSS tokens (rule 1 under Rules: CSS below)
+reject in these values too, with `css-not-allowed` and the token as the detail:
+presentation attributes are CSS values, so `fill="u\72l(...)"` is `url(...)` to a browser
+and `mask="image-set('https://...' 1x)"` loads that image. `data-*` and `aria-*` values
+are not CSS and are exempt.
 
 ## Rules: CSS
 
 Applies to the text of every `<style>` element (including CDATA sections and text inside
-child elements) and to every `style` attribute. Two regular expressions, case-insensitive:
+child elements) and to every `style` attribute; rule 1 also runs on every other attribute
+value except `href`, `data-*` and `aria-*`. Two regular expressions, case-insensitive:
 
 1. Any of these tokens rejects with `css-not-allowed` and the token as the detail: a
    backslash `\`, `@import`, `@charset`, `image(`, `image-set(`, `src(`, `expression(`,

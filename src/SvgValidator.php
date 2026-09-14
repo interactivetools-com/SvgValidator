@@ -538,9 +538,10 @@ final class SvgValidator
         } elseif ($attribute === 'style') {
             $this->checkCss($value);
         } else {
-            $takesCssEscapes = !str_starts_with($attribute, 'data-') && !str_starts_with($attribute, 'aria-');
-            if ($takesCssEscapes && str_contains($value, '\\')) {
-                $this->fail('css-not-allowed', '\\');   // presentation attributes are CSS values, so u\72l( reads as url( to a browser
+            // presentation attributes are CSS values: u\72l( reads as url( to a browser, and mask="image-set(...)" loads the image
+            $isCssValue = !str_starts_with($attribute, 'data-') && !str_starts_with($attribute, 'aria-');
+            if ($isCssValue && preg_match(self::CSS_FORBIDDEN, $value, $match)) {
+                $this->fail('css-not-allowed', $match[0]);
             }
             if (preg_match(self::URL_NOT_FRAGMENT, $value)) {
                 $this->fail('url-not-fragment', self::excerpt($name));   // fill="url(https://...)" and friends

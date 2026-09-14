@@ -265,6 +265,30 @@ class UrlsTest extends SvgValidatorTestCase
         $this->assertRejects($bomb, 'css-not-allowed', '\\');
     }
 
+    /** The other banned CSS tokens reject in attributes too: Chrome applies mask="image-set(...)" and fetches the image. */
+    #[DataProvider('cssTokenInAttributeProvider')]
+    public function testCssTokenInAttributeRejected(string $body, string $detail): void
+    {
+        $this->assertRejects($this->svg($body), 'css-not-allowed', $detail);
+    }
+
+    public static function cssTokenInAttributeProvider(): array
+    {
+        return [
+            'image-set() in mask'   => ['<rect mask="image-set(\'https://evil.example/m.png\' 1x)"/>', 'image-set('],
+            'image() in fill'       => ['<rect fill="image(https://evil.example/p.png)"/>', 'image('],
+            'src() in mask'         => ['<rect mask="src(\'https://evil.example/m.png\')"/>', 'src('],
+            'expression()'          => ['<rect width="expression(alert(1))"/>', 'expression('],
+            'behavior'              => ['<rect fill="behavior:url(#x)"/>', 'behavior:'],
+            'in an animation value' => ['<animate attributeName="mask" to="image-set(\'https://evil.example/m.png\' 1x)"/>', 'image-set('],
+        ];
+    }
+
+    public function testCssTokensInDataAndAriaAttributesAccepted(): void
+    {
+        $this->assertAccepts($this->svg('<rect data-src="image-set(x.png 1x)" aria-label="behavior: none"/>'));
+    }
+
     //endregion
     //region Reference Expansion
 

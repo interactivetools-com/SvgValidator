@@ -339,16 +339,18 @@ attribute is checked by the CSS rule below, which reports `css-not-allowed` inst
 `url(#id)`. Chrome silently refuses to load the external one in `<img>` mode; this rule
 rejects instead, so the file renders the same everywhere.
 
-A backslash in any of these attributes rejects with `css-not-allowed` and `\` as the detail,
-the same as in CSS: presentation attributes take CSS escapes, so `fill="u\72l(...)"` is
-`url(...)` to a browser. Only `data-*` and `aria-*` values may contain one.
+The nine banned CSS tokens listed under `css-not-allowed` below reject in any of these
+attributes too, with the token as the detail: presentation attributes are CSS values, so
+`fill="u\72l(...)"` is `url(...)` to a browser and `mask="image-set('https://...' 1x)"`
+loads that image. Only `data-*` and `aria-*` values are exempt.
 
 ## CSS
 
 ### CSS That Loads, Imports or Escapes - `css-not-allowed`
 
 Applies to every `<style>` element and every `style` attribute. Nine tokens reject on
-sight, with the token as the detail: a backslash `\` (CSS escapes, which could spell any of
+sight (in every other attribute value too, except `href`, `data-*` and `aria-*`), with the
+token as the detail: a backslash `\` (CSS escapes, which could spell any of
 the others in a form a scanner would miss), `@import`, `@charset`, `image(`, `image-set(`,
 `src(`, `expression(`, `-moz-binding`, and `behavior:`. And any `url()` rejects unless it
 is a same-file reference (`#id`) or an embedded font (`data:font/...` or `data:;base64,...`).
