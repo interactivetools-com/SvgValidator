@@ -250,7 +250,10 @@ three levels deep; a fourth level rejects.
 for `url(` followed by optional whitespace and an optional quote and then anything but `#`
 (case-insensitive). A match rejects with `url-not-fragment` and the attribute name.
 `fill="url(#gradient)"` and `fill="url( '#gradient' )"` pass; `fill="url(image.png)"` and
-`fill="url(https://...)"` reject.
+`fill="url(https://...)"` reject. A backslash anywhere in the value rejects first, with
+`css-not-allowed` and `\` as the detail: presentation attributes take CSS escapes, so
+`fill="u\72l(...)"` is `url(...)` to a browser. `data-*` and `aria-*` values are not CSS and
+may contain a backslash.
 
 ## Rules: CSS
 

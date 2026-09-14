@@ -234,6 +234,37 @@ class UrlsTest extends SvgValidatorTestCase
         ];
     }
 
+    /** Presentation attributes take CSS escapes, so u\72l( is url( to a browser; any backslash rejects before the url( scan. */
+    #[DataProvider('cssEscapedUrlProvider')]
+    public function testCssEscapedUrlRejected(string $body): void
+    {
+        $this->assertRejects($this->svg($body), 'css-not-allowed', '\\');
+    }
+
+    public static function cssEscapedUrlProvider(): array
+    {
+        return [
+            'u\72l'            => ['<rect fill="u\72l(https://evil.example/p.svg#a)"/>'],
+            'first letter'     => ['<rect clip-path="\75rl(https://evil.example/c.svg#c)"/>'],
+            'six-digit hex'    => ['<rect stroke="\000072l(https://evil.example/p.svg#a)"/>'],
+            'filter'           => ['<rect filter="u\72l(https://evil.example/f.svg#f)"/>'],
+            'mask'             => ['<rect mask="u\72l(https://evil.example/m.svg#m)"/>'],
+            'same-file target' => ['<rect fill="u\72l(#g)"/>'],
+            'font-family'      => ['<text font-family="\5fae\8f6f">x</text>'],
+        ];
+    }
+
+    public function testBackslashInDataAndAriaAttributesAccepted(): void
+    {
+        $this->assertAccepts($this->svg('<rect data-name="C:\Users\dave\logo.ai" aria-label="a\b"/>'));
+    }
+
+    public function testEscapedUrlCannotHideAPatternBomb(): void
+    {
+        $bomb = str_replace('fill="url(#', 'fill="u\72l(#', $this->patternChain(10, 5));
+        $this->assertRejects($bomb, 'css-not-allowed', '\\');
+    }
+
     //endregion
     //region Reference Expansion
 

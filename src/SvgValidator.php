@@ -8,7 +8,7 @@ use LibXMLError;
 use XMLReader;
 
 // import built-ins so calls resolve at compile time instead of per-call lookups; NamespacedCallsTest keeps this list exact
-use function addcslashes, array_key_last, array_keys, array_map, array_pop, array_push, array_values, base64_decode, basename, count, explode, file_get_contents, implode, in_array, is_file, is_readable, libxml_clear_errors, libxml_get_errors, libxml_use_internal_errors, min, number_format, preg_match, preg_match_all, rawurlencode, str_starts_with, strcasecmp, stripos, strlen, strpos, strspn, strtolower, strval, substr, substr_compare, trim;
+use function addcslashes, array_key_last, array_keys, array_map, array_pop, array_push, array_values, base64_decode, basename, count, explode, file_get_contents, implode, in_array, is_file, is_readable, libxml_clear_errors, libxml_get_errors, libxml_use_internal_errors, min, number_format, preg_match, preg_match_all, rawurlencode, str_contains, str_starts_with, strcasecmp, stripos, strlen, strpos, strspn, strtolower, strval, substr, substr_compare, trim;
 use const LIBXML_NONET, PHP_OS_FAMILY;
 
 /**
@@ -519,6 +519,10 @@ final class SvgValidator
         } elseif ($attribute === 'style') {
             $this->checkCss($value);
         } else {
+            $takesCssEscapes = !str_starts_with($attribute, 'data-') && !str_starts_with($attribute, 'aria-');
+            if ($takesCssEscapes && str_contains($value, '\\')) {
+                $this->fail('css-not-allowed', '\\');   // presentation attributes are CSS values, so u\72l( reads as url( to a browser
+            }
             if (preg_match(self::URL_NOT_FRAGMENT, $value)) {
                 $this->fail('url-not-fragment', self::excerpt($name));   // fill="url(https://...)" and friends
             }

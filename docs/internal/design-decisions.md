@@ -239,7 +239,9 @@ from real uploads.
 `<style>` text and `style=` values are checked with two regular expressions. MediaWiki runs a
 real CSS tokenizer. The regex works because the first thing it bans is the backslash: with no
 escape syntax, every CSS token reads exactly as written, and there is no way to spell
-`url(` that a regex sees differently from a browser.
+`url(` that a regex sees differently from a browser. Presentation attributes such as `fill`
+take the same escapes, so the backslash ban covers every attribute value except `data-*`
+and `aria-*`, which no browser reads as CSS. The corpus has no backslash in any of them.
 
 - **Comments are allowed but not stripped.** Their contents are scanned like everything
   else. Stripping them first is unsafe because `content: "/*"` inside a string can fake a
