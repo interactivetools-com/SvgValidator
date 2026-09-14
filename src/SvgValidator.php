@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Itools\SvgValidator;
 
 use Closure;
+use LibXMLError;
 use XMLReader;
 
 // import built-ins so calls resolve at compile time instead of per-call lookups; NamespacedCallsTest keeps this list exact
@@ -236,6 +237,9 @@ final class SvgValidator
     /** @var array<string, Violation> keyed by code and detail, so the same problem reports once */
     private array $errors = [];
 
+    /** the first libxml diagnostic of this parse, saved before a nested parse clears the process-wide buffer */
+    private ?LibXMLError $libxmlError = null;
+
     private function __construct(private readonly int $embedDepth)
     {
     }
@@ -428,7 +432,7 @@ final class SvgValidator
 
         // any libxml diagnostic counts, not only fatal ones: browsers render up to the first error,
         // and a file that parses differently in two parsers is where trouble starts
-        $libxmlError = libxml_get_errors()[0] ?? null;
+        $libxmlError = $this->libxmlError ?? libxml_get_errors()[0] ?? null;
         if ($libxmlError !== null) {
             $this->fail('malformed-xml', trim($libxmlError->message) . " (line $libxmlError->line)");
         }
@@ -745,6 +749,7 @@ final class SvgValidator
             $this->fail('embedded-svg-not-allowed', 'the data: URL is not valid base64');
             return;
         }
+        $this->libxmlError ??= libxml_get_errors()[0] ?? null;   // the inner parse clears the buffer this parse is still filling
         foreach (self::checkEmbedded($svg, $this->embedDepth + 1)->errors as $violation) {
             $this->fail('embedded-svg-not-allowed', $violation->message);
         }

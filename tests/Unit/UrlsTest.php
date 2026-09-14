@@ -171,6 +171,15 @@ class UrlsTest extends SvgValidatorTestCase
         $this->assertStringStartsWith('This is not an SVG file: it starts with \\037\\213', $violation->detail);
     }
 
+    /** libxml keeps one error buffer per process, and the inner parse clears it; the outer file's diagnostic must survive that. */
+    public function testOuterMalformedXmlSurvivesAnEmbeddedSvg(): void
+    {
+        $image = '<image width="1" height="1" href="data:image/svg+xml;base64,' . base64_encode($this->svg()) . '"/>';
+        $this->assertRejects($this->svg("<g/>$image", 'xmlns:a="not a uri"'), 'malformed-xml', "xmlns:a: 'not a uri' is not a valid URI (line 1)");
+        $this->assertRejects($this->svg("$image<g xmlns:a=\"not a uri\"/>"), 'malformed-xml', "xmlns:a: 'not a uri' is not a valid URI (line 1)");
+        $this->assertRejects($this->svg("<g/>$image", 'xml:id="1bad"'), 'malformed-xml', 'xml:id : attribute value 1bad is not an NCName (line 1)');
+    }
+
     public function testEmbeddedSvgWithBrokenBase64(): void
     {
         $this->assertRejects($this->svg('<image href="data:image/svg+xml;base64,!!!"/>'), 'embedded-svg-not-allowed', 'the data: URL is not valid base64');
