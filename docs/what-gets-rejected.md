@@ -432,11 +432,11 @@ path as the detail; more than 100,000 rendered elements rejects with
 so a loop in a `<symbol>` nothing uses is accepted, the same as in a renderer.
 
 The bookkeeping for this check is capped as well, so a file cannot exhaust the check
-instead of the renderer. Each reference is recorded once per element with an `id` around
-it, and the same target inside the same `id` is one record. A file that needs more than
+instead of the renderer. Every `id` is a record, so is every distinct target of an element
+that renders on its own, and each reference is recorded once more per element with an `id`
+around it; the same target inside the same `id` is one record. A file that needs more than
 100,000 records, for example 500 references to different ids inside 250 nested groups that
-all carry an `id`, rejects with
-`point at more than 100,000 distinct ids, counting each once per id it is nested in`.
+all carry an `id`, rejects with `need more than 100,000 records to track (ids and references)`.
 
 ```xml
 <svg xmlns="http://www.w3.org/2000/svg">

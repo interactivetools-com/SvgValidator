@@ -174,7 +174,7 @@ final class SvgValidator
     public static int $maxErrors           = 50;       // distinct errors reported per file
     public static int $maxEmbedDepth       = 3;        // SVG inside SVG inside SVG, then stop
     public static int $maxExpandedElements = 100000;   // elements the references in a file may add up to when expanded
-    public static int $maxReferenceEntries = 100000;   // distinct (id, target) pairs the expansion check may hold; the same target inside the same id is one entry
+    public static int $maxReferenceEntries = 100000;   // ids and (id, target) pairs the expansion check may hold; the same target inside the same id is one entry
     public static int $maxDetailLength     = 60;       // characters of a value quoted in an error message before "..."
 
     //endregion
@@ -576,7 +576,7 @@ final class SvgValidator
     /** depth of the outermost open hidden element */
     private ?int $hiddenDepth = null;
 
-    /** entries in $referencesUnder and $renderedReferences so far */
+    /** ids in $elementsUnder plus entries in $renderedReferences and $referencesUnder so far */
     private int $referenceEntries = 0;
 
     private function noteReferences(XMLReader $reader): void
@@ -590,7 +590,12 @@ final class SvgValidator
         $holders = $this->openIds;   // ids whose content includes this element's references
         $id      = $reader->getAttribute('id');
         if ($id !== null && $id !== '') {
-            $this->elementsUnder[$id] = ($this->elementsUnder[$id] ?? 0) + 1;
+            if (isset($this->elementsUnder[$id])) {
+                $this->elementsUnder[$id]++;
+            } else {
+                $this->elementsUnder[$id] = 1;
+                $this->referenceEntries++;
+            }
             if ($reader->isEmptyElement) {
                 $holders[] = $id;   // no END_ELEMENT will follow, so it never joins openIds
             } else {
@@ -626,7 +631,12 @@ final class SvgValidator
                 return;
             }
             if ($this->hiddenDepth === null) {
-                $this->renderedReferences[$target] = ($this->renderedReferences[$target] ?? 0) + 1;
+                if (isset($this->renderedReferences[$target])) {
+                    $this->renderedReferences[$target]++;
+                } else {
+                    $this->renderedReferences[$target] = 1;
+                    $this->referenceEntries++;
+                }
             }
             foreach ($holders as $holder) {   // runs once per reference per enclosing id, so no helper call here
                 if (isset($this->referencesUnder[$holder][$target])) {
@@ -640,16 +650,16 @@ final class SvgValidator
     }
 
     /**
-     * Every reference is stored once per id it is nested in, so a file could make the check
-     * hold references times nesting depth entries. Past the cap the file is rejected and
-     * nothing more is stored.
+     * Every id is stored, and every reference once per id it is nested in, so a file could
+     * make the check hold references times nesting depth entries. Past the cap the file is
+     * rejected and nothing more is stored.
      */
     private function tooManyReferences(): bool
     {
         if ($this->referenceEntries <= self::$maxReferenceEntries) {
             return false;
         }
-        $this->fail('reference-expansion-too-large', 'point at more than ' . number_format(self::$maxReferenceEntries) . ' distinct ids, counting each once per id it is nested in');
+        $this->fail('reference-expansion-too-large', 'need more than ' . number_format(self::$maxReferenceEntries) . ' records to track (ids and references)');
         return true;
     }
 

@@ -384,8 +384,24 @@ class UrlsTest extends SvgValidatorTestCase
 
     public function testDistinctReferencesInsideNestedIdsAreCapped(): void
     {
-        $this->assertAccepts($this->nestedReferences(100, 999));   // 99,900 entries
-        $this->assertRejects($this->nestedReferences(100, 1001), 'reference-expansion-too-large', 'point at more than 100,000 distinct ids, counting each once per id it is nested in');
+        $this->assertAccepts($this->nestedReferences(100, 980));   // 98,000 pairs + 980 targets + 100 ids
+        $this->assertRejects($this->nestedReferences(100, 990), 'reference-expansion-too-large', 'need more than 100,000 records to track (ids and references)');
+    }
+
+    /** Every id is a record, so a file cannot grow the check's memory with ids alone. */
+    public function testAHundredThousandIdsIsTooMany(): void
+    {
+        $ids = fn(int $count) => implode('', array_map(fn(int $i) => "<g id=\"i$i\"/>", range(1, $count)));
+        $this->assertAccepts($this->svg($ids(100000)));
+        $this->assertRejects($this->svg($ids(100001)), 'reference-expansion-too-large', 'need more than 100,000 records to track (ids and references)');
+    }
+
+    /** Each distinct target of a visible element is a record too, even when nothing defines it. */
+    public function testAHundredThousandDistinctTargetsIsTooMany(): void
+    {
+        $uses = fn(int $count) => implode('', array_map(fn(int $i) => "<use href=\"#t$i\"/>", range(1, $count)));
+        $this->assertAccepts($this->svg($uses(100000)));
+        $this->assertRejects($this->svg($uses(100001)), 'reference-expansion-too-large', 'need more than 100,000 records to track (ids and references)');
     }
 
     /** Every url() on one element is collected, however many attributes carry one. */

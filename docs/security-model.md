@@ -46,8 +46,9 @@ Chrome's protection is render-time only. An accepted file:
   effect (nothing is fetched for one), and no element from a namespace that could load.
 - **Links nowhere.** `<a href>` is a same-file reference or the file is rejected.
 - **Cannot expand.** No DOCTYPE with declarations. Reference loops and chains that would
-  render more than 100,000 elements are rejected, and so is a file with more than 100,000
-  distinct id references, which is the most the check itself will hold in memory.
+  render more than 100,000 elements are rejected, and so is a file that needs more than
+  100,000 records to track (ids and references), which is the most the check itself will
+  hold in memory.
   libxml2's own limits (256 levels of nesting, 10 MB per text node) apply because the
   parser is never told to lift them.
 - **Renders the same in `<img>` and opened directly**, except for `:hover`, `:visited` and

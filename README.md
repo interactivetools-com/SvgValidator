@@ -20,8 +20,8 @@ renderer when the same file is opened directly. It never rewrites the file.
   or on `<image>` an embedded `data:` image, and every CSS `url()` must be `#id` or an
   embedded font: the same rule as Chrome's `<img>` mode.
 - **Renderer bombs are caught.** Reference loops and `<use>` or pattern chains that would
-  render more than 100,000 elements are rejected, and so is a file with more than 100,000
-  distinct id references. libxml2's own limits (256 levels of nesting, 10 MB per text node)
+  render more than 100,000 elements are rejected, and so is a file that needs more than
+  100,000 records to track (ids and references). libxml2's own limits (256 levels of nesting, 10 MB per text node)
   apply too.
 - **Real files pass.** 3,460 of 3,460 simple-icons and 1,583 of 1,679 resvg test files are
   accepted (the rest reject by design: external links, entities, reference loops). 146 of

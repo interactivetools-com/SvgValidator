@@ -4,8 +4,8 @@ Checking a typical icon takes 0.02 ms. Larger files go through at about 100 MB/s
 1 MB illustration takes 10 ms and a 10 MB file 100 ms. Memory does not grow with the file:
 XMLReader streams it, so a 10 MB file adds nothing measurable to the PHP process and a
 50 MB file about 3 MB, where a DOM parser needs 443 MB. The one thing the check keeps per
-file, the id-to-reference records for the expansion check, is capped at 100,000 entries, a
-few MB. Files built to hang a renderer (a reference bomb, an entity-expansion DOCTYPE,
+file, the ids and references for the expansion check, is capped at 100,000 records, a few
+MB. Files built to hang a renderer (a reference bomb, an entity-expansion DOCTYPE,
 100,000 levels of nesting) are rejected in under 0.2 ms each, because the check refuses
 them before anything expands.
 
