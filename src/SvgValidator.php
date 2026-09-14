@@ -7,7 +7,7 @@ use Closure;
 use XMLReader;
 
 // import built-ins so calls resolve at compile time instead of per-call lookups; NamespacedCallsTest keeps this list exact
-use function addcslashes, array_key_last, array_keys, array_map, array_pop, array_values, base64_decode, basename, count, explode, file_get_contents, implode, in_array, is_file, is_readable, libxml_clear_errors, libxml_get_errors, libxml_use_internal_errors, min, number_format, preg_match, preg_match_all, rawurlencode, str_starts_with, strcasecmp, stripos, strlen, strpos, strspn, strtolower, strval, substr, substr_compare, trim;
+use function addcslashes, array_key_last, array_keys, array_map, array_pop, array_push, array_values, base64_decode, basename, count, explode, file_get_contents, implode, in_array, is_file, is_readable, libxml_clear_errors, libxml_get_errors, libxml_use_internal_errors, min, number_format, preg_match, preg_match_all, rawurlencode, str_starts_with, strcasecmp, stripos, strlen, strpos, strspn, strtolower, strval, substr, substr_compare, trim;
 use const LIBXML_NONET, PHP_OS_FAMILY;
 
 /**
@@ -587,7 +587,7 @@ final class SvgValidator
                         $targets[] = substr($value, 1);
                     }
                 } elseif (stripos($value, 'url(') !== false && preg_match_all(self::URL_FRAGMENT, $value, $matches)) {
-                    $targets = [...$targets, ...$matches[1]];   // fill, stroke, marker-*, mask, clip-path, filter, and style=
+                    array_push($targets, ...$matches[1]);   // fill, stroke, marker-*, mask, clip-path, filter, and style=
                 }
             } while ($reader->moveToNextAttribute());
             $reader->moveToElement();

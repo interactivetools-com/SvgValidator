@@ -348,6 +348,15 @@ class UrlsTest extends SvgValidatorTestCase
         $this->assertRejects($this->nestedReferences(100, 1001), 'reference-expansion-too-large', 'point at more than 100,000 distinct ids, counting each once per id it is nested in');
     }
 
+    /** Every url() on one element is collected, however many attributes carry one. */
+    public function testThousandsOfUrlAttributesOnOneElement(): void
+    {
+        $pattern = '<pattern id="p" width="1" height="1">' . str_repeat('<rect width="1" height="1"/>', 50) . '</pattern>';
+        $fills   = fn(int $count) => implode(' ', array_map(fn(int $i) => "data-$i=\"url(#p)\"", range(1, $count)));
+        $this->assertAccepts($this->svg("$pattern<rect {$fills(1900)}/>"));   // 1,900 x 51 = 96,900 elements
+        $this->assertRejects($this->svg("$pattern<rect {$fills(2000)}/>"), 'reference-expansion-too-large', 'expand to more than 100,000 elements');
+    }
+
     /** Numeric ids come back from PHP array keys as ints; the expansion walk must still treat them as ids. */
     public function testNumericIds(): void
     {
