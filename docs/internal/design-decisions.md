@@ -191,6 +191,9 @@ No options in v1. Every install checks the same way, the docs can say exactly wh
 there is no "we turned that check off" support ticket. Add an option when a real caller needs
 one, and record here why.
 
+The size limits are the one exception (2026-09): public static properties such as
+`SvgValidator::$maxExpandedElements`, for the application with an unusual file. The rules
+stay fixed.
 `rules()` exposes the allowlists as arrays for documentation and debugging. It is read-only;
 the lists are constants.
 

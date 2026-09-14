@@ -30,6 +30,9 @@ resource, or hang a renderer. It never rewrites the file.
   renders its target is followed, and a loop or more than 100,000 rendered elements fails
   with `reference-expansion-too-large`. The check's own bookkeeping is capped at 100,000
   records (ids and references), so a file cannot exhaust the check's memory either.
+- **Seven size limits as public static properties** (`SvgValidator::$maxExpandedElements`
+  and the others in [docs/method-reference.md](docs/method-reference.md#limits)), for the
+  application with an unusual file. The rules themselves have no options.
 
 ### Requirements
 

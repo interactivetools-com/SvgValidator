@@ -88,19 +88,26 @@ rule with an example and the fix.
 
 ## Limits
 
-Fixed values, not configurable.
+The SvgValidator limits are public static properties, named in the last column. Set one
+before the check when a real file needs it; the memory a hostile file can cost rises with
+it. The rules themselves cannot be changed.
 
-| Limit                                | Value         | Where it comes from                                    |
-|--------------------------------------|---------------|--------------------------------------------------------|
-| Bytes searched for the root tag      | 64 KB         | SvgValidator; past this, `malformed-xml`               |
-| Errors reported per file             | 50            | SvgValidator; reading stops at the fiftieth            |
-| Embedded SVG nesting                 | 3 levels      | SvgValidator; the fourth level rejects                 |
-| Elements rendered through references | 100,000       | SvgValidator; `reference-expansion-too-large` above it |
-| Ids and references recorded          | 100,000       | SvgValidator; `reference-expansion-too-large` above it |
-| Value length in `detail`             | 60 characters | SvgValidator; longer values end with `...`             |
-| Element nesting depth                | 256           | libxml2 default; deeper is `malformed-xml`             |
-| Single text node                     | 10 MB         | libxml2 default; larger is `malformed-xml`             |
-| File size                            | none          | the file is streamed; cap it at upload time            |
+```php
+SvgValidator::$maxExpandedElements = 250000;
+```
+
+| Limit                                | Value         | Where it comes from                                              |
+|--------------------------------------|---------------|------------------------------------------------------------------|
+| Bytes searched for the root tag      | 64 KB         | `$prologLimit`; past this, `malformed-xml`                       |
+| Errors reported per file             | 50            | `$maxErrors`; reading stops at the cap                           |
+| Embedded SVG nesting                 | 3 levels      | `$maxEmbedDepth`; the next level rejects                         |
+| Elements rendered through references | 100,000       | `$maxExpandedElements`; `reference-expansion-too-large` above it |
+| Ids and references recorded          | 100,000       | `$maxReferenceEntries`; `reference-expansion-too-large` above it |
+| Text in one `<style>` element        | 1 MB          | `$maxStyleLength`; `css-not-allowed` above it                    |
+| Value length in `detail`             | 60 characters | `$maxDetailLength`; longer values end with `...`                 |
+| Element nesting depth                | 256           | libxml2 default; deeper is `malformed-xml`                       |
+| Single text node                     | 10 MB         | libxml2 default; larger is `malformed-xml`                       |
+| File size                            | none          | the file is streamed; cap it at upload time                      |
 
 ---
 

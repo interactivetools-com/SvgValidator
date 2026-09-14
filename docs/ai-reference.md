@@ -36,7 +36,8 @@ bytes or refuses the upload.
 
 Every rule is an allowlist, except CSS, which is scanned for a short list of tokens.
 Elements, attributes, XML namespaces, URL forms and animation targets not on a list are
-rejected. There are no options: every install checks the same way.
+rejected. The rules have no options: every install checks the same way. The size limits
+are public static properties, see [Limits](#limits).
 
 ```php
 use Itools\SvgValidator\SvgValidator;
@@ -416,17 +417,22 @@ xpacket
 
 ## Limits
 
-| Limit                                | Value         | Source                          |
-|--------------------------------------|---------------|---------------------------------|
-| Bytes searched for the root tag      | 64 KB         | SvgValidator                    |
-| Errors reported per file             | 50            | SvgValidator                    |
-| Embedded SVG nesting                 | 3 levels      | SvgValidator                    |
-| Elements rendered through references | 100,000       | SvgValidator                    |
-| Ids and references recorded          | 100,000       | SvgValidator                    |
-| Value length in `detail`             | 60 characters | SvgValidator                    |
-| Element nesting depth                | 256           | libxml2 default                 |
-| Single text node                     | 10 MB         | libxml2 default                 |
-| File size                            | none          | streamed; cap it at upload time |
+The SvgValidator limits are public static properties, set before the check
+(`SvgValidator::$maxExpandedElements = 250000;`). The memory a hostile file can cost rises
+with them. The rules themselves have no options.
+
+| Limit                                | Value         | Source                 |
+|--------------------------------------|---------------|------------------------|
+| Bytes searched for the root tag      | 64 KB         | `$prologLimit`         |
+| Errors reported per file             | 50            | `$maxErrors`           |
+| Embedded SVG nesting                 | 3 levels      | `$maxEmbedDepth`       |
+| Elements rendered through references | 100,000       | `$maxExpandedElements` |
+| Ids and references recorded          | 100,000       | `$maxReferenceEntries` |
+| Text in one `<style>` element        | 1 MB          | `$maxStyleLength`      |
+| Value length in `detail`             | 60 characters | `$maxDetailLength`     |
+| Element nesting depth                | 256           | libxml2 default        |
+| Single text node                     | 10 MB         | libxml2 default        |
+| File size                            | none          | the file is streamed   |
 
 ## How the Rules Compare to Chrome
 
@@ -486,4 +492,5 @@ unknown elements although Chrome would tolerate them.
   `<img>`. Pasting SVG source into an HTML page is a different threat model (the page's
   origin, the page's scripts) and is not what these rules were built for.
 - **Not configurable.** There is no way to allow an extra element or attribute. Open an issue
-  with the file that was rejected.
+  with the file that was rejected. The size limits are the one exception, see
+  [Limits](#limits).
