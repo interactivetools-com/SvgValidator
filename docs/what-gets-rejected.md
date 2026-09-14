@@ -11,7 +11,7 @@ message wording can.
 
 Contents:
 
-- [The File Itself](#the-file-itself) - `file-unreadable`, `not-svg`, `not-utf8`, `malformed-xml`, `doctype-not-allowed`, `processing-instruction`, `comment-not-allowed`
+- [The File Itself](#the-file-itself) - `file-unreadable`, `not-svg`, `not-utf8`, `malformed-xml`, `doctype-not-allowed`, `processing-instruction`, `comment-not-allowed`, `cdata-not-allowed`
 - [The Root Element](#the-root-element) - `root-not-svg`, `root-namespace-wrong`
 - [Elements](#elements) - `element-not-allowed`, `namespace-not-allowed`
 - [Attributes](#attributes) - `event-handler`, `attribute-not-allowed`
@@ -141,6 +141,23 @@ comment is fine.
 ```
 
 **Fix:** put a space or any text after `<!--`.
+
+### CDATA That HTML Would End Early - `cdata-not-allowed`
+
+A `<![CDATA[ ... ]]>` section inside `<title>` or `<desc>` whose text contains `>`. To the
+XML parser the whole section is text. An HTML parser follows HTML rules inside those two
+elements, where `<![CDATA[` is a bogus comment that ends at the first `>`, and what follows
+is live markup. If a file like that is ever served as `text/html`, the "text" runs. CDATA
+anywhere else is fine, and so is `>` written as `&gt;`. The detail is the element name.
+
+```xml
+<svg xmlns="http://www.w3.org/2000/svg">
+  <title><![CDATA[to an HTML parser this is already closed: </title><script>alert(1)</script>]]></title>
+</svg>
+<!-- rejected: cdata-not-allowed, detail "title" -->
+```
+
+**Fix:** write the text without CDATA, with `>` as `&gt;` if it needs one.
 
 ## The Root Element
 

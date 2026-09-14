@@ -148,12 +148,14 @@ class CssTest extends SvgValidatorTestCase
     /**
      * CDATA holding markup is plain text to a browser, and this library never re-serializes
      * a file, so the markup stays text. Sanitizers that rewrite CDATA into a text node have
-     * had breakouts here (CVE-2022-23638); a validator has nothing to break out of.
+     * had breakouts here (CVE-2022-23638); a validator has nothing to break out of. The
+     * exception is <title> and <desc>, where an HTML parser would not honor the CDATA at
+     * all; StructureTest covers that rule.
      */
     public function testMarkupInsideCdataStaysText(): void
     {
         $markup = '<![CDATA[<p/><img src=x onerror=alert(1)>]]>';
-        $this->assertAccepts($this->svg("<title>$markup</title>"));
+        $this->assertAccepts($this->svg("<text>$markup</text>"));
         $this->assertAccepts($this->svg("<style>$markup</style>"));
     }
 

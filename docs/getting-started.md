@@ -128,7 +128,7 @@ back with `sprintf()`. `Violation::TEMPLATES` lists every template by code.
 
 ## What Next
 
-- [What Gets Rejected](what-gets-rejected.md) - each of the 21 codes, with the smallest
+- [What Gets Rejected](what-gets-rejected.md) - each of the 22 codes, with the smallest
   file that triggers it and the fix.
 - [What Gets Through](what-gets-through.md) - the allowlists themselves.
 - [Security Model](security-model.md) - the headers to serve accepted files with. An

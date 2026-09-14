@@ -405,6 +405,8 @@ final class SvgValidator
         $isRoot     = true;
         $styleDepth = null;   // depth of the open <style> while its text is being collected
         $css        = '';
+        $textDepth  = null;   // depth of the open <title> or <desc>, see the CDATA case below
+        $textName   = '';
 
         while (count($this->errors) < self::$maxErrors && $reader->read()) {
             switch ($reader->nodeType) {
@@ -425,6 +427,10 @@ final class SvgValidator
                     if ($styleDepth === null && $reader->localName === 'style' && $reader->namespaceURI === self::SVG_NS && !$reader->isEmptyElement) {
                         $styleDepth = $reader->depth;
                     }
+                    if ($textDepth === null && ($reader->localName === 'title' || $reader->localName === 'desc') && $reader->namespaceURI === self::SVG_NS && !$reader->isEmptyElement) {
+                        $textDepth = $reader->depth;
+                        $textName  = $reader->localName;
+                    }
                     break;
                 case XMLReader::END_ELEMENT:
                     $this->noteEndElementForReferences($reader->depth);
@@ -432,6 +438,9 @@ final class SvgValidator
                         $this->checkCss($css);
                         $styleDepth = null;
                         $css        = '';
+                    }
+                    if ($reader->depth === $textDepth) {
+                        $textDepth = null;
                     }
                     break;
                 case XMLReader::COMMENT:
@@ -441,8 +450,15 @@ final class SvgValidator
                         $this->fail('comment-not-allowed', str_starts_with($reader->value, '>') ? '>' : '->');
                     }
                     break;
-                case XMLReader::TEXT:
                 case XMLReader::CDATA:
+                    // inside <title> and <desc> an HTML parser is back on HTML rules, where <![CDATA[ is a
+                    // bogus comment that ends at the first >, so the rest would be live markup if the file
+                    // were ever served as text/html (<foreignObject>, the third such element, is banned)
+                    if ($textDepth !== null && str_contains($reader->value, '>')) {
+                        $this->fail('cdata-not-allowed', $textName);
+                    }
+                    // no break: CDATA is collected as text below
+                case XMLReader::TEXT:
                 case XMLReader::WHITESPACE:
                 case XMLReader::SIGNIFICANT_WHITESPACE:
                     if ($styleDepth === null) {

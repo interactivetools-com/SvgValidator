@@ -44,7 +44,7 @@ One rule the file broke. Four readonly strings, plus the template table.
 
 | Member                 | Type     | Description                                                                                                                                          |
 |------------------------|----------|------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `$violation->code`     | `string` | One of the 21 codes below. Never renamed once released, so application code can switch on it                                                         |
+| `$violation->code`     | `string` | One of the 22 codes below. Never renamed once released, so application code can switch on it                                                         |
 | `$violation->detail`   | `string` | What was found: an element or attribute name, a namespace, or the first 60 characters of a value (then `...`). Taken from the file, not HTML-encoded; always one line of valid UTF-8, control characters and invalid bytes escaped (`\n`, `\351`) |
 | `$violation->template` | `string` | The English message with one `%s` where the detail goes                                                                                              |
 | `$violation->message`  | `string` | `sprintf($template, $detail)`                                                                                                                        |
@@ -71,6 +71,7 @@ rule with an example and the fix.
 | `doctype-not-allowed`           | `The DOCTYPE declaration is not allowed because %s`                                     |
 | `processing-instruction`        | `Processing instructions like <?%s?> are not allowed`                                   |
 | `comment-not-allowed`           | `A comment starting with <!--%s is not allowed, HTML parsers close it there`            |
+| `cdata-not-allowed`             | `A CDATA section containing > is not allowed inside <%s>, HTML parsers end it there`    |
 | `root-not-svg`                  | `The root element must be <svg>, not <%s>`                                              |
 | `root-namespace-wrong`          | `The root <svg> element must declare xmlns="http://www.w3.org/2000/svg", but it has %s` |
 | `element-not-allowed`           | `<%s> is not allowed in uploaded SVGs`                                                  |

@@ -14,8 +14,8 @@ use ReflectionClass;
  * libxml reports about well-formedness.
  *
  * Codes: file-unreadable, not-svg, not-utf8, doctype-not-allowed,
- * processing-instruction, comment-not-allowed, root-not-svg, root-namespace-wrong,
- * malformed-xml.
+ * processing-instruction, comment-not-allowed, cdata-not-allowed, root-not-svg,
+ * root-namespace-wrong, malformed-xml.
  *
  * libxml's 10 MB text-node limit is not exercised: building the input costs more
  * than it proves. The depth limit is, since 300 nested elements are cheap.
@@ -205,6 +205,50 @@ class StructureTest extends SvgValidatorTestCase
             'empty comment quirk'   => [$open . '<!--> <img src=x onerror=alert(1)> <!--></svg>', '>'],
             'dash quirk'            => [$open . '<!---> <img src=x onerror=alert(1)> <!--></svg>', '->'],
             'before the root'       => ['<!--> <img src=x onerror=alert(1)> --><svg xmlns="http://www.w3.org/2000/svg"/>', '>'],
+        ];
+    }
+
+    //endregion
+    //region CDATA in Title and Desc
+
+    /**
+     * <title> and <desc> switch an HTML parser back to HTML rules, where <![CDATA[ is a bogus
+     * comment that ends at the first >. Everything from there to ]]> would be live markup if
+     * the file were served as text/html. Everywhere else CDATA is honored by both parsers.
+     */
+    #[DataProvider('acceptedCdataProvider')]
+    public function testCdataAccepted(string $body): void
+    {
+        $this->assertAccepts($this->svg($body));
+    }
+
+    public static function acceptedCdataProvider(): array
+    {
+        return [
+            'title without >'          => ['<title><![CDATA[Logo & wordmark]]></title>'],
+            'desc without >'           => ['<desc><![CDATA[a < b]]></desc>'],
+            'title with > as entity'   => ['<title>&lt;/title&gt;&lt;script&gt;alert(1)&lt;/script&gt;</title>'],
+            'style with >'             => ['<style><![CDATA[ .x{content:"</style><script>alert(1)</script>"} ]]></style>'],
+            'text with >'              => ['<text><![CDATA[a > b]]></text>'],
+            'sibling after title'      => ['<title><![CDATA[x]]></title><text><![CDATA[a > b]]></text>'],
+            'empty title element'      => ['<title/><text><![CDATA[a > b]]></text>'],
+        ];
+    }
+
+    #[DataProvider('rejectedCdataProvider')]
+    public function testCdataRejected(string $body, string $detail): void
+    {
+        $this->assertRejects($this->svg($body), 'cdata-not-allowed', $detail);
+    }
+
+    public static function rejectedCdataProvider(): array
+    {
+        return [
+            'title'                    => ['<title><![CDATA[</title><script>alert(1)</script>]]></title>', 'title'],
+            'desc'                     => ['<desc><![CDATA[</desc><script>alert(1)</script>]]></desc>', 'desc'],
+            'bare > is enough'         => ['<title><![CDATA[a > b]]></title>', 'title'],
+            'second CDATA section'     => ['<title><![CDATA[safe]]><![CDATA[</title><script>alert(1)</script>]]></title>', 'title'],
+            'nested title in a group'  => ['<g><g><title><![CDATA[a > b]]></title></g></g>', 'title'],
         ];
     }
 

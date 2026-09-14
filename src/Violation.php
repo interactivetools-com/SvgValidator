@@ -36,6 +36,7 @@ final class Violation
         'doctype-not-allowed'           => 'The DOCTYPE declaration is not allowed because %s',
         'processing-instruction'        => 'Processing instructions like <?%s?> are not allowed',
         'comment-not-allowed'           => 'A comment starting with <!--%s is not allowed, HTML parsers close it there',
+        'cdata-not-allowed'             => 'A CDATA section containing > is not allowed inside <%s>, HTML parsers end it there',
         'root-not-svg'                  => 'The root element must be <svg>, not <%s>',
         'root-namespace-wrong'          => 'The root <svg> element must declare xmlns="http://www.w3.org/2000/svg", but it has %s',
         'element-not-allowed'           => '<%s> is not allowed in uploaded SVGs',

@@ -1,0 +1,4 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10">
+  <title><![CDATA[to an HTML parser the CDATA is a comment that ended at this: </title> so this is live markup: <script>alert(1)</script>]]></title>
+  <rect width="10" height="10"/>
+</svg>

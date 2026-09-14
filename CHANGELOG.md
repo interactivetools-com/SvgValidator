@@ -18,7 +18,7 @@ resource, or hang a renderer. It never rewrites the file.
 - **A `Result` with `ok` and `errors`**, and a `Violation` with `code`, `detail`, `template`
   and `message`. Errors are deduplicated by code and detail and capped at 50.
   `Violation::TEMPLATES` holds every message template for translation.
-- **21 error codes**, one per rule, listed in [docs/what-gets-rejected.md](docs/what-gets-rejected.md).
+- **22 error codes**, one per rule, listed in [docs/what-gets-rejected.md](docs/what-gets-rejected.md).
   Codes are stable from this release on.
 - **Allowlists** for elements, attributes, prefixed attributes, design-tool namespaces, URL
   forms, CSS tokens and animation targets, matched to Chrome's `<img>` mode and stricter

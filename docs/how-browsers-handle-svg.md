@@ -149,6 +149,7 @@ Wherever Chrome neutralizes something instead of refusing it, the rules refuse i
 | DTD entities expand                       | expand                            | `doctype-not-allowed`                 |
 | reference loops broken by the renderer    | hang or crash other renderers     | `reference-expansion-too-large`       |
 | `<!-->` is a comment to the XML parser    | an HTML parser closes it early    | `comment-not-allowed`                 |
+| `<![CDATA[` in `<title>` is text          | an HTML parser ends it at `>`     | `cdata-not-allowed`                   |
 | SVG in `<image>` rendered in secure mode  | rasterizers give it no protection | checked with every rule               |
 
 **Looser than Chrome, or not mirrored.** `:hover`, `:visited` and `:focus` in CSS and

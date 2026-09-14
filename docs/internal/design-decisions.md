@@ -93,6 +93,7 @@ Chrome merely neutralizes something instead of refusing it:
 | DTD entities expand                        | expand                          | `doctype-not-allowed`                      |
 | reference loops broken by the renderer     | hang or crash other renderers   | `reference-expansion-too-large`            |
 | `<!-->` is a comment to the XML parser     | an HTML parser closes it early  | `comment-not-allowed`                      |
+| `<![CDATA[` in `<title>` is text           | an HTML parser ends it at `>`   | `cdata-not-allowed`                        |
 
 And the rules are looser than Chrome, or simply do not mirror it, in a few places where there
 is no attack. These are worth stating plainly in the public docs, since "matches Chrome" is the

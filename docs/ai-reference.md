@@ -154,6 +154,7 @@ Every code, its template, and what `detail` holds. Templates are `Violation::TEM
 | `doctype-not-allowed`           | `The DOCTYPE declaration is not allowed because %s`                                     | `it contains an internal DTD subset (entity declarations)`                                                                                                      |
 | `processing-instruction`        | `Processing instructions like <?%s?> are not allowed`                                   | the instruction's target, such as `xml-stylesheet`                                                                                                              |
 | `comment-not-allowed`           | `A comment starting with <!--%s is not allowed, HTML parsers close it there`            | `>` or `->`                                                                                                                                                     |
+| `cdata-not-allowed`             | `A CDATA section containing > is not allowed inside <%s>, HTML parsers end it there`    | `title` or `desc`                                                                                                                                               |
 | `root-not-svg`                  | `The root element must be <svg>, not <%s>`                                              | the root element's name as written                                                                                                                              |
 | `root-namespace-wrong`          | `The root <svg> element must declare xmlns="http://www.w3.org/2000/svg", but it has %s` | `none` or `xmlns="..."` with the namespace found                                                                                                                |
 | `element-not-allowed`           | `<%s> is not allowed in uploaded SVGs`                                                  | the element's local name, or its name as written when it has no namespace                                                                                       |
@@ -195,6 +196,9 @@ anything found earlier in the file.
   `<?xml ...?>` declaration itself is not a processing instruction and is fine.
 - **`comment-not-allowed`**: a comment whose content starts with `>` or `->` (written
   `<!-->` or `<!--->`). All other comments are fine.
+- **`cdata-not-allowed`**: a `<![CDATA[` section inside `<title>` or `<desc>` whose text
+  contains `>`. HTML parsers use HTML rules inside those two elements and end the CDATA at
+  the first `>`. CDATA anywhere else is fine, and so is `&gt;`. The detail is the element name.
 - **`root-not-svg`**: the root element's local name is not `svg`. Stops the check.
 - **`root-namespace-wrong`**: the root `<svg>` is not in `http://www.w3.org/2000/svg`. A
   prefixed root (`<svg:svg xmlns:svg="...">`) is fine. Stops the check.
