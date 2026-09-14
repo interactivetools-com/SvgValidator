@@ -175,11 +175,12 @@ final class SvgValidator
      */
     public static function checkFile(string $path): Result
     {
-        $head = is_file($path) && is_readable($path) ? file_get_contents($path, false, null, 0, self::PROLOG_LIMIT) : false;
-        if ($head === false) {
+        $firstBytes = is_file($path) && is_readable($path) ? file_get_contents($path, false, null, 0, self::PROLOG_LIMIT) : false;
+        if ($firstBytes === false) {
             return new Result([new Violation('file-unreadable', basename($path))]);
         }
-        return (new self(0))->check($head, fn(XMLReader $reader) => $reader->open(self::fileUri($path), null, LIBXML_NONET));
+        // @ because a failed open is reported in the Result, not as a PHP warning
+        return (new self(0))->check($firstBytes, fn(XMLReader $reader) => @$reader->open(self::fileUri($path), null, LIBXML_NONET), basename($path));
     }
 
     /**
@@ -241,20 +242,25 @@ final class SvgValidator
 
     private static function checkEmbedded(string $svg, int $embedDepth): Result
     {
-        $head = substr($svg, 0, self::PROLOG_LIMIT);
-        return (new self($embedDepth))->check($head, fn(XMLReader $reader) => $reader->XML($svg, null, LIBXML_NONET));
+        return (new self($embedDepth))->check(substr($svg, 0, self::PROLOG_LIMIT), fn(XMLReader $reader) => $reader->XML($svg, null, LIBXML_NONET), '');
     }
 
     /**
-     * Runs the byte-level prolog check, then streams the document. $load points the reader at
-     * the source; it runs only when the prolog gave no reason to stop.
+     * Runs the byte-level prolog check on the first 64 KB, then streams the document. $load
+     * points the reader at the source and runs only when the prolog gave no reason to stop,
+     * so the parser never sees bytes the prolog rejected. When it returns false (a file
+     * deleted or locked since checkFile() found it readable; a string never fails to load)
+     * the result is file-unreadable with $unreadableDetail as the detail.
      */
-    private function check(string $head, Closure $load): Result
+    private function check(string $firstBytes, Closure $load, string $unreadableDetail): Result
     {
-        if ($this->prologAllowsParsing($head)) {
+        if ($this->prologAllowsParsing($firstBytes)) {
             $reader = new XMLReader();
-            $load($reader);
-            $this->walk($reader);
+            if ($load($reader)) {
+                $this->walk($reader);
+            } else {
+                $this->fail('file-unreadable', $unreadableDetail);
+            }
         }
         return new Result(array_values($this->errors));
     }
@@ -273,47 +279,47 @@ final class SvgValidator
      * refused before the parser expands anything it declares. Returns false when the file is
      * not worth parsing.
      */
-    private function prologAllowsParsing(string $head): bool
+    private function prologAllowsParsing(string $firstBytes): bool
     {
-        if (str_starts_with($head, "\xEF\xBB\xBF")) {
-            $head = substr($head, 3);
+        if (str_starts_with($firstBytes, "\xEF\xBB\xBF")) {
+            $firstBytes = substr($firstBytes, 3);
         }
         foreach (["\xFF\xFE", "\xFE\xFF", "<\0", "\0<", "\0\0"] as $utf16or32Start) {
-            if (str_starts_with($head, $utf16or32Start)) {
+            if (str_starts_with($firstBytes, $utf16or32Start)) {
                 $this->fail('not-utf8', 'UTF-16 or UTF-32');
                 return false;
             }
         }
-        if (preg_match('/^<\?xml\s[^>]*?encoding\s*=\s*["\']([^"\']*)["\']/i', $head, $match) && strcasecmp($match[1], 'utf-8') !== 0) {
+        if (preg_match('/^<\?xml\s[^>]*?encoding\s*=\s*["\']([^"\']*)["\']/i', $firstBytes, $match) && strcasecmp($match[1], 'utf-8') !== 0) {
             $this->fail('not-utf8', "declared as $match[1]");
             return false;
         }
 
-        $pos = strspn($head, " \t\r\n");
-        if (substr($head, $pos, 1) !== '<') {
-            $start = addcslashes(substr($head, 0, 20), "\0..\37\177..\377");
-            $this->fail('not-svg', trim($head) === '' ? 'nothing (the file is empty)' : $start);
+        $pos = strspn($firstBytes, " \t\r\n");
+        if (substr($firstBytes, $pos, 1) !== '<') {
+            $start = addcslashes(substr($firstBytes, 0, 20), "\0..\37\177..\377");
+            $this->fail('not-svg', trim($firstBytes) === '' ? 'nothing (the file is empty)' : $start);
             return false;
         }
 
         // walk the prolog: comments, PIs, and the DOCTYPE, until the root tag
-        $length = strlen($head);
+        $length = strlen($firstBytes);
         while ($pos < $length) {
-            $pos += strspn($head, " \t\r\n", $pos);
-            if (substr_compare($head, '<!--', $pos, 4) === 0) {
-                $end = strpos($head, '-->', $pos + 4);
+            $pos += strspn($firstBytes, " \t\r\n", $pos);
+            if (substr_compare($firstBytes, '<!--', $pos, 4) === 0) {
+                $end = strpos($firstBytes, '-->', $pos + 4);
                 if ($end === false) {
                     break;
                 }
                 $pos = $end + 3;
-            } elseif (substr_compare($head, '<?', $pos, 2) === 0) {
-                $end = strpos($head, '?>', $pos + 2);
+            } elseif (substr_compare($firstBytes, '<?', $pos, 2) === 0) {
+                $end = strpos($firstBytes, '?>', $pos + 2);
                 if ($end === false) {
                     break;
                 }
                 $pos = $end + 2;
-            } elseif (substr_compare($head, '<!DOCTYPE', $pos, 9) === 0) {
-                $end = $this->doctypeEnd($head, $pos + 9);
+            } elseif (substr_compare($firstBytes, '<!DOCTYPE', $pos, 9) === 0) {
+                $end = $this->doctypeEnd($firstBytes, $pos + 9);
                 if ($end === null) {
                     $this->fail('doctype-not-allowed', 'it contains an internal DTD subset (entity declarations)');
                     return false;

@@ -6,6 +6,7 @@ namespace Itools\SvgValidator\Tests\Unit;
 use Itools\SvgValidator\SvgValidator;
 use Itools\SvgValidator\Tests\Support\SvgValidatorTestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
+use ReflectionClass;
 
 /**
  * Everything decided before the first element is inspected: reading the file, the
@@ -60,6 +61,21 @@ class StructureTest extends SvgValidatorTestCase
         } finally {
             unlink($path);
         }
+    }
+
+    /**
+     * A file deleted or locked between checkFile()'s readability check and XMLReader::open()
+     * must come back as file-unreadable, not as an Error from reading an empty reader. No
+     * portable way exists to make a real open fail after is_readable() passed, so this calls
+     * the private check() with a loader that reports failure.
+     */
+    public function testOpenFailureReportsFileUnreadable(): void
+    {
+        $class     = new ReflectionClass(SvgValidator::class);
+        $validator = $class->newInstanceWithoutConstructor();
+        $class->getConstructor()->invoke($validator, 0);
+        $result = $class->getMethod('check')->invoke($validator, $this->svg(), fn() => false, 'logo.svg');
+        $this->assertSame('file-unreadable: logo.svg', self::describe($result));
     }
 
     //endregion
