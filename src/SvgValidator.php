@@ -13,8 +13,8 @@ use const LIBXML_NONET, PHP_OS_FAMILY;
 
 /**
  * Checks an uploaded SVG against what browsers allow for SVG in an <img> tag, and rejects
- * anything that could run script or load an outside resource when the same file is opened
- * directly. The file is streamed and never modified.
+ * anything that could run script, load an outside resource, or hang a renderer when the
+ * same file is opened directly. The file is streamed and never modified.
  *
  *     $result = SvgValidator::checkFile($_FILES['logo']['tmp_name']);
  *     if (!$result->ok) {
