@@ -16,16 +16,19 @@ renderer when the same file is opened directly. It never rewrites the file.
 
 - **Scripts cannot get through.** `<script>`, every `on*` attribute, `javascript:` in any
   URL, `<foreignObject>`, and DTD entity declarations are rejected before the file is stored.
-- **Nothing phones home.** Every `href` and every CSS `url()` must be a same-file reference
-  (`#id`) or an embedded `data:` image, the same rule Chrome applies to SVG in an `<img>` tag.
+- **Can't load anything from outside.** Every `href` must be a same-file reference (`#id`),
+  or on `<image>` an embedded `data:` image, and every CSS `url()` must be `#id` or an
+  embedded font: the same rule as Chrome's `<img>` mode.
 - **Renderer bombs are caught.** Reference loops and `<use>` or pattern chains that would
-  render more than 100,000 elements are rejected, so is a file with more than 100,000
-  distinct id references, and libxml2's depth and size limits apply.
+  render more than 100,000 elements are rejected, and so is a file with more than 100,000
+  distinct id references. libxml2's own limits (256 levels of nesting, 10 MB per text node)
+  apply too.
 - **Real files pass.** 3,460 of 3,460 simple-icons and 1,583 of 1,679 resvg test files are
   accepted (the rest reject by design: external links, entities, reference loops). 146 of
   157 design-tool exports from Wikimedia Commons (Illustrator, Inkscape, Affinity Designer,
   Figma, Sketch, CorelDRAW) are accepted; the rest embed SVG fonts, which no browser
-  renders. Inkscape, Illustrator, Affinity, Sketch and Visio metadata is on the allowlist.
+  renders. Inkscape, Illustrator, Affinity Designer, Sketch and Visio metadata is on the
+  allowlist. Counts from the 2026-09-13 tally.
 - **Streams, never rewrites.** XMLReader reads the file once, at about 100 MB/s with memory
   that does not grow with the file, and returns a list of up to 50 distinct problems.
   Nothing throws for a bad file.
