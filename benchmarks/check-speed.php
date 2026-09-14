@@ -78,8 +78,11 @@ if (!$opcacheOn || $xdebugOn) {
 //endregion
 //region Generated Files
 
-$tempDir = sys_get_temp_dir() . '/svgvalidator-bench-' . getmypid();
-mkdir($tempDir);
+$tempDir = sys_get_temp_dir() . '/svgvalidator-bench-' . bin2hex(random_bytes(8));   // a name nobody can create ahead of us
+if (!mkdir($tempDir, 0700)) {
+    fwrite(STDERR, "check-speed.php: could not create $tempDir\n");
+    exit(1);
+}
 
 echo "## Generated files\n\n";
 $headers = ['File', 'Check time', 'Throughput', 'Peak memory added'];
