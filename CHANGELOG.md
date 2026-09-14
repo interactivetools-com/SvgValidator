@@ -28,7 +28,8 @@ resource, or hang a renderer. It never rewrites the file.
   server-side rasterizers.
 - **Reference loops and expansion bombs** are rejected: every same-file reference that
   renders its target is followed, and a loop or more than 100,000 rendered elements fails
-  with `reference-expansion-too-large`.
+  with `reference-expansion-too-large`. The check's own bookkeeping is capped at 100,000
+  distinct id references, so a file cannot exhaust the check's memory either.
 
 ### Requirements
 

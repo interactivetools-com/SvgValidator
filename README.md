@@ -19,7 +19,8 @@ renderer when the same file is opened directly. It never rewrites the file.
 - **Nothing phones home.** Every `href` and every CSS `url()` must be a same-file reference
   (`#id`) or an embedded `data:` image, the same rule Chrome applies to SVG in an `<img>` tag.
 - **Renderer bombs are caught.** Reference loops and `<use>` or pattern chains that would
-  render more than 100,000 elements are rejected, and libxml2's depth and size limits apply.
+  render more than 100,000 elements are rejected, so is a file with more than 100,000
+  distinct id references, and libxml2's depth and size limits apply.
 - **Real files pass.** 3,460 of 3,460 simple-icons and 1,583 of 1,679 resvg test files are
   accepted (the rest reject by design: external links, entities, reference loops). Inkscape,
   Illustrator, Affinity, Sketch and Visio metadata is on the allowlist.

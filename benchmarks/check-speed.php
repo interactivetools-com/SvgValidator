@@ -242,6 +242,16 @@ function hostileFiles(): array
     }
     $laughs .= "]>$open<text>&j;</text></svg>";
 
+    // 500 references to different ids inside 250 nested groups with ids: 125,000 records for the expansion check, from 14 KB
+    $flood = $open;
+    for ($i = 0; $i < 250; $i++) {
+        $flood .= "<g id=\"n$i\">";
+    }
+    for ($i = 0; $i < 500; $i++) {
+        $flood .= "<use href=\"#m$i\"/>";
+    }
+    $flood .= str_repeat('</g>', 250) . '</svg>';
+
     // 100,000 different violations in one file, well past the 50 the check reports
     $violations = $open;
     for ($i = 0; $i < 100000; $i++) {
@@ -252,6 +262,7 @@ function hostileFiles(): array
     return [
         'reference bomb'            => $bomb,
         'reference loop'            => "$open<g id=\"a\"><use href=\"#b\"/></g><g id=\"b\"><use href=\"#a\"/></g><use href=\"#a\"/></svg>",
+        'reference flood'           => $flood,
         'entity-expansion DOCTYPE'  => $laughs,
         '100,000 levels of nesting' => $open . str_repeat('<g>', 100000) . str_repeat('</g>', 100000) . '</svg>',
         '100,000 violations'        => $violations,

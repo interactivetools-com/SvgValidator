@@ -7,7 +7,7 @@ use Closure;
 use XMLReader;
 
 // import built-ins so calls resolve at compile time instead of per-call lookups; NamespacedCallsTest keeps this list exact
-use function addcslashes, array_key_last, array_keys, array_map, array_pop, array_values, base64_decode, basename, count, explode, file_get_contents, implode, in_array, is_file, is_readable, libxml_clear_errors, libxml_get_errors, libxml_use_internal_errors, min, number_format, preg_match, preg_match_all, rawurlencode, str_starts_with, strcasecmp, stripos, strlen, strpos, strspn, strtolower, substr, substr_compare, trim;
+use function addcslashes, array_key_last, array_keys, array_map, array_pop, array_values, base64_decode, basename, count, explode, file_get_contents, implode, in_array, is_file, is_readable, libxml_clear_errors, libxml_get_errors, libxml_use_internal_errors, min, number_format, preg_match, preg_match_all, rawurlencode, str_starts_with, strcasecmp, stripos, strlen, strpos, strspn, strtolower, strval, substr, substr_compare, trim;
 use const LIBXML_NONET, PHP_OS_FAMILY;
 
 /**
@@ -161,6 +161,7 @@ final class SvgValidator
     private const MAX_ERRORS       = 50;       // distinct errors reported per file
     private const MAX_EMBED_DEPTH  = 3;        // SVG inside SVG inside SVG, then stop
     private const MAX_EXPANDED_ELEMENTS = 100000;   // elements the references in a file may add up to when expanded
+    private const MAX_REFERENCE_ENTRIES = 100000;    // distinct (id, target) pairs the expansion check may hold; the same target inside the same id is one entry
 
     //endregion
     //region Public API
@@ -531,17 +532,23 @@ final class SvgValidator
     /** @var array<string, int> elements inside each id, itself included */
     private array $elementsUnder = [];
 
-    /** @var array<string, string[]> ids referenced from inside each id */
+    /** @var array<string, array<string, int>> how many times each id is referenced from inside each id */
     private array $referencesUnder = [];
 
-    /** @var string[] ids referenced by elements that render on their own, outside the hidden elements */
+    /** @var array<string, int> how many times each id is referenced by elements that render on their own, outside the hidden elements */
     private array $renderedReferences = [];
 
     /** depth of the outermost open hidden element */
     private ?int $hiddenDepth = null;
 
+    /** entries in $referencesUnder and $renderedReferences so far */
+    private int $referenceEntries = 0;
+
     private function noteReferences(XMLReader $reader): void
     {
+        if ($this->tooManyReferences()) {
+            return;
+        }
         foreach ($this->openIds as $id) {
             $this->elementsUnder[$id]++;
         }
@@ -580,13 +587,35 @@ final class SvgValidator
             $reader->moveToElement();
         }
         foreach ($targets as $target) {
-            if ($this->hiddenDepth === null) {
-                $this->renderedReferences[] = $target;
+            if ($this->tooManyReferences()) {   // checked per target: one element can carry thousands of url() attributes
+                return;
             }
-            foreach ($holders as $holder) {
-                $this->referencesUnder[$holder][] = $target;
+            if ($this->hiddenDepth === null) {
+                $this->renderedReferences[$target] = ($this->renderedReferences[$target] ?? 0) + 1;
+            }
+            foreach ($holders as $holder) {   // runs once per reference per enclosing id, so no helper call here
+                if (isset($this->referencesUnder[$holder][$target])) {
+                    $this->referencesUnder[$holder][$target]++;
+                } else {
+                    $this->referencesUnder[$holder][$target] = 1;
+                    $this->referenceEntries++;
+                }
             }
         }
+    }
+
+    /**
+     * Every reference is stored once per id it is nested in, so a file could make the check
+     * hold references times nesting depth entries. Past the cap the file is rejected and
+     * nothing more is stored.
+     */
+    private function tooManyReferences(): bool
+    {
+        if ($this->referenceEntries <= self::MAX_REFERENCE_ENTRIES) {
+            return false;
+        }
+        $this->fail('reference-expansion-too-large', 'point at more than ' . number_format(self::MAX_REFERENCE_ENTRIES) . ' distinct ids, counting each once per id it is nested in');
+        return true;
     }
 
     private function noteEndElementForReferences(int $depth): void
@@ -599,12 +628,15 @@ final class SvgValidator
 
     private function checkReferenceExpansion(): void
     {
+        if ($this->tooManyReferences()) {
+            return;   // the graph stopped short, so there is nothing sound to expand
+        }
         $limit   = self::MAX_EXPANDED_ELEMENTS + 1;   // totals are capped here so a bomb cannot overflow an int
         $counted = [];   // id => elements rendered by one reference to it
         $loop    = null;
         $total   = 0;
-        foreach ($this->renderedReferences as $target) {
-            $total = min($total + $this->expandedElements($target, $counted, $limit, $loop), $limit);
+        foreach ($this->renderedReferences as $target => $times) {
+            $total = min($total + $this->expandedElements((string) $target, $counted, $limit, $loop) * $times, $limit);   // a numeric id comes back from the key as an int
         }
         if ($loop !== null) {
             $this->fail('reference-expansion-too-large', "form a loop ($loop)");
@@ -626,23 +658,23 @@ final class SvgValidator
         if (isset($counted[$start])) {
             return $counted[$start];
         }
-        $frames = [[$start, 0, $this->elementsUnder[$start] ?? 0]];   // [id, next target index, total so far]; an undefined id renders nothing
+        $frames = [$this->frame($start)];
         $onPath = [$start => true];
         while ($frames !== []) {
-            $last              = array_key_last($frames);
-            [$id, $next, $sum] = $frames[$last];
-            $targets           = $this->referencesUnder[$id] ?? [];
+            $last                        = array_key_last($frames);
+            [$id, $next, $sum, $targets] = $frames[$last];
             if ($next < count($targets)) {
                 $target = $targets[$next];
+                $times  = $this->referencesUnder[$id][$target];
                 $frames[$last][1]++;
                 if (isset($counted[$target])) {
-                    $frames[$last][2] = min($sum + $counted[$target], $limit);
+                    $frames[$last][2] = min($sum + $counted[$target] * $times, $limit);
                 } elseif (isset($onPath[$target])) {
                     $loop ??= implode(' -> ', array_map(fn(string $step) => "#$step", [...array_keys($onPath), $target]));
                     $frames[$last][2] = $limit;
                 } else {
                     $onPath[$target] = true;
-                    $frames[]        = [$target, 0, $this->elementsUnder[$target] ?? 0];
+                    $frames[]        = $this->frame($target);
                 }
                 continue;
             }
@@ -650,11 +682,23 @@ final class SvgValidator
             unset($onPath[$id]);
             $counted[$id] = $sum;
             if ($frames !== []) {
-                $last = array_key_last($frames);
-                $frames[$last][2] = min($frames[$last][2] + $sum, $limit);
+                $last  = array_key_last($frames);
+                $times = $this->referencesUnder[$frames[$last][0]][$id];
+                $frames[$last][2] = min($frames[$last][2] + $sum * $times, $limit);
             }
         }
         return $counted[$start];
+    }
+
+    /**
+     * A stack frame for expandedElements(): [id, next target index, total so far, targets].
+     * An undefined id renders nothing. A numeric id comes back from the array key as an int.
+     *
+     * @return array{string, int, int, string[]}
+     */
+    private function frame(string $id): array
+    {
+        return [$id, 0, $this->elementsUnder[$id] ?? 0, array_map(strval(...), array_keys($this->referencesUnder[$id] ?? []))];
     }
 
     //endregion

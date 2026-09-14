@@ -160,7 +160,7 @@ Every code, its template, and what `detail` holds. Templates are `Violation::TEM
 | `image-href-not-allowed`        | `Image href must be #id or an embedded PNG, JPEG, GIF, WebP or SVG data: URL, not %s`   | the value, or `(empty)`                                                                                       |
 | `embedded-svg-not-allowed`      | `An embedded SVG image was rejected: %s`                                                | the inner file's message, `the data: URL is not valid base64`, or `SVG images nested more than 3 levels deep` |
 | `url-not-fragment`              | `url() in the %s attribute must reference an element in the same file (#id)`            | the attribute name                                                                                            |
-| `reference-expansion-too-large` | `The references in this file %s`                                                        | `form a loop (#a -> #b -> #a)` or `expand to more than 100,000 elements`                                      |
+| `reference-expansion-too-large` | `The references in this file %s`                                                        | `form a loop (#a -> #b -> #a)`, `expand to more than 100,000 elements`, or `point at more than 100,000 distinct ids, counting each once per id it is nested in` |
 | `css-not-allowed`               | `CSS containing %s is not allowed`                                                      | the banned token as matched, such as `@import`, `\`, or `url(https://example.com/a.css`                       |
 | `animation-target-not-allowed`  | `Animating the %s attribute is not allowed`                                             | the `attributeName` value                                                                                     |
 | `animation-value-not-allowed`   | `The %s animation attribute contains a URL or scheme`                                   | `from`, `to`, `by`, or `values`                                                                               |
@@ -292,6 +292,10 @@ that renders its target is followed: `url(#id)` in any attribute including `styl
   with `reference-expansion-too-large` and `form a loop (#a -> #b -> #a)`.
 - The elements the references would render are counted. More than 100,000 rejects with
   `expand to more than 100,000 elements`. Ten nested patterns of ten rects each is enough.
+- Each reference is recorded once per element with an `id` around it, and the same target
+  inside the same `id` is one record. More than 100,000 records rejects with
+  `point at more than 100,000 distinct ids, counting each once per id it is nested in`, so
+  memory stays at a few MB whatever the file does.
 - Content inside `<defs>`, `<symbol>`, `<pattern>`, `<mask>`, `<marker>`, `<clipPath>` and
   `<filter>` counts only when something references it. A loop inside a `<symbol>` that
   nothing uses is accepted.
@@ -391,6 +395,7 @@ http://www.w3.org/2001/XMLSchema-instance
 | Errors reported per file             | 50            | SvgValidator                    |
 | Embedded SVG nesting                 | 3 levels      | SvgValidator                    |
 | Elements rendered through references | 100,000       | SvgValidator                    |
+| Distinct id references recorded      | 100,000       | SvgValidator                    |
 | Value length in `detail`             | 60 characters | SvgValidator                    |
 | Element nesting depth                | 256           | libxml2 default                 |
 | Single text node                     | 10 MB         | libxml2 default                 |

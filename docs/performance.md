@@ -2,10 +2,11 @@
 
 Checking a typical icon takes 0.02 ms. Larger files go through at about 100 MB/s, so a
 1 MB illustration takes 10 ms and a 10 MB file 100 ms. Memory does not grow with the file:
-XMLReader streams it, and even a 50 MB file adds under 3 MB to the PHP process. Files built
-to hang a renderer (a reference bomb, an entity-expansion DOCTYPE, 100,000 levels of
-nesting) are rejected in under 0.2 ms each, because the check refuses them before anything
-expands.
+XMLReader streams it, and even a 50 MB file adds under 3 MB to the PHP process. The one
+thing the check keeps per file, the id-to-reference records for the expansion check, is
+capped at 100,000 entries, a few MB. Files built to hang a renderer (a reference bomb, an
+entity-expansion DOCTYPE, 100,000 levels of nesting) are rejected in under 0.2 ms each,
+because the check refuses them before anything expands.
 
 All times on this page are in milliseconds (ms), thousandths of a second. For scale,
 response-time research puts the point where people start to notice a delay at about
@@ -86,7 +87,7 @@ The 684 KB on PHP 8.1 is the same for every size: it is libxml2's parser setting
 on first use, not the file. On PHP 8.5 the process's startup peak already covers it. A DOM
 parser needs about nine times the file's size; this check does not, which is why the
 [Security Model](security-model.md#at-upload-time) page says to cap upload size for a
-different reason: a 100 MB file is checked in constant memory and can pass.
+different reason: a 100 MB file is checked in a few MB of memory and can pass.
 
 ## Hostile Files
 

@@ -46,8 +46,10 @@ where Chrome's protection is render-time only. An accepted file:
   effect (nothing is fetched for one), and no element from a namespace that could load.
 - **Links nowhere.** `<a href>` is a same-file reference or the file is rejected.
 - **Cannot expand.** No DOCTYPE with declarations. Reference loops and chains that would
-  render more than 100,000 elements are rejected. libxml2's own limits (256 levels of
-  nesting, 10 MB per text node) apply because the parser is never told to lift them.
+  render more than 100,000 elements are rejected, and so is a file with more than 100,000
+  distinct id references, which is the most the check itself will hold in memory.
+  libxml2's own limits (256 levels of nesting, 10 MB per text node) apply because the
+  parser is never told to lift them.
 - **Renders the same in `<img>` and opened directly**, except for `:hover`, `:visited` and
   `begin="click"`, which Chrome ignores in `<img>` and honours when the file is opened.
   Nothing loads and nothing runs when they fire, so they are accepted.
@@ -66,8 +68,8 @@ Stating the limits plainly is the point of this page.
 - **Anything about the picture.** An accepted file can be blank, enormous in pixels,
   offensive, or a copy of another site's logo. The check is about what the file can do,
   not what it shows.
-- **File size.** The file is streamed, so a 100 MB upload is checked in constant memory and
-  may pass. Cap the size at upload time.
+- **File size.** The file is streamed, so a 100 MB upload is checked in a few MB of memory
+  and may pass. Cap the size at upload time.
 - **The extension and the MIME type.** The check reads the bytes it is given. A `.svgz`
   (gzipped SVG) is rejected as not an SVG file, since it starts with the gzip header rather
   than `<`; an `.html` file is rejected because its root element is not `<svg>`. Refuse

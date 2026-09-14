@@ -419,6 +419,13 @@ path as the detail; more than 100,000 rendered elements rejects with
 `<mask>`, `<marker>`, `<clipPath>` and `<filter>` counts only when something references it,
 so a loop in a `<symbol>` nothing uses is accepted, the same as in a renderer.
 
+The bookkeeping for this check is capped as well, so a file cannot exhaust the check
+instead of the renderer. Each reference is recorded once per element with an `id` around
+it, and the same target inside the same `id` is one record. A file that needs more than
+100,000 records, for example 500 references to different ids inside 250 nested groups that
+all carry an `id`, rejects with
+`point at more than 100,000 distinct ids, counting each once per id it is nested in`.
+
 ```xml
 <svg xmlns="http://www.w3.org/2000/svg">
   <defs>
@@ -430,11 +437,11 @@ so a loop in a `<symbol>` nothing uses is accepted, the same as in a renderer.
 <!-- rejected: reference-expansion-too-large, detail "form a loop (#a -> #b -> #a)" -->
 ```
 
-**Fix:** the detail names the loop; break it. For the count, a real illustration never
-needs a hundred thousand rendered elements through references; flatten the repeated art in
-the design tool. One gap to know about: references made through CSS selectors
-(`.a { fill: url(#p) }` in a `<style>` element) are not followed, because that would need a
-selector engine.
+**Fix:** the detail names the loop; break it. For either count, a real illustration never
+needs a hundred thousand rendered elements or a hundred thousand distinct references;
+flatten the repeated art in the design tool. One gap to know about: references made
+through CSS selectors (`.a { fill: url(#p) }` in a `<style>` element) are not followed,
+because that would need a selector engine.
 
 ## What Is Not Checked
 

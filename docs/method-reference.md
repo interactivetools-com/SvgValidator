@@ -94,6 +94,7 @@ Fixed values, not configurable.
 | Errors reported per file             | 50            | SvgValidator; reading stops at the fiftieth            |
 | Embedded SVG nesting                 | 3 levels      | SvgValidator; the fourth level rejects                 |
 | Elements rendered through references | 100,000       | SvgValidator; `reference-expansion-too-large` above it |
+| Distinct id references recorded      | 100,000       | SvgValidator; `reference-expansion-too-large` above it |
 | Value length in `detail`             | 60 characters | SvgValidator; longer values end with `...`             |
 | Element nesting depth                | 256           | libxml2 default; deeper is `malformed-xml`             |
 | Single text node                     | 10 MB         | libxml2 default; larger is `malformed-xml`             |

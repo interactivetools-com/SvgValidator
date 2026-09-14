@@ -320,6 +320,41 @@ class UrlsTest extends SvgValidatorTestCase
         $this->assertRejects($this->patternChain(10, 5), 'reference-expansion-too-large', 'expand to more than 100,000 elements');
     }
 
+    /** $references <use> elements, each to its own missing id, inside $nestedIds groups that all have an id. */
+    private function nestedReferences(int $nestedIds, int $references, string $target = 'missing'): string
+    {
+        $body = '';
+        for ($i = 0; $i < $nestedIds; $i++) {
+            $body .= "<g id=\"n$i\">";
+        }
+        for ($i = 0; $i < $references; $i++) {
+            $body .= $target === 'missing' ? "<use href=\"#m$i\"/>" : "<use href=\"#$target\"/>";
+        }
+        return $this->svg($body . str_repeat('</g>', $nestedIds));
+    }
+
+    /** The same target inside the same id is one entry, so repeating a reference costs nothing however deep it sits. */
+    public function testRepeatedReferenceInsideNestedIdsStaysSmall(): void
+    {
+        $svg  = $this->nestedReferences(200, 40000, 'dot');
+        $peak = memory_get_peak_usage();
+        $this->assertAccepts($svg);
+        $this->assertLessThan($peak + 16 * 1024 * 1024, memory_get_peak_usage(), 'checking the file added more than 16 MB');
+    }
+
+    public function testDistinctReferencesInsideNestedIdsAreCapped(): void
+    {
+        $this->assertAccepts($this->nestedReferences(100, 999));   // 99,900 entries
+        $this->assertRejects($this->nestedReferences(100, 1001), 'reference-expansion-too-large', 'point at more than 100,000 distinct ids, counting each once per id it is nested in');
+    }
+
+    /** Numeric ids come back from PHP array keys as ints; the expansion walk must still treat them as ids. */
+    public function testNumericIds(): void
+    {
+        $this->assertAccepts($this->svg('<circle id="2" r="1"/><g id="1"><use href="#2"/></g><use href="#1"/>'));
+        $this->assertRejects($this->svg('<g id="1"><use href="#2"/></g><g id="2"><use href="#1"/></g><use href="#1"/>'), 'reference-expansion-too-large', 'form a loop (#2 -> #1 -> #2)');
+    }
+
     #[DataProvider('referenceLoopProvider')]
     public function testReferenceLoop(string $body, string $loop): void
     {
