@@ -279,6 +279,9 @@ final class SvgValidator
 
     private function fail(string $code, string $detail): void
     {
+        if (count($this->errors) >= self::MAX_ERRORS) {
+            return;   // the read loop stops at the cap too, but one element can add several errors before it checks
+        }
         $this->errors["$code\0$detail"] ??= new Violation($code, $detail);
     }
 
@@ -303,7 +306,7 @@ final class SvgValidator
             }
         }
         if (preg_match('/^<\?xml\s[^>]*?encoding\s*=\s*["\']([^"\']*)["\']/i', $firstBytes, $match) && strcasecmp($match[1], 'utf-8') !== 0) {
-            $this->fail('not-utf8', "declared as $match[1]");
+            $this->fail('not-utf8', 'declared as ' . self::excerpt($match[1]));
             return false;
         }
 
@@ -395,11 +398,11 @@ final class SvgValidator
                     if ($isRoot) {
                         $isRoot = false;
                         if ($reader->localName !== 'svg') {
-                            $this->fail('root-not-svg', $reader->name);
+                            $this->fail('root-not-svg', self::excerpt($reader->name));
                             break 2;
                         }
                         if ($reader->namespaceURI !== self::SVG_NS) {   // a hand-written <svg> with no xmlns: browsers show nothing
-                            $this->fail('root-namespace-wrong', $reader->namespaceURI === '' ? 'none' : 'xmlns="' . $reader->namespaceURI . '"');
+                            $this->fail('root-namespace-wrong', $reader->namespaceURI === '' ? 'none' : 'xmlns="' . self::excerpt($reader->namespaceURI) . '"');
                             break 2;
                         }
                     }
@@ -434,7 +437,7 @@ final class SvgValidator
                     break;
                 case XMLReader::PI:
                     if (!in_array($reader->name, self::INERT_PROCESSING_INSTRUCTIONS, true)) {
-                        $this->fail('processing-instruction', $reader->name);
+                        $this->fail('processing-instruction', self::excerpt($reader->name));
                     }
                     break;
             }
@@ -444,7 +447,7 @@ final class SvgValidator
         // and a file that parses differently in two parsers is where trouble starts
         $libxmlError = $this->libxmlError ?? libxml_get_errors()[0] ?? null;
         if ($libxmlError !== null) {
-            $this->fail('malformed-xml', trim($libxmlError->message) . " (line $libxmlError->line)");
+            $this->fail('malformed-xml', self::excerpt(trim($libxmlError->message)) . " (line $libxmlError->line)");
         }
         libxml_clear_errors();
         libxml_use_internal_errors($previousErrorMode);
@@ -463,14 +466,14 @@ final class SvgValidator
 
         if ($namespace === self::SVG_NS) {
             if (!in_array($element, self::ELEMENTS, true)) {
-                $this->fail('element-not-allowed', $element);
+                $this->fail('element-not-allowed', self::excerpt($element));
                 return;   // one error for the element; its attributes are not worth reporting
             }
         } elseif ($namespace === '') {
-            $this->fail('element-not-allowed', $reader->name);   // unbound prefix, or xmlns="" reset
+            $this->fail('element-not-allowed', self::excerpt($reader->name));   // unbound prefix, or xmlns="" reset
             return;
         } elseif (!$inert) {
-            $this->fail('namespace-not-allowed', $namespace);
+            $this->fail('namespace-not-allowed', self::excerpt($namespace));
             return;
         }
 
@@ -494,7 +497,7 @@ final class SvgValidator
             return;
         }
         if (stripos($attribute, 'on') === 0) {
-            $this->fail('event-handler', $name);
+            $this->fail('event-handler', self::excerpt($name));
             return;
         }
         if ($inertElement || self::isInertNamespace($namespace)) {
@@ -505,7 +508,7 @@ final class SvgValidator
             ? in_array($attribute, self::ATTRIBUTES, true) || str_starts_with($attribute, 'data-') || str_starts_with($attribute, 'aria-')
             : in_array($attribute, self::NAMESPACED_ATTRIBUTES[$namespace] ?? [], true);
         if (!$allowed) {
-            $this->fail('attribute-not-allowed', $name);
+            $this->fail('attribute-not-allowed', self::excerpt($name));
             return;
         }
 
@@ -515,7 +518,7 @@ final class SvgValidator
             $this->checkCss($value);
         } else {
             if (preg_match(self::URL_NOT_FRAGMENT, $value)) {
-                $this->fail('url-not-fragment', $name);   // fill="url(https://...)" and friends
+                $this->fail('url-not-fragment', self::excerpt($name));   // fill="url(https://...)" and friends
             }
             if (in_array($element, self::ANIMATION_ELEMENTS, true)) {
                 $this->checkAnimationAttribute($attribute, $value);
@@ -659,7 +662,7 @@ final class SvgValidator
             $total = min($total + $this->expandedElements((string) $target, $counted, $limit, $loop) * $times, $limit);   // a numeric id comes back from the key as an int
         }
         if ($loop !== null) {
-            $this->fail('reference-expansion-too-large', "form a loop ($loop)");
+            $this->fail('reference-expansion-too-large', 'form a loop (' . self::excerpt($loop) . ')');
         } elseif ($total > self::MAX_EXPANDED_ELEMENTS) {
             $this->fail('reference-expansion-too-large', 'expand to more than ' . number_format(self::MAX_EXPANDED_ELEMENTS) . ' elements');
         }
@@ -788,7 +791,7 @@ final class SvgValidator
         if ($attribute === 'attributeName') {
             $target = trim($value);
             if (in_array($target, self::ANIMATION_TARGETS_DENIED, true) || stripos($target, 'on') === 0) {
-                $this->fail('animation-target-not-allowed', $target);
+                $this->fail('animation-target-not-allowed', self::excerpt($target));
             }
             return;
         }

@@ -12,6 +12,8 @@ use Itools\SvgValidator\Violation;
  * The shape of what comes back: Result, Violation and its templates, how the error
  * list is deduplicated, ordered and capped, and what rules() returns.
  */
+use PHPUnit\Framework\Attributes\DataProvider;
+
 class ResultTest extends SvgValidatorTestCase
 {
     //region Result
@@ -80,6 +82,42 @@ class ResultTest extends SvgValidatorTestCase
         $this->assertSame('This is not an SVG file: it starts with a<b>c', $violation->message);
     }
 
+    /** Every detail taken from the file is cut at 60 characters, whichever rule reports it; fixed words around it stay. */
+    #[DataProvider('longDetailProvider')]
+    public function testDetailFromTheFileIsCutAtSixty(string $svg, string $code, string $endsWith): void
+    {
+        $result = SvgValidator::checkString($svg);
+        foreach ($result->errors as $violation) {
+            if ($violation->code === $code) {
+                $this->assertStringNotContainsString(str_repeat('a', 61), $violation->detail, $violation->detail);
+                $this->assertStringEndsWith($endsWith, $violation->detail);
+                return;
+            }
+        }
+        $this->fail("no $code in: " . implode(' | ', array_column($result->errors, 'message')));
+    }
+
+    public static function longDetailProvider(): array
+    {
+        $long = str_repeat('a', 80);
+        $svg  = 'xmlns="http://www.w3.org/2000/svg"';
+        return [
+            'element name'       => ["<svg $svg><$long/></svg>", 'element-not-allowed', '...'],
+            'unbound prefix'     => ["<svg $svg><$long:g/></svg>", 'element-not-allowed', '...'],
+            'namespace URI'      => ["<svg $svg><x:g xmlns:x=\"http://x.example/$long\"/></svg>", 'namespace-not-allowed', '...'],
+            'attribute name'     => ["<svg $svg><rect $long=\"1\"/></svg>", 'attribute-not-allowed', '...'],
+            'event handler'      => ["<svg $svg><rect on$long=\"1\"/></svg>", 'event-handler', '...'],
+            'url() attribute'    => ["<svg $svg><rect data-$long=\"url(https://x.example/)\"/></svg>", 'url-not-fragment', '...'],
+            'animation target'   => ["<svg $svg><set attributeName=\"on$long\"/></svg>", 'animation-target-not-allowed', '...'],
+            'root element'       => ["<$long $svg/>", 'root-not-svg', '...'],
+            'root namespace'     => ["<svg xmlns=\"http://x.example/$long\"/>", 'root-namespace-wrong', '..."'],
+            'processing instr.'  => ["<svg $svg><?$long x?></svg>", 'processing-instruction', '...'],
+            'encoding name'      => ["<?xml version=\"1.0\" encoding=\"$long\"?><svg $svg/>", 'not-utf8', '...'],
+            'libxml message'     => ["<svg $svg xmlns:a=\"not a uri $long\"/>", 'malformed-xml', '... (line 1)'],
+            'reference loop'     => ["<svg $svg><g id=\"$long\"><use href=\"#b$long\"/></g><g id=\"b$long\"><use href=\"#$long\"/></g><use href=\"#$long\"/></svg>", 'reference-expansion-too-large', '...)'],
+        ];
+    }
+
     //endregion
     //region The Error List
 
@@ -106,6 +144,27 @@ class ResultTest extends SvgValidatorTestCase
         $this->assertCount(50, $result->errors);
         $this->assertSame('bad1', $result->errors[0]->detail);
         $this->assertSame('bad50', $result->errors[49]->detail);
+    }
+
+    /** The cap holds however the errors arrive: many on one element, or from inside an embedded SVG. */
+    public function testAtMostFiftyErrorsFromOneElement(): void
+    {
+        $attributes = '';
+        for ($i = 1; $i <= 60; $i++) {
+            $attributes .= " bad$i=\"1\"";
+        }
+        $this->assertCount(50, SvgValidator::checkString($this->svg("<rect$attributes/>"))->errors);
+    }
+
+    public function testAtMostFiftyErrorsWithAnEmbeddedSvg(): void
+    {
+        $inner = $this->svg('<a1/><a2/><a3/><a4/><a5/>');
+        $body  = '';
+        for ($i = 1; $i <= 48; $i++) {
+            $body .= "<bad$i/>";
+        }
+        $body .= '<image href="data:image/svg+xml;base64,' . base64_encode($inner) . '"/>';
+        $this->assertCount(50, SvgValidator::checkString($this->svg($body))->errors);
     }
 
     public function testErrorsAreViolationsWithKnownCodes(): void
