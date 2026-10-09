@@ -17,8 +17,8 @@ safe either way. It never rewrites the file.
 A sanitizer strips what it does not like and hands back a changed file, and a logo that renders
 differently from what the designer exported is a support ticket nobody can explain. A rejection
 with a reason costs a re-export; a cleaned file that still holds something the filter did not
-know about costs an XSS. Every rule here is an allowlist, so anything new is rejected until
-someone adds it.
+know about costs an XSS. Every rule here is an allowlist except the CSS check, so a new
+element or attribute is rejected until someone adds it.
 
 ## Quick Start
 
@@ -114,6 +114,7 @@ Full docs ([browse on GitHub](https://github.com/interactivetools-com/SvgValidat
 
 ## Related Libraries
 
+- [HtmlValidator](https://github.com/interactivetools-com/HtmlValidator) - the same check for HTML from an editor, a form or an import: reject, never rewrite.
 - [ZenDB](https://github.com/interactivetools-com/ZenDB) - injection-proof PHP/MySQL database layer with automatic XSS-safe output.
 - [SmartArray](https://github.com/interactivetools-com/SmartArray) - database rows as chainable collections, with fields that HTML-encode themselves on output.
 - [SmartString](https://github.com/interactivetools-com/SmartString) - PHP strings that HTML-encode themselves on echo, interpolation, and concatenation.
