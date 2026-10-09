@@ -160,8 +160,8 @@ final class SvgValidator
     // quantifiers (*+ ?+) stop the regex from backtracking past the quote to dodge the # lookahead.
     private const URL_NOT_FRAGMENT = '/url\(\s*+["\']?+\s*+(?!#)/i';
 
-    // CSS that can escape, import, or fetch: a backslash (CSS escapes), @import, @charset, and the functions that load URLs
-    private const CSS_FORBIDDEN = '/\\\\|@import|@charset|image\(|image-set\(|src\(|expression\(|-moz-binding|behavior\s*:/i';
+    // CSS that can escape, import, or fetch: a backslash (CSS escapes), @import, and the functions that load URLs
+    private const CSS_FORBIDDEN = '/\\\\|@import|image\(|image-set\(|src\(|expression\(|-moz-binding|behavior\s*:/i';
 
     // url( in CSS that is not #id and not an embedded font (data:font/... or data:;base64,...), with up to 40 chars of context
     // (u so the 40 counts characters, not bytes: a cut inside a multibyte character would make detail invalid UTF-8)

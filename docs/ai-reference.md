@@ -257,7 +257,7 @@ three levels deep; a fourth level rejects.
 for `url(` followed by optional whitespace and an optional quote and then anything but `#`
 (case-insensitive). A match rejects with `url-not-fragment` and the attribute name.
 `fill="url(#gradient)"` and `fill="url( '#gradient' )"` pass; `fill="url(image.png)"` and
-`fill="url(https://...)"` reject. The nine banned CSS tokens (rule 1 under Rules: CSS below)
+`fill="url(https://...)"` reject. The eight banned CSS tokens (rule 1 under Rules: CSS below)
 reject in these values too, with `css-not-allowed` and the token as the detail:
 presentation attributes are CSS values, so `fill="u\72l(...)"` is `url(...)` to a browser
 and `mask="image-set('https://...' 1x)"` loads that image. `data-*` and `aria-*` values
@@ -270,7 +270,7 @@ child elements) and to every `style` attribute; rule 1 also runs on every other 
 value except `href`, `data-*` and `aria-*`. Two regular expressions, case-insensitive:
 
 1. Any of these tokens rejects with `css-not-allowed` and the token as the detail: a
-   backslash `\`, `@import`, `@charset`, `image(`, `image-set(`, `src(`, `expression(`,
+   backslash `\`, `@import`, `image(`, `image-set(`, `src(`, `expression(`,
    `-moz-binding`, `behavior:` (whitespace before the colon allowed).
 2. `url(` whose target, after optional whitespace and quote, does not start with `#`,
    `data:font/`, or `data:;base64,` rejects with the `url(` and up to 40 characters after it

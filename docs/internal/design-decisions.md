@@ -170,6 +170,10 @@ browser reads as CSS. The corpus has no backslash in any of them.
 - The font carve-out applies anywhere in the CSS, not only inside `@font-face`. Finding the
   block would need the tokenizer this decision avoids, and a font data URL outside
   `@font-face` loads nothing.
+- `@charset` is not banned. A browser reads it only at the start of a stylesheet loaded as
+  its own file, and an upload cannot load one, since `@import` and `<?xml-stylesheet?>` are
+  refused. In a `<style>` element or a `style` attribute it is ignored. No current browser
+  decodes UTF-7, the trick it was banned for.
 
 ## `url()` Is Checked in Every Attribute
 
